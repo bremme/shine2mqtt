@@ -43,22 +43,13 @@ CONFIG_REGISTERS = {
         "description": "Modbus Range high",  # 0x06
         "fmt": "s",
     },
-    # 7 = b'X'
+    # 7 is unknown
     8: {
         "name": "datalogger_serial",
         "description": "Datalogger Serial Number",  # 0x08
         "fmt": "s",
     },
-    # 9 = b'XXXX'
-    # 10 = b'0' ?
-    # 11 = b'##192.168.3.35/app/xml/#8081#
-    # 11: {
-    #     "name": "ftp_credentials",
-    #     "description": "FTP credentials",  # 0x0B
-    #     "fmt": "s",
-    # },
-    # 12: {"name": "dns_ip_address", "description": "DNS", "fmt": "s"},  # 0x0C
-    # 13 = b'16' ?
+    # 9-13 are unknown
     14: {"name": "ip_address", "description": "Local IP", "fmt": "s"},  # 0x0E
     15: {"name": "port", "description": "Local Port", "fmt": "s"},  # 0x0F
     16: {"name": "mac_address", "description": "Mac Address", "fmt": "s"},  # 0x10
@@ -78,12 +69,7 @@ CONFIG_REGISTERS = {
     },
     25: {"name": "netmask", "description": "Netmask", "fmt": "s"},  # 0x19
     26: {"name": "gateway_ip_address", "description": "Gateway IP", "fmt": "s"},  # 0x1A
-    # 27 = b'1'
-    # 28 = b'0'
-    # 29 = b'X'
-    # 30 = b'XXXXXXXXXX'
-    # 30: {"name": "timezone", "description": "Timezone", "fmt": "s"},  # 0x1E
-    # 31 = b'2017-07-01 23:59:59'
+    # 27-30 are unknown
     31: {"name": "date", "description": "Date", "fmt": "s"},  # 0x1F
     32: {"name": "reboot", "description": "Reboot", "fmt": "s"},  # ?,  # ??? # 0x20
     56: {"name": "wifi_ssid", "description": "WiFi SSID", "fmt": "s"},  # 0x38
@@ -91,7 +77,7 @@ CONFIG_REGISTERS = {
         "name": "wifi_password",
         "description": "WiFi password",
         "fmt": "s",
-    },  # 0x39
+    },
 }
 
 # TODO
