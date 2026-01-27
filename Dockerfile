@@ -6,9 +6,9 @@ RUN python -m pip install --no-cache-dir uv && \
     useradd -m -u 1000 shine2mqtt && \
     chown -R shine2mqtt:shine2mqtt /app
 
-USER shine2mqtt
+COPY README.md pyproject.toml uv.lock ./
 
-COPY --chown=shine2mqtt:shine2mqtt README.md pyproject.toml uv.lock ./
+USER shine2mqtt
 
 RUN uv sync --frozen --no-dev
 
