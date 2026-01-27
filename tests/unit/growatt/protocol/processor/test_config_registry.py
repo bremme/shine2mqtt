@@ -51,6 +51,7 @@ def test_default_uses_config_registers():
     registry = ConfigRegistry()
     assert registry.has_register(4) is True
     info = registry.get_register_info(4)
+    assert info is not None
     assert info.name == "update_interval"
 
 
