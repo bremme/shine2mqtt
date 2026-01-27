@@ -2,8 +2,18 @@
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml)
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=bugs)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=coverage)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+
 [![Docker Pulls](https://img.shields.io/docker/pulls/bremme/shine2mqtt)](https://hub.docker.com/r/bremme/shine2mqtt)
 [![PyPI version](https://img.shields.io/pypi/v/shine2mqtt)](https://pypi.org/project/shine2mqtt/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
