@@ -1,5 +1,11 @@
 # 🌟 Shine2MQTT
 
+[![CI](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=coverage)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
+[![Docker Pulls](https://img.shields.io/docker/pulls/bremme/shine2mqtt)](https://hub.docker.com/r/bremme/shine2mqtt)
+[![PyPI version](https://img.shields.io/pypi/v/shine2mqtt)](https://pypi.org/project/shine2mqtt/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 > **A local Growatt server which listens to your Shine Wifi-X datalogger and publishes to MQTT** 
 
@@ -77,10 +83,21 @@ Run the container:
 docker compose up
 ```
 
-> See also the [docker-compose.example.yaml](docker-compose.example.yaml) for a more complete example.
+### Option 2: UV (Python Package Manager)
 
+```bash
+# Install UV if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-### Option 2: Python Module
+# Run directly with UV
+uv run shine2mqtt -c config.yaml
+
+# Or install globally
+uv tool install shine2mqtt
+shine2mqtt -c config.yaml
+```
+
+### Option 3: Python Module
 
 ```bash
 # Clone the repository
