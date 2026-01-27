@@ -2,7 +2,8 @@ import asyncio
 
 from loguru import logger
 
-from shine2mqtt.growatt.client.data.generator import DataGenerator
+from shine2mqtt.growatt.client.config import SimulatedClientConfig
+from shine2mqtt.growatt.client.generator import DataGenerator
 from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.frame import FrameDecoder, FrameEncoder
 from shine2mqtt.growatt.protocol.messages import BaseMessage
@@ -14,14 +15,9 @@ class SimulatedClient:
         self,
         encoder: FrameEncoder,
         decoder: FrameDecoder,
-        # config: SimulatedClientConfig,
+        config: SimulatedClientConfig,
     ):
-        self.host = "localhost"
-        # self.port = 5279
-        self.port = 4000
-        self.data_interval = 10
-        self.ping_interval = 10
-
+        self.config = config
         self.encoder = encoder
         self.decoder = decoder
 
@@ -40,8 +36,10 @@ class SimulatedClient:
             await self._close()
 
     async def _connect(self):
-        logger.info(f"Connecting to {self.host}:{self.port}")
-        self.reader, self.writer = await asyncio.open_connection(self.host, self.port)
+        logger.info(f"Connecting to {self.config.server_host}:{self.config.server_port}")
+        self.reader, self.writer = await asyncio.open_connection(
+            self.config.server_host, self.config.server_port
+        )
         self._is_connected = True
         logger.info("Connected to server")
 
@@ -127,15 +125,14 @@ class SimulatedClient:
         """Periodically send DATA messages"""
         while self._is_connected:
             await self._send_data()
-            await asyncio.sleep(self.data_interval)
+            await asyncio.sleep(self.config.data_interval)
 
     async def _send_ping_loop(self):
         """Periodically send PING messages"""
-        await asyncio.sleep(self.ping_interval)  # Initial delay
-
+        await asyncio.sleep(self.config.ping_interval)  # Initial delay
         while self._is_connected:
             await self._send_ping()
-            await asyncio.sleep(self.ping_interval)
+            await asyncio.sleep(self.config.ping_interval)
 
     # ---------- reader ----------
 
@@ -196,8 +193,6 @@ class SimulatedClient:
 
         else:
             logger.warning(f"Unhandled message type: {function_code.name}")
-
-    # ---------- message sending ----------
 
     async def _send_announce(self):
         """Send ANNOUNCE message to server"""

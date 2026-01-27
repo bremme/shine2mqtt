@@ -106,29 +106,7 @@ class TestFrameEncoder:
 
         return FrameFactory.encoder()
 
-    # @pytest.fixture
-    # def decoder(self):
-    #     from shine2mqtt.growatt.protocol.frame import FrameFactory
-
-    #     return FrameFactory.decoder()
-
-    # @pytest.fixture
-    # def captured_ping_data(self):
-    #     """Load captured ping message frames"""
-    #     data = load_captured_frames("ping_message")
-    #     if not data:
-    #         pytest.skip("No captured ping data available")
-    #     return data
-
-    # @pytest.fixture
-    # def captured_data_data(self):
-    #     """Load captured data message frames"""
-    #     data = load_captured_frames("data_message")
-    #     if not data:
-    #         pytest.skip("No captured data message data available")
-    #     return data
-
-    @pytest.mark.parametrize("message,expected_frame", CASES, ids=[i for i in range(len(CASES))])
+    @pytest.mark.parametrize("message,expected_frame", CASES, ids=list(range(len(CASES))))
     def test_encode_valid_message_success(
         self,
         encoder: FrameEncoder,
@@ -138,26 +116,3 @@ class TestFrameEncoder:
         frame = encoder.encode(message)
 
         assert frame == expected_frame
-
-    # def test_encode_captured_ping_messages(self, encoder: FrameEncoder, captured_ping_data):
-    #     """Test encoding with real captured ping messages"""
-    #     frames, headers, payloads = captured_ping_data
-
-    #     for i, (original_frame, header, payload) in enumerate(
-    #         zip(frames, headers, payloads, strict=True)
-    #     ):
-    #         # Create message from captured data
-    #         message = GrowattPingMessage(
-    #             header=MBAPHeader(
-    #                 transaction_id=1,
-    #                 protocol_id=6,
-    #                 length=1,
-    #                 unit_id=1,
-    #                 function_code=FunctionCode.PING,
-    #             ),
-    #             datalogger_serial="XGDABCDEFG",
-    #         )
-
-    #         # Encode and compare
-    #         encoded_frame = encoder.encode(message)
-    #         assert encoded_frame == original_frame

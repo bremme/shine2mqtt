@@ -148,9 +148,7 @@ class TestFrameDecoder:
     def decoder(self):
         return FrameFactory.server_decoder()
 
-    @pytest.mark.parametrize(
-        "frame,header,expected_message", CASES, ids=[i for i in range(len(CASES))]
-    )
+    @pytest.mark.parametrize("frame,header,expected_message", CASES, ids=list(range(len(CASES))))
     def test_decode_valid_frame_success(
         self,
         decoder: FrameDecoder,

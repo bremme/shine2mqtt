@@ -84,9 +84,7 @@ class TestDataRequestDecoder:
     def decoder(self):
         return DataRequestDecoder()
 
-    @pytest.mark.parametrize(
-        "header,payload,expected_message", CASES, ids=[i for i in range(len(CASES))]
-    )
+    @pytest.mark.parametrize("header,payload,expected_message", CASES, ids=list(range(len(CASES))))
     def test_decode_announce_request_valid_header_and_payload_success(
         self,
         decoder: DataRequestDecoder,

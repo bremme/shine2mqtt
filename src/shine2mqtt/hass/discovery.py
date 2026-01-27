@@ -67,8 +67,7 @@ class MqttDiscoveryBuilder:
     def _build_components(self, sensor_map: dict[str, dict], base_sub_topic: str) -> dict[str, Any]:
         components = {}
 
-        for _, sensor_config in sensor_map.items():
-            entity_id = sensor_config["entity_id"]
+        for entity_id, sensor_config in sensor_map.items():
             component = {
                 "platform": "sensor",
                 "name": sensor_config["name"],

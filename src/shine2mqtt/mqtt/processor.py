@@ -17,8 +17,6 @@ from shine2mqtt.mqtt.config import MqttConfig
 from shine2mqtt.mqtt.message import MqttMessage
 
 
-# TODO maybe not the best name
-# it processes inverter/datalogger messages into MQTT messages
 class MqttDataloggerMessageProcessor:
     def __init__(self, discovery: MqttDiscoveryBuilder, config: MqttConfig):
         self._discovery = discovery
@@ -160,8 +158,6 @@ class MqttDataloggerMessageProcessor:
 
     def _build_discovery_messages(self, message: GrowattAnnounceMessage) -> list[MqttMessage]:
         inverter_message = self._build_inverter_discovery_messages(message)
-        # datalogger_message = self._build_datalogger_discovery_messages(message)
-        # return [inverter_message, datalogger_message]
         return [inverter_message]
 
     def _build_inverter_discovery_messages(self, message: GrowattAnnounceMessage) -> MqttMessage:

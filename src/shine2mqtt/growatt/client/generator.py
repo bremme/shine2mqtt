@@ -15,9 +15,6 @@ INVERTER_SERIAL = "MLABC12345"
 
 
 class DataGenerator:
-    def __init__(self):
-        pass
-
     def generate_announce_message(self, transaction_id: int) -> GrowattAnnounceMessage:
         return GrowattAnnounceMessage(
             header=MBAPHeader(

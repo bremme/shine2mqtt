@@ -28,9 +28,7 @@ class TestPingRequestDecoder:
     def decoder(self):
         return PingRequestDecoder()
 
-    @pytest.mark.parametrize(
-        "header,payload,expected_message", CASES, ids=[i for i in range(len(CASES))]
-    )
+    @pytest.mark.parametrize("header,payload,expected_message", CASES, ids=list(range(len(CASES))))
     def test_decode_ping_request_valid_header_and_payload_success(
         self,
         decoder: PingRequestDecoder,

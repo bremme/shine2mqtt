@@ -6,6 +6,9 @@ POWER_AC_ICON = "mdi:solar-power"
 CURRENT_AC_ICON = "mdi:current-ac"
 VOLTAGE_AC_ICON = "mdi:gauge"
 FREQUENCY_AC_ICON = "mdi:sine-wave"
+VERSION_ICON = "mdi:chip"
+IP_ADDRESS_ICON = "mdi:ip-network"
+NETWORK_ICON = "mdi:network"
 
 ENERGY_ICON = "mdi:meter-electric-outline"
 
@@ -224,13 +227,13 @@ ANNOUNCE_MESSAGE_SENSORS = {
         "entity_id": "inverter_fw_version",
         "entity_category": "diagnostic",
         "name": "Inverter firmware version",
-        "icon": "mdi:chip",
+        "icon": VERSION_ICON,
     },
     "inverter_control_fw_version": {
         "entity_id": "inverter_control_fw_version",
         "entity_category": "diagnostic",
         "name": "Inverter control firmware version",
-        "icon": "mdi:chip",
+        "icon": VERSION_ICON,
     },
     # lcd_language
     # device_type
@@ -299,49 +302,49 @@ DATALOGGER_SENSOR_MAP = {
         "entity_id": "ip_address",
         "entity_category": "diagnostic",
         "name": "IP Address",
-        "icon": "mdi:ip-network",
+        "icon": IP_ADDRESS_ICON,
     },
     "mac_address": {
         "entity_id": "mac_address",
         "entity_category": "diagnostic",
         "name": "MAC Address",
-        "icon": "mdi:network",
+        "icon": NETWORK_ICON,
     },
     "server_ip_address": {
         "entity_id": "server_ip_address",
         "entity_category": "diagnostic",
         "name": "Server IP Address",
-        "icon": "mdi:ip-network",
+        "icon": IP_ADDRESS_ICON,
     },
     "server_port": {
         "entity_id": "server_port",
         "entity_category": "diagnostic",
         "name": "Server Port",
-        "icon": "mdi:network",
+        "icon": NETWORK_ICON,
     },
     "datalogger_sw_version": {
         "entity_id": "datalogger_sw_version",
         "entity_category": "diagnostic",
         "name": "Datalogger Software Version",
-        "icon": "mdi:chip",
+        "icon": VERSION_ICON,
     },
     "datalogger_hw_version": {
         "entity_id": "datalogger_hw_version",
         "entity_category": "diagnostic",
         "name": "Datalogger Hardware Version",
-        "icon": "mdi:chip",
+        "icon": VERSION_ICON,
     },
     "netmask": {
         "entity_id": "netmask",
         "entity_category": "diagnostic",
         "name": "Netmask",
-        "icon": "mdi:ip-network",
+        "icon": IP_ADDRESS_ICON,
     },
     "gateway_ip_address": {
         "entity_id": "gateway_ip_address",
         "entity_category": "diagnostic",
         "name": "Gateway IP Address",
-        "icon": "mdi:ip-network",
+        "icon": IP_ADDRESS_ICON,
     },
     "wifi_ssid": {
         "entity_id": "wifi_ssid",
