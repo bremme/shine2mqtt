@@ -3,12 +3,12 @@ name: CI
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_call:
-
-env:
-  PYTHON_VERSION: '3.13'
+    inputs:
+      python-version:
+        required: false
+        default: '3.13'
+        type: string
 
 jobs:
   lint-and-format:
@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ inputs.python-version }}
 
       - name: Install dependencies
         run: uv sync
@@ -48,7 +48,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ inputs.python-version }}
 
       - name: Install dependencies
         run: uv sync
@@ -69,7 +69,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ inputs.python-version }}
 
       - name: Install dependencies
         run: uv sync
