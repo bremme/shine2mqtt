@@ -6,13 +6,13 @@ from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigResponse
 from shine2mqtt.growatt.protocol.messages.data import GrowattBufferedDataMessage, GrowattDataMessage
 from shine2mqtt.growatt.protocol.messages.ping import GrowattPingMessage
 
-DATALOGGER_SERIAL = "XGDABCDEFG"
-INVERTER_SERIAL = "MLG0A12345"
-IP_ADDRESS = "192.168.1.100"
-MAC_ADDRESS = "00:11:22:33:44:55"
-SERVER_IP_ADDRESS = "192.168.1.200"
-WIFI_SSID = "MyWiFiNetwork"
-WIFI_PASSWORD = "MySecretPassword"
+SANE_DATALOGGER_SERIAL = "XGDABCDEFG"
+SANE_INVERTER_SERIAL = "MLG0A12345"
+SANE_IP_ADDRESS = "192.168.1.100"
+SANE_MAC_ADDRESS = "00:11:22:33:44:55"
+SANE_SERVER_IP_ADDRESS = "192.168.1.200"
+SANE_WIFI_SSID = "MyWiFiNetwork"
+SANE_WIFI_PASSWORD = "MySecretPassword"
 
 
 class MessageSanitizer:
@@ -21,19 +21,19 @@ class MessageSanitizer:
             case GrowattAnnounceMessage():
                 return replace(
                     message,
-                    datalogger_serial=DATALOGGER_SERIAL,
-                    inverter_serial=INVERTER_SERIAL,
+                    datalogger_serial=SANE_DATALOGGER_SERIAL,
+                    inverter_serial=SANE_INVERTER_SERIAL,
                 )
             case GrowattBufferedDataMessage() | GrowattDataMessage():
                 return replace(
                     message,
-                    datalogger_serial=DATALOGGER_SERIAL,
-                    inverter_serial=INVERTER_SERIAL,
+                    datalogger_serial=SANE_DATALOGGER_SERIAL,
+                    inverter_serial=SANE_INVERTER_SERIAL,
                 )
             case GrowattPingMessage():
                 return replace(
                     message,
-                    datalogger_serial=DATALOGGER_SERIAL,
+                    datalogger_serial=SANE_DATALOGGER_SERIAL,
                 )
             case GrowattGetConfigResponseMessage():
                 return self._sanitize_get_config_response(message)
@@ -44,11 +44,11 @@ class MessageSanitizer:
         self, message: GrowattGetConfigResponseMessage
     ) -> GrowattGetConfigResponseMessage:
         sanitized_registers = {
-            "ip_address": IP_ADDRESS,
-            "mac_address": MAC_ADDRESS,
-            "server_ip_address": SERVER_IP_ADDRESS,
-            "wifi_ssid": WIFI_SSID,
-            "wifi_password": WIFI_PASSWORD,
+            "ip_address": SANE_IP_ADDRESS,
+            "mac_address": SANE_MAC_ADDRESS,
+            "server_ip_address": SANE_SERVER_IP_ADDRESS,
+            "wifi_ssid": SANE_WIFI_SSID,
+            "wifi_password": SANE_WIFI_PASSWORD,
         }
         if message.name not in sanitized_registers:
             return message
@@ -60,7 +60,7 @@ class MessageSanitizer:
 
         return replace(
             message,
-            datalogger_serial=DATALOGGER_SERIAL,
+            datalogger_serial=SANE_DATALOGGER_SERIAL,
             length=message.length + length_difference,
             data=sanitized_data,
             value=sanitized_value,
