@@ -21,7 +21,7 @@ async def main():
         if args.simulated_client__enabled:
             decoder = FrameFactory.client_decoder()
             logger.info(f"Client decoder registry: {decoder.decoder_registry._decoders}")
-            client = SimulatedClient(FrameFactory.encoder(), decoder)
+            client = SimulatedClient(FrameFactory.encoder(), decoder, config.simulated_client)
             await client.run()
         else:
             app = Application(config=config)
