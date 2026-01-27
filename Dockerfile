@@ -8,13 +8,15 @@ RUN python -m pip install --no-cache-dir uv && \
 
 COPY README.md pyproject.toml uv.lock ./
 
-USER shine2mqtt
+RUN uv sync --frozen --no-dev --no-install-project
+
+COPY src ./src
 
 RUN uv sync --frozen --no-dev
 
-COPY --chown=shine2mqtt:shine2mqtt src ./src
+USER shine2mqtt
 
 EXPOSE 5279
 
-ENTRYPOINT ["uv", "run", "shine2mqtt"]
+ENTRYPOINT ["uv", "run", "--no-sync", "shine2mqtt"]
 CMD []
