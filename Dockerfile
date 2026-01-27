@@ -2,9 +2,8 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-RUN python -m pip install --no-cache-dir uv
-
-RUN useradd -m -u 1000 shine2mqtt && \
+RUN python -m pip install --no-cache-dir uv && \
+    useradd -m -u 1000 shine2mqtt && \
     chown -R shine2mqtt:shine2mqtt /app
 
 USER shine2mqtt
