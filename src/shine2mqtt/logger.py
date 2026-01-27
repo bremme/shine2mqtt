@@ -47,7 +47,7 @@ def setup_logging(log_level: str, color: bool | None = None) -> None:
 
     logger.remove()
     logger.add(
-        sys.stdout,
+        sys.stderr,
         format=log_format,
         level=log_level,
         colorize=color,
