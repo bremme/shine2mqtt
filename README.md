@@ -45,7 +45,6 @@ docker run -d \
     --mqtt-server-port 1883 \
     --mqtt-server-username username \
     --mqtt-server-password password \
-    --mqtt-discovery-enabled true \
     --mqtt-discovery-inverter-model "MIC 3000TL-X" \
     --mqtt-discovery-datalogger-model "Shine WiFi-X"
 ```
@@ -67,7 +66,6 @@ services:
       SHINE2MQTT_MQTT__CLIENT__PORT: "1883"
       SHINE2MQTT_MQTT__CLIENT__USERNAME: "username"
       SHINE2MQTT_MQTT__CLIENT__PASSWORD: "password"
-      SHINE2MQTT_MQTT__DISCOVERY__ENABLED: "true"
       SHINE2MQTT_MQTT__DISCOVERY__INVERTER__MODEL: "MIC 3000TL-X"
       SHINE2MQTT_MQTT__DISCOVERY__DATALOGGER__MODEL: "Shine WiFi-X"
     restart: unless-stopped
@@ -121,6 +119,7 @@ Shine2MQTT can be configured through **CLI arguments**, **environment variables*
 | `mqtt.server.password`    |               | MQTT broker password                               |
 | `mqtt.server.client_id`   | `shine2mqtt`  | MQTT client identifier                             |
 | `mqtt.discovery.enabled`  | `false`       | Enable Home Assistant MQTT discovery               |
+| `mqtt.discovery.prefix_topic` | `homeassistant` | MQTT discovery topic prefix                  |
 | `mqtt.discovery.inverter.model`   |       | Inverter model for Home Assistant                  |
 | `mqtt.discovery.datalogger.model` |       | Datalogger model for Home Assistant                |
 | `server.host`             | `0.0.0.0`     | TCP server host                                    |
@@ -267,7 +266,7 @@ Shine2MQTT publishes the following metrics via MQTT:
 | Datalogger IP Address                   | `solar/datalogger/sensor/ip_address`              | -    |
 | Datalogger MAC Address                  | `solar/datalogger/sensor/mac_address`             | -    |
 | Network Netmask                         | `solar/datalogger/sensor/netmask`                 | -    |
-| Gateway IP Address                      | `solar/datalogger/sensor/gateway_ip_adr`          | -    |
+| Gateway IP Address                      | `solar/datalogger/sensor/gateway_ip_address`          | -    |
 | Server IP Address                       | `solar/datalogger/sensor/server_ip_address`       | -    |
 | Server Port                             | `solar/datalogger/sensor/server_port`             | -    |
 | WiFi Network Name (SSID)                | `solar/datalogger/sensor/wifi_ssid`               | -    |

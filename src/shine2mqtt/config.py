@@ -15,10 +15,12 @@ from shine2mqtt.mqtt.config import MqttConfig
 
 DEFAULT_CONFIG_FILE = PROJECT_ROOT / "config.yaml"
 
+ENV_PREFIX = "SHINE2MQTT_"
+
 
 class ApplicationConfig(BaseSettings):
     log_level: str = logging.getLevelName(logging.INFO)
-    log_color: bool | None = None
+    log_color: bool = True
     config_file: Path | None = None
     capture_data: bool = False
     mqtt: MqttConfig = Field(default_factory=MqttConfig)
@@ -27,7 +29,7 @@ class ApplicationConfig(BaseSettings):
     simulated_client: SimulatedClientConfig = Field(default_factory=SimulatedClientConfig)
 
     model_config = SettingsConfigDict(
-        env_prefix="SHINE2MQTT_",
+        env_prefix=ENV_PREFIX,
         env_nested_delimiter="__",
         env_file=".env",
     )
@@ -56,7 +58,7 @@ class ConfigLoader:
         if cli_args.config_file:
             return cli_args.config_file
 
-        env_config_file = os.environ.get("SHINE2MQTT_CONFIG_FILE")
+        env_config_file = os.environ.get(f"{ENV_PREFIX}CONFIG_FILE")
 
         if env_config_file:
             return Path(env_config_file)
@@ -69,11 +71,10 @@ class ConfigLoader:
     def _convert_cli_args(self, args: Namespace) -> dict:
         """Convert CLI args to nested dict using __ delimiter."""
 
-        skip_keys = ["config_file", "simulate_client"]
-
         cli_config = {}
         for key, value in vars(args).items():
-            if key in skip_keys or value is None:
+            # Remove unset arguments
+            if value is None:
                 continue
 
             # Check if key contains __ for nesting
@@ -102,4 +103,4 @@ class ConfigLoader:
             raise FileNotFoundError(f"Config file {path} does not exist")
 
         with open(path) as f:
-            return yaml.safe_load(f) or {}
+            return yaml.safe_load(f)

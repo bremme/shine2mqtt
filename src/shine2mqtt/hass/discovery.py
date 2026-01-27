@@ -98,6 +98,6 @@ class MqttDiscoveryBuilder:
         return self._build_device_discovery_topic(self._config.datalogger.device_id)
 
     def _build_device_discovery_topic(self, device_id: str) -> str:
-        topic = f"{self._config.prefix}/device/{device_id}/config"
+        topic = f"{self._config.prefix_topic}/device/{device_id}/config"
 
         return topic

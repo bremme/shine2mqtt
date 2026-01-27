@@ -13,12 +13,14 @@ class ArgParser:
             help="Set the logging level (e.g., DEBUG, INFO, WARNING, ERROR)",
             choices=list(logging.getLevelNamesMapping().keys()),
             type=str,
+            dest="log_level",
         )
         self.parser.add_argument(
             "--log-color",
             help="Set the logging level (e.g., DEBUG, INFO, WARNING, ERROR)",
             action="store_true",
             default=None,
+            dest="log_color",
         )
 
         self.parser.add_argument("-c", "--config-file", type=Path)
@@ -27,13 +29,16 @@ class ArgParser:
             "--capture-data",
             help="Enable capturing of decoded frame data",
             action="store_true",
+            default=None,
+            dest="capture_data",
         )
 
         self.parser.add_argument(
             "-s",
             "--simulated-client",
-            action="store_true",
             help="Run simulated TCP client instead of server",
+            action="store_true",
+            default=None,
             dest="simulated_client__enabled",
         )
         self.parser.add_argument(
@@ -52,7 +57,10 @@ class ArgParser:
         self.parser.add_argument("--mqtt-server-password", dest="mqtt__server__password")
 
         self.parser.add_argument(
-            "--mqtt-discovery", action="store_true", dest="mqtt__discovery__enabled"
+            "--mqtt-discovery",
+            action="store_true",
+            default=None,
+            dest="mqtt__discovery__enabled",
         )
         self.parser.add_argument(
             "--mqtt-discovery-inverter-model", dest="mqtt__discovery__inverter__model"
@@ -64,7 +72,7 @@ class ArgParser:
         self.parser.add_argument("--server-host", dest="server__host")
         self.parser.add_argument("--server-port", type=int, dest="server__port")
 
-        self.parser.add_argument("--api", action="store_true", dest="api__enabled")
+        self.parser.add_argument("--api", action="store_true", default=None, dest="api__enabled")
         self.parser.add_argument("--api-host", dest="api__host")
         self.parser.add_argument("--api-port", type=int, dest="api__port")
 

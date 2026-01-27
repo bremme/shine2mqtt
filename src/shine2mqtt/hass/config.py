@@ -24,6 +24,6 @@ class HassDiscoveryConfig(BaseModel):
     enabled: bool = True
     base_topic: str = "solar"
     availability_topic: str = "solar/state"
-    prefix: str = "homeassistant"
+    prefix_topic: str = "homeassistant"
     inverter: DeviceConfig = Field(default_factory=DeviceConfig)
     datalogger: DeviceConfig = Field(default_factory=DeviceConfig)
