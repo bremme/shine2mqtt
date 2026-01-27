@@ -16,11 +16,11 @@
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/bremme/shine2mqtt)](https://hub.docker.com/r/bremme/shine2mqtt)
 [![PyPI version](https://img.shields.io/pypi/v/shine2mqtt)](https://pypi.org/project/shine2mqtt/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-GNU_v3-green.svg)](LICENSE)
 
 > **A local Growatt server which listens to your Shine Wifi-X datalogger and publishes to MQTT** 
 
-Shine2MQTT acts as a local server for your Growatt Shine datalogger, intercepting data that would normally be sent to Growatt's cloud servers. It publishes this data via MQTT in a Home Assistant-friendly format, giving you complete local control of your solar inverter data.
+Shine2MQTT acts as a local server for your Growatt Shine Wifi-X datalogger, intercepting data that would normally be sent to Growatt's cloud servers. It publishes this data via MQTT in a Home Assistant-friendly format, giving you complete local control of your solar inverter data.
 
 ## ✨ Features
 
@@ -39,7 +39,7 @@ Shine2MQTT acts as a local server for your Growatt Shine datalogger, interceptin
 | **Inverter**   | MIC 3000TL-X  |
 
 > 💡 Other Growatt models using the Shine protocol may work but haven't been tested.
-> I'm planning to add some functionality to easily capture raw data from other data loggers, most likely they are easy to integrate.
+> There is some functionality to capture raw data frames for integrating other models. Please open an issue so I can check if its easy to integrate, most likely it is.
 
 ## 📦 Installation
 
@@ -91,6 +91,8 @@ Run the container:
 docker compose up
 ```
 
+> 💡 See [docker-compose.example.yaml](docker-compose.example.yaml) for all available options.
+
 ### Option 2: UV (Python Package Manager)
 
 ```bash
@@ -98,14 +100,15 @@ docker compose up
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Run directly with UV
-uv run shine2mqtt -c config.yaml
+uv run shine2mqtt
 
 # Or install globally
 uv tool install shine2mqtt
-shine2mqtt -c config.yaml
+# And run
+shine2mqtt
 ```
 
-### Option 3: Python Module
+### Option 3: Python Module from src
 
 ```bash
 # Clone the repository
@@ -113,10 +116,10 @@ git clone https://github.com/bremme/shine2mqtt.git
 cd shine2mqtt
 
 # Install dependencies
-uv sync
+uv sync --no-dev
 
 # Run the application
-uv run shine2mqtt -c config.yaml
+uv run shine2mqtt
 ```
 
 ## ⚙️ Configuration
@@ -195,7 +198,7 @@ Point your Shine datalogger to the IP address where Shine2MQTT is running:
 2. Access your datalogger's web interface (usually at `http://192.168.10.100`)
 3. Login using default credentials (typically admin and 12345678)
 4. Navigate to **Advanced Settings** > **Server IP**
-5. Change the server IP to your Shine2MQTT host
+5. Change the server IP to your Shine2MQTT host address
 6. Set the port to `5279` (default)
 7. Save and reboot the datalogger
 
@@ -207,12 +210,16 @@ Check the logs to confirm the datalogger is connecting:
 # Docker
 docker logs -f shine2mqtt
 
+# Docker compose  (if running detached)
+docker compose logs -f shine2mqtt
+
 # UV/Python
 # Logs will appear in stdout
 ```
 
-You should see messages like:
-```
+You should see a message like:
+
+```shell
 11:48:15 | INFO     | server - Accepted new TCP connection from ('<ip-address>', <random-port>)
 ```
 
@@ -312,7 +319,7 @@ git clone https://github.com/bremme/shine2mqtt.git
 cd shine2mqtt
 
 # Install dependencies (including dev dependencies)
-uv sync --dev
+uv sync
 
 # Install pre-commit hooks
 pre-commit install
