@@ -39,8 +39,6 @@ class SimulatedClient:
         finally:
             await self._close()
 
-    # ---------- connection ----------
-
     async def _connect(self):
         logger.info(f"Connecting to {self.host}:{self.port}")
         self.reader, self.writer = await asyncio.open_connection(self.host, self.port)
@@ -55,8 +53,6 @@ class SimulatedClient:
         self._is_connected = False
         logger.info("Connection closed")
 
-    # ---------- protocol flow ----------
-
     async def _run_protocol(self):
         """Run the client protocol with concurrent reader and state machine"""
         reader_loop_task = asyncio.create_task(self._reader_loop())
@@ -65,19 +61,19 @@ class SimulatedClient:
         try:
             await asyncio.gather(reader_loop_task, protocol_loop_task)
         except asyncio.CancelledError:
-            logger.info("Protocol tasks cancelled")
+            logger.info("Reader loop and protocol loop cancelled")
             raise
         finally:
             reader_loop_task.cancel()
             protocol_loop_task.cancel()
             try:
-                await reader_loop_task
-            except asyncio.CancelledError:
-                pass
-            try:
-                await protocol_loop_task
-            except asyncio.CancelledError:
-                pass
+                await asyncio.wait_for(
+                    asyncio.gather(reader_loop_task, protocol_loop_task, return_exceptions=True),
+                    timeout=1.0,
+                )
+                logger.info("Reader loop and protocol loop tasks cancelled successfully")
+            except TimeoutError:
+                logger.warning("Reader/protocol task cancellation timed out")
 
     async def _announce_loop(self):
         """
@@ -119,6 +115,13 @@ class SimulatedClient:
         finally:
             data_task.cancel()
             ping_task.cancel()
+            try:
+                await asyncio.wait_for(
+                    asyncio.gather(data_task, ping_task, return_exceptions=True), timeout=1.0
+                )
+                logger.info("Data and ping tasks cancelled successfully")
+            except TimeoutError:
+                logger.warning("Data/ping task cancellation timed out")
 
     async def _send_data_loop(self):
         """Periodically send DATA messages"""

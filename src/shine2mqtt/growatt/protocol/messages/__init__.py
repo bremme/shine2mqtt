@@ -21,5 +21,4 @@ __all__ = [
     "GrowattGetConfigRequestMessage",
     "GrowattGetConfigResponseMessage",
     "GrowattSetConfigRequestMessage",
-    "GrowattSetConfigResponseMessage",
 ]

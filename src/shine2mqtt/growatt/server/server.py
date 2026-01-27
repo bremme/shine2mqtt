@@ -46,15 +46,19 @@ class GrowattServer:
     async def stop(self):
         logger.info("Stopping TCP server")
 
-        logger.info("Closing active TCP session")
         if self.session_task:
-            logger.debug("Cancelling TCP session task")
+            logger.info("Closing active TCP session")
             self.session_task.cancel()
+
             try:
-                await self.session_task
+                await asyncio.wait_for(self.session_task, timeout=1.0)
             except asyncio.CancelledError:
-                logger.debug("TCP session task cancelled")
-        logger.info("Active TCP session closed")
+                logger.debug("TCP session task closed")
+                raise
+            except TimeoutError:
+                logger.warning("TCP session cancellation timed out")
+
+            logger.info("Active TCP session closed")
 
         if self.server:
             logger.info("Closing TCP server")

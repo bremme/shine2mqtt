@@ -27,11 +27,15 @@ async def main():
             app = Application(config=config)
             await app.run()
     except asyncio.CancelledError:
-        logger.info("Shutting down main")
+        logger.info("Shutting down gracefully")
+        raise
 
 
 def run():
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Application stopped by CTRL+C (Interrupted by user)")
 
 
 if __name__ == "__main__":
