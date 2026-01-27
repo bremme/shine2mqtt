@@ -25,6 +25,7 @@ class InverterStatus(Enum):
 
 UPDATE_INTERVAL_REGISTER = 4
 DATALOGGER_SW_VERSION_REGISTER = 21
+DATALOGGER_WIFI_PASSWORD_REGISTER = 57
 
 CONFIG_REGISTERS = {
     4: {
@@ -86,7 +87,11 @@ CONFIG_REGISTERS = {
     31: {"name": "date", "description": "Date", "fmt": "s"},  # 0x1F
     32: {"name": "reboot", "description": "Reboot", "fmt": "s"},  # ?,  # ??? # 0x20
     56: {"name": "wifi_ssid", "description": "WiFi SSID", "fmt": "s"},  # 0x38
-    57: {"name": "wifi_password", "description": "WiFi password", "fmt": "s"},  # 0x39
+    DATALOGGER_WIFI_PASSWORD_REGISTER: {
+        "name": "wifi_password",
+        "description": "WiFi password",
+        "fmt": "s",
+    },  # 0x39
 }
 
 # TODO
