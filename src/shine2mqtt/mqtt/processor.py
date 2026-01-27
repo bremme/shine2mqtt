@@ -63,7 +63,8 @@ class MqttDataloggerMessageProcessor:
     def _process_announce_message(self, message: GrowattAnnounceMessage) -> list[MqttMessage]:
         mqtt_messages = []
         if self._hass_discovery and not self._inverter_announced:
-            mqtt_messages.extend(self._build_discovery_messages(message))
+            logger.info("Appending inverter discovery message")
+            mqtt_messages.append(self._build_inverter_discovery_messages(message))
             self._inverter_announced = True
 
         # use retain diagnostic sensors don't change over time
@@ -77,8 +78,12 @@ class MqttDataloggerMessageProcessor:
         logger.debug(f"Processing get config response message: {message}")
         mqtt_messages = []
 
-        if message.name == "datalogger_sw_version" and not self._datalogger_announced:
-            logger.debug("Publishing datalogger discovery message")
+        if (
+            self._hass_discovery
+            and message.name == "datalogger_sw_version"
+            and not self._datalogger_announced
+        ):
+            logger.info("Appending datalogger discovery message")
             discovery_message = self._discovery.build_datalogger_discovery_message(
                 datalogger_sw_version=str(message.value),
                 datalogger_serial=message.datalogger_serial,
@@ -167,7 +172,7 @@ class MqttDataloggerMessageProcessor:
 
         payload = json.dumps(discovery_message)
         topic = self._discovery.build_inverter_discovery_topic()
-        return MqttMessage(topic=topic, payload=payload)
+        return MqttMessage(topic=topic, payload=payload, qos=1, retain=True)
 
     def _build_datalogger_discovery_messages(
         self, datalogger_sw_version: str, datalogger_serial: str
@@ -178,4 +183,4 @@ class MqttDataloggerMessageProcessor:
         )
         payload = json.dumps(discovery_message)
         topic = self._discovery.build_datalogger_discovery_topic()
-        return MqttMessage(topic=topic, payload=payload)
+        return MqttMessage(topic=topic, payload=payload, qos=1, retain=True)
