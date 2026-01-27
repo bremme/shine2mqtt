@@ -56,7 +56,7 @@ CONFIG_REGISTERS = {
     #     "description": "FTP credentials",  # 0x0B
     #     "fmt": "s",
     # },
-    # 12: {"name": "dns_ip_adr", "description": "DNS", "fmt": "s"},  # 0x0C
+    # 12: {"name": "dns_ip_address", "description": "DNS", "fmt": "s"},  # 0x0C
     # 13 = b'16' ?
     14: {"name": "ip_address", "description": "Local IP", "fmt": "s"},  # 0x0E
     15: {"name": "port", "description": "Local Port", "fmt": "s"},  # 0x0F
@@ -76,7 +76,7 @@ CONFIG_REGISTERS = {
         "fmt": "s",
     },
     25: {"name": "netmask", "description": "Netmask", "fmt": "s"},  # 0x19
-    26: {"name": "gateway_ip_adr", "description": "Gateway IP", "fmt": "s"},  # 0x1A
+    26: {"name": "gateway_ip_address", "description": "Gateway IP", "fmt": "s"},  # 0x1A
     # 27 = b'1'
     # 28 = b'0'
     # 29 = b'X'

@@ -337,8 +337,8 @@ DATALOGGER_SENSOR_MAP = {
         "name": "Netmask",
         "icon": "mdi:ip-network",
     },
-    "gateway_ip_adr": {
-        "entity_id": "gateway_ip_adr",
+    "gateway_ip_address": {
+        "entity_id": "gateway_ip_address",
         "entity_category": "diagnostic",
         "name": "Gateway IP Address",
         "icon": "mdi:ip-network",
