@@ -77,7 +77,7 @@ class ProtocolProcessor:
                 case GrowattDataMessage() | GrowattBufferedDataMessage():
                     response_messages = self._handle_data_request(message)
                 case GrowattAckMessage():
-                    response_messages = self._handle_set_config_response(message)
+                    response_messages = self._handle_set_config_response()
                 case GrowattGetConfigResponseMessage():
                     response_messages = self._handle_get_config_response(message)
                 case _:
@@ -158,7 +158,7 @@ class ProtocolProcessor:
     ) -> list[BaseMessage]:
         return [GrowattAckMessage(header=message.header, ack=True)]
 
-    def _handle_set_config_response(self, message: GrowattAckMessage) -> list[BaseMessage]:
+    def _handle_set_config_response(self) -> list[BaseMessage]:
         # this just ack the set config command
         return []
 
