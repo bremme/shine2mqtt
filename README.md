@@ -1,5 +1,6 @@
 # 🌟 Shine2MQTT
 
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=coverage)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
@@ -8,9 +9,6 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 > **A local Growatt server which listens to your Shine Wifi-X datalogger and publishes to MQTT** 
-
-[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Shine2MQTT acts as a local server for your Growatt Shine datalogger, intercepting data that would normally be sent to Growatt's cloud servers. It publishes this data via MQTT in a Home Assistant-friendly format, giving you complete local control of your solar inverter data.
 
