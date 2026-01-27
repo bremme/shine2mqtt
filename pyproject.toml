@@ -55,6 +55,8 @@ pythonpath = ["."]
 addopts = [
     "--import-mode=importlib",
     "--cov=shine2mqtt",
+    "--cov-report=xml",
+    "--cov-report=term",
 ]
 
 # [tool.pytest.coverage.run]
