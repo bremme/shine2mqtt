@@ -1,7 +1,7 @@
 # 🌟 Shine2MQTT
 
 [![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
-[![CI](https://github.com/bremme/shine2mqtt/actions/workflows/continuous-integration.yaml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/continuous-integration.yaml)
+[![CI](https://github.com/bremme/shine2mqtt/actions/workflows/main.yaml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/main.yaml)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=bugs)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
