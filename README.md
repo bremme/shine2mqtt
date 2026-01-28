@@ -18,7 +18,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/shine2mqtt)](https://pypi.org/project/shine2mqtt/)
 [![License](https://img.shields.io/badge/license-GNU_v3-green.svg)](LICENSE)
 
-> **A local Growatt server which listens to your Shine Wifi-X datalogger and publishes to MQTT** 
+> **A local Growatt server which listens to your Shine Wifi-X datalogger and publishes to MQTT**
 
 Shine2MQTT acts as a local server for your Growatt Shine Wifi-X datalogger, capturing data that would normally be sent to Growatt's cloud servers. It publishes this data via MQTT in a Home Assistant-friendly format, giving you complete local control of your solar inverter data.
 
@@ -34,7 +34,7 @@ Shine2MQTT acts as a local server for your Growatt Shine Wifi-X datalogger, capt
 ## 🔌 Compatibility
 
 | Component      | Tested Models |
-|----------------|---------------|
+| -------------- | ------------- |
 | **Datalogger** | Shine WiFi-X  |
 | **Inverter**   | MIC 3000TL-X  |
 
@@ -131,33 +131,32 @@ Shine2MQTT can be configured through **CLI arguments**, **environment variables*
 3. Configuration file
 4. Default values
 
-
 ### Configuration options
 
-| Option                    | Default       | Description                                        |
-|---------------------------|---------------|----------------------------------------------------|
-| `log_level`               | `INFO`        | Logging level (DEBUG, INFO, WARNING, ERROR)        |
-| `log_color`               | `false`       | Force colored logging output                       |
-| `capture_data`            | `false`       | Capture raw frames and store in `captured_frames/` |
-| `mqtt.base_topic`         | `solar`       | Base MQTT topic for publishing data                |
-| `mqtt.availability_topic` | `solar/state` | MQTT topic for availability status                 |
-| `mqtt.server.host`        | `localhost`   | MQTT broker host                                   |
-| `mqtt.server.port`        | `1883`        | MQTT broker port                                   |
-| `mqtt.server.username`    |               | MQTT broker username                               |
-| `mqtt.server.password`    |               | MQTT broker password                               |
-| `mqtt.server.client_id`   | `shine2mqtt`  | MQTT client identifier                             |
-| `mqtt.discovery.enabled`  | `false`       | Enable Home Assistant MQTT discovery               |
-| `mqtt.discovery.prefix_topic` | `homeassistant` | MQTT discovery topic prefix                  |
-| `mqtt.discovery.inverter.model`   |       | Inverter model for Home Assistant                  |
-| `mqtt.discovery.datalogger.model` |       | Datalogger model for Home Assistant                |
-| `server.host`             | `0.0.0.0`     | TCP server host                                    |
-| `server.port`             | `5279`        | TCP server port                                    |
-| `api.enabled`             | `false`       | Enable RESTful API                                 |
-| `api.host`                | `0.0.0.0`     | RESTful API host                                   |
-| `api.port`                | `8000`        | RESTful API port                                   |
-| `simulated_client`        | `false`       | Enable simulated client for testing                |
-| `simulated_client.server_host` | `localhost` | Simulated client server host                    |
-| `simulated_client.server_port` | `5279`      | Simulated client server port                    |
+| Option                            | Default         | Description                                        |
+| --------------------------------- | --------------- | -------------------------------------------------- |
+| `log_level`                       | `INFO`          | Logging level (DEBUG, INFO, WARNING, ERROR)        |
+| `log_color`                       | `false`         | Force colored logging output                       |
+| `capture_data`                    | `false`         | Capture raw frames and store in `captured_frames/` |
+| `mqtt.base_topic`                 | `solar`         | Base MQTT topic for publishing data                |
+| `mqtt.availability_topic`         | `solar/state`   | MQTT topic for availability status                 |
+| `mqtt.server.host`                | `localhost`     | MQTT broker host                                   |
+| `mqtt.server.port`                | `1883`          | MQTT broker port                                   |
+| `mqtt.server.username`            |                 | MQTT broker username                               |
+| `mqtt.server.password`            |                 | MQTT broker password                               |
+| `mqtt.server.client_id`           | `shine2mqtt`    | MQTT client identifier                             |
+| `mqtt.discovery.enabled`          | `false`         | Enable Home Assistant MQTT discovery               |
+| `mqtt.discovery.prefix_topic`     | `homeassistant` | MQTT discovery topic prefix                        |
+| `mqtt.discovery.inverter.model`   |                 | Inverter model for Home Assistant                  |
+| `mqtt.discovery.datalogger.model` |                 | Datalogger model for Home Assistant                |
+| `server.host`                     | `0.0.0.0`       | TCP server host                                    |
+| `server.port`                     | `5279`          | TCP server port                                    |
+| `api.enabled`                     | `false`         | Enable RESTful API                                 |
+| `api.host`                        | `0.0.0.0`       | RESTful API host                                   |
+| `api.port`                        | `8000`          | RESTful API port                                   |
+| `simulated_client`                | `false`         | Enable simulated client for testing                |
+| `simulated_client.server_host`    | `localhost`     | Simulated client server host                       |
+| `simulated_client.server_port`    | `5279`          | Simulated client server port                       |
 
 All options can be set via any of the configuration methods.
 
@@ -165,7 +164,7 @@ All options can be set via any of the configuration methods.
 
 For cli arguments `_`, or `.` need to be converted to `-`. For example:
 
-- `log_level` becomes `--log-level` 
+- `log_level` becomes `--log-level`
 - `mqtt.base_topic` becomes `--mqtt-base-topic`
 
 For all available options run:
@@ -178,10 +177,8 @@ uv run shine2mqtt --help
 
 For environmental variables prefix with `SHINE2MQTT_`, use uppercase, convert `-` to `_` and `.` to `__`. For example:
 
-
 - `log_level` becomes `SHINE2MQTT_LOG_LEVEL`
 - `mqtt.base_topic` becomes `SHINE2MQTT_MQTT__BASE_TOPIC`
-
 
 ### YAML Configuration File
 
@@ -240,68 +237,68 @@ Shine2MQTT publishes the following metrics via MQTT:
 
 ### Inverter Sensors
 
-| Metric                           | Topic                                      | Unit |
-|----------------------------------|--------------------------------------------|------|
-| **DC Metrics**                   |                                            |      |
-| Total DC Power Input             | `solar/inverter/sensor/power_dc`           | W    |
-| DC Voltage String 1              | `solar/inverter/sensor/voltage_dc_1`       | V    |
-| DC Current String 1              | `solar/inverter/sensor/current_dc_1`       | A    |
-| DC Power String 1                | `solar/inverter/sensor/power_dc_1`         | W    |
-| DC Voltage String 2              | `solar/inverter/sensor/voltage_dc_2`       | V    |
-| DC Current String 2              | `solar/inverter/sensor/current_dc_2`       | A    |
-| DC Power String 2                | `solar/inverter/sensor/power_dc_2`         | W    |
-| **AC Metrics**                   |                                            |      |
-| AC Power Output                  | `solar/inverter/sensor/power_ac`           | W    |
-| Grid Frequency                   | `solar/inverter/sensor/frequency_ac`       | Hz   |
-| AC Voltage Phase 1               | `solar/inverter/sensor/voltage_ac_1`       | V    |
-| AC Current Phase 1               | `solar/inverter/sensor/current_ac_1`       | A    |
-| AC Apparent Power Phase 1        | `solar/inverter/sensor/power_ac_1`         | VA   |
-| **AC Line Voltages**             |                                            |      |
-| AC Line Voltage L1-L2            | `solar/inverter/sensor/voltage_ac_l1_l2`   | V    |
-| AC Line Voltage L2-L3            | `solar/inverter/sensor/voltage_ac_l2_l3`   | V    |
-| AC Line Voltage L3-L1            | `solar/inverter/sensor/voltage_ac_l3_l1`   | V    |
-| **Energy Production**            |                                            |      |
-| Today's AC Energy Production     | `solar/inverter/sensor/energy_ac_today`    | kWh  |
-| Lifetime AC Energy Production    | `solar/inverter/sensor/energy_ac_total`    | kWh  |
-| Lifetime DC Energy Production    | `solar/inverter/sensor/energy_dc_total`    | kWh  |
-| Today's DC Energy String 1       | `solar/inverter/sensor/energy_dc_1_today`  | kWh  |
-| Lifetime DC Energy String 1      | `solar/inverter/sensor/energy_dc_1_total`  | kWh  |
-| Today's DC Energy String 2       | `solar/inverter/sensor/energy_dc_2_today`  | kWh  |
-| Lifetime DC Energy String 2      | `solar/inverter/sensor/energy_dc_2_total`  | kWh  |
+| Metric                        | Topic                                     | Unit |
+| ----------------------------- | ----------------------------------------- | ---- |
+| **DC Metrics**                |                                           |      |
+| Total DC Power Input          | `solar/inverter/sensor/power_dc`          | W    |
+| DC Voltage String 1           | `solar/inverter/sensor/voltage_dc_1`      | V    |
+| DC Current String 1           | `solar/inverter/sensor/current_dc_1`      | A    |
+| DC Power String 1             | `solar/inverter/sensor/power_dc_1`        | W    |
+| DC Voltage String 2           | `solar/inverter/sensor/voltage_dc_2`      | V    |
+| DC Current String 2           | `solar/inverter/sensor/current_dc_2`      | A    |
+| DC Power String 2             | `solar/inverter/sensor/power_dc_2`        | W    |
+| **AC Metrics**                |                                           |      |
+| AC Power Output               | `solar/inverter/sensor/power_ac`          | W    |
+| Grid Frequency                | `solar/inverter/sensor/frequency_ac`      | Hz   |
+| AC Voltage Phase 1            | `solar/inverter/sensor/voltage_ac_1`      | V    |
+| AC Current Phase 1            | `solar/inverter/sensor/current_ac_1`      | A    |
+| AC Apparent Power Phase 1     | `solar/inverter/sensor/power_ac_1`        | VA   |
+| **AC Line Voltages**          |                                           |      |
+| AC Line Voltage L1-L2         | `solar/inverter/sensor/voltage_ac_l1_l2`  | V    |
+| AC Line Voltage L2-L3         | `solar/inverter/sensor/voltage_ac_l2_l3`  | V    |
+| AC Line Voltage L3-L1         | `solar/inverter/sensor/voltage_ac_l3_l1`  | V    |
+| **Energy Production**         |                                           |      |
+| Today's AC Energy Production  | `solar/inverter/sensor/energy_ac_today`   | kWh  |
+| Lifetime AC Energy Production | `solar/inverter/sensor/energy_ac_total`   | kWh  |
+| Lifetime DC Energy Production | `solar/inverter/sensor/energy_dc_total`   | kWh  |
+| Today's DC Energy String 1    | `solar/inverter/sensor/energy_dc_1_today` | kWh  |
+| Lifetime DC Energy String 1   | `solar/inverter/sensor/energy_dc_1_total` | kWh  |
+| Today's DC Energy String 2    | `solar/inverter/sensor/energy_dc_2_today` | kWh  |
+| Lifetime DC Energy String 2   | `solar/inverter/sensor/energy_dc_2_total` | kWh  |
 
 ### Inverter Diagnostic Sensors
 
-| Metric                                  | Topic                                                | Unit |
-|-----------------------------------------|------------------------------------------------------|------|
-| Inverter Serial Number                  | `solar/inverter/sensor/inverter_serial`              | -    |
-| Inverter Firmware Version               | `solar/inverter/sensor/inverter_fw_version`          | -    |
-| Inverter Control Firmware Version       | `solar/inverter/sensor/inverter_control_fw_version`  | -    |
-| Maximum Active AC Power                 | `solar/inverter/sensor/active_power_ac_max`          | %    |
-| Maximum Reactive AC Power               | `solar/inverter/sensor/reactive_power_ac_max`        | %    |
-| Power Factor                            | `solar/inverter/sensor/power_factor`                 | -    |
-| Power Factor Control Mode               | `solar/inverter/sensor/power_factor_control_mode`    | -    |
-| Rated AC Power                          | `solar/inverter/sensor/rated_power_ac`               | VA   |
-| Rated DC Voltage                        | `solar/inverter/sensor/rated_voltage_dc`             | V    |
-| AC Voltage Low Limit                    | `solar/inverter/sensor/voltage_ac_low_limit`         | V    |
-| AC Voltage High Limit                   | `solar/inverter/sensor/voltage_ac_high_limit`        | V    |
-| AC Frequency Low Limit                  | `solar/inverter/sensor/frequency_ac_low_limit`       | Hz   |
-| AC Frequency High Limit                 | `solar/inverter/sensor/frequency_ac_high_limit`      | Hz   |
+| Metric                            | Topic                                               | Unit |
+| --------------------------------- | --------------------------------------------------- | ---- |
+| Inverter Serial Number            | `solar/inverter/sensor/inverter_serial`             | -    |
+| Inverter Firmware Version         | `solar/inverter/sensor/inverter_fw_version`         | -    |
+| Inverter Control Firmware Version | `solar/inverter/sensor/inverter_control_fw_version` | -    |
+| Maximum Active AC Power           | `solar/inverter/sensor/active_power_ac_max`         | %    |
+| Maximum Reactive AC Power         | `solar/inverter/sensor/reactive_power_ac_max`       | %    |
+| Power Factor                      | `solar/inverter/sensor/power_factor`                | -    |
+| Power Factor Control Mode         | `solar/inverter/sensor/power_factor_control_mode`   | -    |
+| Rated AC Power                    | `solar/inverter/sensor/rated_power_ac`              | VA   |
+| Rated DC Voltage                  | `solar/inverter/sensor/rated_voltage_dc`            | V    |
+| AC Voltage Low Limit              | `solar/inverter/sensor/voltage_ac_low_limit`        | V    |
+| AC Voltage High Limit             | `solar/inverter/sensor/voltage_ac_high_limit`       | V    |
+| AC Frequency Low Limit            | `solar/inverter/sensor/frequency_ac_low_limit`      | Hz   |
+| AC Frequency High Limit           | `solar/inverter/sensor/frequency_ac_high_limit`     | Hz   |
 
 ### Datalogger Diagnostic Sensors
 
-| Metric                                  | Topic                                             | Unit |
-|-----------------------------------------|---------------------------------------------------|------|
-| Datalogger Serial Number                | `solar/datalogger/sensor/datalogger_serial`       | -    |
-| Datalogger Software Version             | `solar/datalogger/sensor/datalogger_sw_version`   | -    |
-| Datalogger Hardware Version             | `solar/datalogger/sensor/datalogger_hw_version`   | -    |
-| Data Update Interval                    | `solar/datalogger/sensor/update_interval`         | min  |
-| Datalogger IP Address                   | `solar/datalogger/sensor/ip_address`              | -    |
-| Datalogger MAC Address                  | `solar/datalogger/sensor/mac_address`             | -    |
-| Network Netmask                         | `solar/datalogger/sensor/netmask`                 | -    |
-| Gateway IP Address                      | `solar/datalogger/sensor/gateway_ip_address`          | -    |
-| Server IP Address                       | `solar/datalogger/sensor/server_ip_address`       | -    |
-| Server Port                             | `solar/datalogger/sensor/server_port`             | -    |
-| WiFi Network Name (SSID)                | `solar/datalogger/sensor/wifi_ssid`               | -    |
+| Metric                      | Topic                                           | Unit |
+| --------------------------- | ----------------------------------------------- | ---- |
+| Datalogger Serial Number    | `solar/datalogger/sensor/datalogger_serial`     | -    |
+| Datalogger Software Version | `solar/datalogger/sensor/datalogger_sw_version` | -    |
+| Datalogger Hardware Version | `solar/datalogger/sensor/datalogger_hw_version` | -    |
+| Data Update Interval        | `solar/datalogger/sensor/update_interval`       | min  |
+| Datalogger IP Address       | `solar/datalogger/sensor/ip_address`            | -    |
+| Datalogger MAC Address      | `solar/datalogger/sensor/mac_address`           | -    |
+| Network Netmask             | `solar/datalogger/sensor/netmask`               | -    |
+| Gateway IP Address          | `solar/datalogger/sensor/gateway_ip_address`    | -    |
+| Server IP Address           | `solar/datalogger/sensor/server_ip_address`     | -    |
+| Server Port                 | `solar/datalogger/sensor/server_port`           | -    |
+| WiFi Network Name (SSID)    | `solar/datalogger/sensor/wifi_ssid`             | -    |
 
 ## 🛠️ Development
 
@@ -327,7 +324,7 @@ pre-commit install
 
 ### Project Structure
 
-```
+```shell
 shine2mqtt/
 ├── src/shine2mqtt/          # Main application code
 │   ├── growatt/             # Growatt protocol implementation
