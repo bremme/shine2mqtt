@@ -14,7 +14,6 @@ on:
 
 env:
   UV_FROZEN: 'true'
-  UV_LOCKED: 'true'
 
 jobs:
   quality:
