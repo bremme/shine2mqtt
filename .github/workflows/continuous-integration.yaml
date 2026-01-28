@@ -65,7 +65,7 @@ jobs:
         run: uv run pytest
 
       - name: Run SonarQube scan
-        if: ${{ inputs.run-sonar == 'true' }}
+        if: inputs.run-sonar
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
