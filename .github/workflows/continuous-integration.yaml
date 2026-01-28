@@ -7,6 +7,10 @@ on:
         required: false
         default: false
         type: boolean
+      run-dependency-check:
+        required: false
+        default: false
+        type: boolean
     secrets:
       SONAR_TOKEN:
         required: false
@@ -43,6 +47,9 @@ jobs:
 
       - name: Run ty type checker
         run: uv run ty check
+
+      - name: Run pip-audit dependency check
+        uses: pypa/gh-action-pip-audit@v1.0.0
 
   test:
     runs-on: ubuntu-latest
