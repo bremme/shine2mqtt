@@ -11,6 +11,9 @@ on:
         required: false
         default: false
         type: boolean
+    secrets:
+      SONAR_TOKEN:
+        required: false
 
 env:
   UV_FROZEN: 'true'
