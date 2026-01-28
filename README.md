@@ -1,6 +1,6 @@
 # 🌟 Shine2MQTT
 
-[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/ci.yml)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bremme_shine2mqtt&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bremme_shine2mqtt)
@@ -307,7 +307,7 @@ Shine2MQTT publishes the following metrics via MQTT:
 
 ### Prerequisites
 
-- Python 3.13+
+- Python 3.14+
 - [UV](https://docs.astral.sh/uv/) - Fast Python package manager
 - [Pre-commit](https://pre-commit.com/) - Git hooks
 

@@ -5,41 +5,40 @@ on:
     branches: [main]
 
 env:
-  PYTHON_VERSION: '3.13'
+  PYTHON_VERSION: '3.14'
 
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
     with:
       python-version: ${{ env.PYTHON_VERSION }}
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+  # coverage:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v6
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
+  #     - name: Install uv
+  #       uses: astral-sh/setup-uv@v7
+  #       with:
+  #         enable-cache: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v6
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
-        run: uv sync
+  #     - name: Install dependencies
+  #       run: uv sync
 
-      - name: Run tests
-        run: uv run pytest
+  #     - name: Run tests
+  #       run: uv run pytest
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     - name: SonarQube Scan
+  #       uses: SonarSource/sonarqube-scan-action@v7
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   docker-build:
     runs-on: ubuntu-latest

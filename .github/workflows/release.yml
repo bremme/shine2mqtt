@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ github.repository }}
-  PYTHON_VERSION: '3.13'
+  PYTHON_VERSION: '3.14'
 
 jobs:
   ci:
