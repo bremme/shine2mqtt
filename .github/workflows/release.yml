@@ -8,13 +8,11 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ github.repository }}
-  PYTHON_VERSION: '3.14'
 
 jobs:
   ci:
     uses: ./.github/workflows/continuous-integration.yaml
     with:
-      python-version: '3.14'
       run-sonar: true
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -93,7 +91,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version-file: .python-version
 
       - name: Build Python package
         run: uv build

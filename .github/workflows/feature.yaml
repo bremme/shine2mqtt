@@ -9,5 +9,4 @@ jobs:
   ci:
     uses: ./.github/workflows/continuous-integration.yaml
     with:
-      python-version: '3.14'
       run-sonar: false
