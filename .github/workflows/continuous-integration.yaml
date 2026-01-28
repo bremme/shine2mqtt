@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -50,6 +52,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: ${{ inputs.run-sonar && 0 || 1 }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
