@@ -39,17 +39,17 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run ruff linter
+      - name: Run linter
         run: uv run ruff check .
 
-      - name: Run ruff formatting check
+      - name: Run format check
         run: uv run ruff format --check .
 
-      - name: Run ty type checker
+      - name: Run type checker
         run: uv run ty check
 
-      - name: Run pip-audit dependency check
-        uses: pypa/gh-action-pip-audit@v1.0.0
+      - name: Run dependency check
+        run: uv run pip-audit --skip-editable --verbose
 
   test:
     runs-on: ubuntu-latest
