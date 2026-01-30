@@ -16,7 +16,7 @@ on:
         required: false
 
 env:
-  UV_FROZEN: 'true'
+  UV_FROZEN: 1
 
 jobs:
   quality:
