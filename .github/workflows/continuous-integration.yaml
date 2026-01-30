@@ -49,6 +49,7 @@ jobs:
         run: uv run ty check
 
       - name: Run dependency check
+        if: inputs.run-dependency-check
         run: uv run pip-audit --skip-editable --verbose
 
   test:
