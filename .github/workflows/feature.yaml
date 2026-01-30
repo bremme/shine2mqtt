@@ -4,10 +4,14 @@ on:
   push:
     branches-ignore:
       - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   ci:
-    if: '!github.event.pull_request'
     uses: ./.github/workflows/continuous-integration.yaml
     with:
-      run-sonar: false
+      run-sonar: ${{ github.event_name == 'pull_request' }}
+      run-dependency-check: ${{ github.event_name == 'pull_request' }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
