@@ -5,7 +5,7 @@ import uvicorn
 from loguru import logger
 
 from shine2mqtt.api.api import RestApi
-from shine2mqtt.config import ApplicationConfig
+from shine2mqtt.app.config.config import ApplicationConfig
 from shine2mqtt.growatt.protocol.frame import (
     FrameFactory,
 )
