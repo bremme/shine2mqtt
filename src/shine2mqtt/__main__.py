@@ -2,12 +2,26 @@ import asyncio
 
 from loguru import logger
 
-from shine2mqtt.app import Application
-from shine2mqtt.cli import ArgParser
-from shine2mqtt.config import ApplicationConfig, ConfigLoader
+from shine2mqtt.app.app import Application
+from shine2mqtt.app.cli.parser import ArgParser
+from shine2mqtt.app.config.config import ApplicationConfig
+from shine2mqtt.app.config.loader import ConfigLoader
+from shine2mqtt.app.logger import LoggerConfigurator
+from shine2mqtt.growatt.client.config import SimulatedClientConfig
 from shine2mqtt.growatt.client.simulate import SimulatedClient
 from shine2mqtt.growatt.protocol.frame.factory import FrameFactory
-from shine2mqtt.logger import setup_logging
+
+
+async def run_simulated_client(config: SimulatedClientConfig) -> None:
+    decoder = FrameFactory.client_decoder()
+    encoder = FrameFactory.encoder()
+    client = SimulatedClient(encoder, decoder, config)
+    await client.run()
+
+
+async def run_application(config: ApplicationConfig) -> None:
+    app = Application(config=config)
+    await app.run()
 
 
 async def main():
@@ -15,17 +29,16 @@ async def main():
         args = ArgParser().parse()
 
         config: ApplicationConfig = ConfigLoader().load(args)
-        setup_logging(log_level=config.log_level, color=config.log_color)
+
+        LoggerConfigurator.setup(log_level=config.log_level, color=config.log_color)
+
         logger.info(f"Loaded configuration: {config}")
 
-        if args.simulated_client__enabled:
-            decoder = FrameFactory.client_decoder()
-            logger.info(f"Client decoder registry: {decoder.decoder_registry._decoders}")
-            client = SimulatedClient(FrameFactory.encoder(), decoder, config.simulated_client)
-            await client.run()
+        if config.simulated_client.enabled:
+            await run_simulated_client(config.simulated_client)
         else:
-            app = Application(config=config)
-            await app.run()
+            await run_application(config)
+
     except asyncio.CancelledError:
         logger.info("Shutting down gracefully")
         raise
