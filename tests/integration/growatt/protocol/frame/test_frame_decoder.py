@@ -90,6 +90,7 @@ EXPECTED_MESSAGES = [
         voltage_ac_l1_l2=233.2,
         voltage_ac_l2_l3=0.0,
         voltage_ac_l3_l1=0.0,
+        total_run_time=0,
         energy_ac_today=0.0,
         energy_ac_total=7430.4,
         energy_dc_total=7506.5,
@@ -97,6 +98,7 @@ EXPECTED_MESSAGES = [
         energy_dc_1_total=7506.5,
         energy_dc_2_today=0.0,
         energy_dc_2_total=0.0,
+        temperature=0.0,
     ),
     GrowattDataMessage(
         header=data_headers[0],
@@ -119,6 +121,7 @@ EXPECTED_MESSAGES = [
         voltage_ac_l1_l2=232.2,
         voltage_ac_l2_l3=0.0,
         voltage_ac_l3_l1=0.0,
+        total_run_time=0,
         energy_ac_today=1.0,
         energy_ac_total=7446.5,
         energy_dc_total=7522.8,
@@ -126,6 +129,7 @@ EXPECTED_MESSAGES = [
         energy_dc_1_total=7522.8,
         energy_dc_2_today=0.0,
         energy_dc_2_total=0.0,
+        temperature=0.0,
     ),
     GrowattGetConfigResponseMessage(
         header=get_config_headers[14],

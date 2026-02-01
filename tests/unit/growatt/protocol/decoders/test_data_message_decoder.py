@@ -37,6 +37,7 @@ EXPECTED_MESSAGES = [
         voltage_ac_l1_l2=232.2,
         voltage_ac_l2_l3=0.0,
         voltage_ac_l3_l1=0.0,
+        total_run_time=0,
         energy_ac_today=1.0,
         energy_ac_total=7446.5,
         energy_dc_total=7522.8,
@@ -44,6 +45,7 @@ EXPECTED_MESSAGES = [
         energy_dc_1_total=7522.8,
         energy_dc_2_today=0.0,
         energy_dc_2_total=0.0,
+        temperature=0.0,
     ),
     GrowattDataMessage(
         header=headers[1],
@@ -66,6 +68,7 @@ EXPECTED_MESSAGES = [
         voltage_ac_l1_l2=231.7,
         voltage_ac_l2_l3=0.0,
         voltage_ac_l3_l1=0.0,
+        total_run_time=0,
         energy_ac_today=1.0,
         energy_ac_total=7446.5,
         energy_dc_total=7522.8,
@@ -73,6 +76,7 @@ EXPECTED_MESSAGES = [
         energy_dc_1_total=7522.8,
         energy_dc_2_today=0.0,
         energy_dc_2_total=0.0,
+        temperature=0.0,
     ),
 ]
 # Build test cases from captured data
