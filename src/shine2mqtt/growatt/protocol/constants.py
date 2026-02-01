@@ -6,6 +6,13 @@ NACK = b"\x03"
 ENCRYPTION_KEY = b"Growatt"
 DECRYPTION_KEY = ENCRYPTION_KEY
 
+# Modbus function codes
+# https://en.wikipedia.org/wiki/Modbus#Public_function_codes
+READ_INPUT_REGISTERS = 4
+READ_HOLDING_REGISTERS = 3
+WRITE_SINGLE_HOLDING_REGISTER = 6
+WRITE_MULTIPLE_HOLDING_REGISTERS = 16
+
 
 class FunctionCode(Enum):
     PING = 0x16  # 22
@@ -14,7 +21,7 @@ class FunctionCode(Enum):
     BUFFERED_DATA = 0x50  # 80
     SET_CONFIG = 0x18  # 24
     GET_CONFIG = 0x19  # 25
-    # REBOOT = 020 ?
+    # REBOOT = 0x20 ?
 
 
 class InverterStatus(Enum):
@@ -30,23 +37,23 @@ DATALOGGER_WIFI_PASSWORD_REGISTER = 57
 CONFIG_REGISTERS = {
     4: {
         "name": "update_interval",
-        "description": "Update Interval min",  # 0x04
+        "description": "Update Interval min",
         "fmt": "s",
     },
     5: {
         "name": "modbus_range_low",
-        "description": "Modbus Range low",  # 0x05
+        "description": "Modbus Range low",
         "fmt": "s",
     },
     6: {
         "name": "modbus_range_high",
-        "description": "Modbus Range high",  # 0x06
+        "description": "Modbus Range high",
         "fmt": "s",
     },
     # 7 is unknown
     8: {
         "name": "datalogger_serial",
-        "description": "Datalogger Serial Number",  # 0x08
+        "description": "Datalogger Serial Number",
         "fmt": "s",
     },
     # 9-13 are unknown
@@ -80,7 +87,5 @@ CONFIG_REGISTERS = {
     },
 }
 
-# TODO
 ANNOUNCE_REGISTER = {}
-# TODO
 DATA_REGISTER = {}
