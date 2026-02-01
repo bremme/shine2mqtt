@@ -16,6 +16,8 @@ INVERTER_SERIAL = "MLABC12345"
 
 class DataGenerator:
     def generate_announce_message(self, transaction_id: int) -> GrowattAnnounceMessage:
+        from shine2mqtt.growatt.protocol.messages.announce import SafetyFunction
+
         return GrowattAnnounceMessage(
             header=MBAPHeader(
                 transaction_id=transaction_id,
@@ -26,6 +28,19 @@ class DataGenerator:
             ),
             datalogger_serial=DATALOGGER_SERIAL,
             inverter_serial=INVERTER_SERIAL,
+            remote_on_off=True,
+            safety_function=SafetyFunction(
+                spi=True,
+                auto_test_start=False,
+                low_voltage_fault_ride_through=True,
+                frequency_derating=False,
+                soft_start=True,
+                demand_response_management_system=False,
+                power_voltage_control=True,
+                high_voltage_fault_ride_through=False,
+                rate_of_change_of_frequency_protection=True,
+                frequency_derating_recovery=False,
+            ),
             active_power_ac_max=100,
             reactive_power_ac_max=0,
             power_factor=1.0,

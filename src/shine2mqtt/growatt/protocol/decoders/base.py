@@ -9,6 +9,10 @@ from shine2mqtt.growatt.protocol.messages import BaseMessage, MBAPHeader
 
 class ByteDecoder:
     @staticmethod
+    def read_bool(frame: bytes, offset: int) -> bool:
+        return struct.unpack_from(">B", frame, offset)[0] == 1
+
+    @staticmethod
     def read_u8(frame: bytes, offset: int) -> int:
         return struct.unpack_from(">B", frame, offset)[0]
 
@@ -23,6 +27,10 @@ class ByteDecoder:
     @staticmethod
     def read_str(frame: bytes, offset: int, length: int) -> str:
         return struct.unpack_from(f">{length}s", frame, offset)[0].decode("ascii").strip()
+
+    @staticmethod
+    def read_bit(value: int, bit_position: int) -> bool:
+        return bool(value & (1 << bit_position))
 
 
 class MessageDecoder[T: BaseMessage](ABC, ByteDecoder):

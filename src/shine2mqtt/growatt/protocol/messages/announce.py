@@ -4,12 +4,30 @@ from datetime import datetime
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
 
 
+@dataclass
+class SafetyFunction:
+    spi: bool
+    auto_test_start: bool
+    low_voltage_fault_ride_through: bool
+    frequency_derating: bool
+    soft_start: bool
+    demand_response_management_system: bool
+    power_voltage_control: bool
+    high_voltage_fault_ride_through: bool
+    rate_of_change_of_frequency_protection: bool
+    frequency_derating_recovery: bool
+
+
 # Client messages ######################################################################
 # requests
 @dataclass
 class GrowattAnnounceMessage(BaseMessage):
     datalogger_serial: str
     inverter_serial: str
+
+    remote_on_off: bool
+    safety_function: SafetyFunction
+    power_factor_memory: bool
     active_power_ac_max: int
     reactive_power_ac_max: int
     power_factor: float
