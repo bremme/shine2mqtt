@@ -8,7 +8,8 @@
             "name": "shine2mqtt (module)",
             "type": "debugpy",
             "request": "launch",
-            "module": "shine2mqtt"
+            "module": "shine2mqtt",
+            "args": ["run"]
         }
     ]
 }
