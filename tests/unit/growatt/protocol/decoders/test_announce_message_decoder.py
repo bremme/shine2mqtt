@@ -2,10 +2,11 @@ from datetime import datetime
 
 import pytest
 
-from shine2mqtt.growatt.protocol.decoders.announce import (
-    AnnounceRequestDecoder,
+from shine2mqtt.growatt.protocol.decoders.announce import AnnounceRequestDecoder
+from shine2mqtt.growatt.protocol.messages.announce import (
+    GrowattAnnounceMessage,
+    SafetyFunction,
 )
-from shine2mqtt.growatt.protocol.messages.announce import GrowattAnnounceMessage
 from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
 from tests.utils.loader import CapturedFrameLoader
 
@@ -19,6 +20,20 @@ EXPECTED_MESSAGES = [
         header=headers[0],
         datalogger_serial=DATALOGGER_SERIAL,
         inverter_serial=INVERTER_SERIAL,
+        remote_on_off=False,
+        safety_function=SafetyFunction(
+            spi=False,
+            auto_test_start=False,
+            low_voltage_fault_ride_through=False,
+            frequency_derating=False,
+            soft_start=False,
+            demand_response_management_system=False,
+            power_voltage_control=False,
+            high_voltage_fault_ride_through=False,
+            rate_of_change_of_frequency_protection=False,
+            frequency_derating_recovery=False,
+        ),
+        power_factor_memory=False,
         active_power_ac_max=100,
         reactive_power_ac_max=0,
         power_factor=1.0,

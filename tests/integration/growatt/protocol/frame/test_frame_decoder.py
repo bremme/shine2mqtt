@@ -11,6 +11,7 @@ from shine2mqtt.growatt.protocol.messages import (
     MBAPHeader,
 )
 from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
+from shine2mqtt.growatt.protocol.messages.announce import SafetyFunction
 from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigResponseMessage
 from shine2mqtt.growatt.protocol.messages.data import GrowattDataMessage
 from shine2mqtt.growatt.protocol.messages.ping import GrowattPingMessage
@@ -38,6 +39,20 @@ EXPECTED_MESSAGES = [
         header=announce_headers[0],
         datalogger_serial=DATALOGGER_SERIAL,
         inverter_serial=INVERTER_SERIAL,
+        remote_on_off=False,
+        safety_function=SafetyFunction(
+            spi=False,
+            auto_test_start=False,
+            low_voltage_fault_ride_through=False,
+            frequency_derating=False,
+            soft_start=False,
+            demand_response_management_system=False,
+            power_voltage_control=False,
+            high_voltage_fault_ride_through=False,
+            rate_of_change_of_frequency_protection=False,
+            frequency_derating_recovery=False,
+        ),
+        power_factor_memory=False,
         active_power_ac_max=100,
         reactive_power_ac_max=0,
         power_factor=1.0,
