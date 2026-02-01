@@ -1,5 +1,7 @@
 # 🌟 Shine2MQTT
 
+> ⚠️ Currently in Alpha stage. Use at your own risk. The first images image's I've build seem to work fine, but the whole project is still under heavy development.
+
 [![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/bremme/shine2mqtt/actions/workflows/main.yaml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/main.yaml)
 
