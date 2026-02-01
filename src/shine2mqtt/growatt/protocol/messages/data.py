@@ -34,16 +34,21 @@ class GrowattDataMessage(BaseMessage):
     voltage_ac_l1_l2: float
     voltage_ac_l2_l3: float
     voltage_ac_l3_l1: float
+    #
+    total_run_time: int
     # Energy AC
     energy_ac_today: float
     energy_ac_total: float
-    energy_dc_total: float
     # Energy DC 1
     energy_dc_1_today: float
     energy_dc_1_total: float
     # Energy DC 2
     energy_dc_2_today: float
     energy_dc_2_total: float
+    # Energy DC
+    energy_dc_total: float
+    # Temperatures
+    temperature: float
 
 
 @dataclass
