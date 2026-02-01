@@ -4,6 +4,7 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from shine2mqtt import util
 from shine2mqtt.api.config import ApiConfig
 from shine2mqtt.growatt.client.config import SimulatedClientConfig
 from shine2mqtt.growatt.server.config import GrowattServerConfig
@@ -29,3 +30,8 @@ class ApplicationConfig(BaseSettings):
         env_nested_delimiter=NESTED_DELIMITER,
         env_file=".env",
     )
+
+    @staticmethod
+    def create(base: dict, override: dict) -> "ApplicationConfig":
+        merged_config = util.merge_dict(base=base, override=override)
+        return ApplicationConfig(**merged_config)

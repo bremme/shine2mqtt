@@ -1,42 +1,58 @@
 import logging
+import sys
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from collections.abc import Sequence
 from pathlib import Path
 
+from shine2mqtt import NAME
 
-class CustomHelpFormatter(HelpFormatter):
+
+class _CustomHelpFormatter(HelpFormatter):
     def __init__(self, prog: str) -> None:
         super().__init__(prog, max_help_position=60, width=100)
 
 
-class ArgParser:
-    def __init__(self):
-        parser = ArgumentParser(description="Shine2MQTT CLI", formatter_class=CustomHelpFormatter)
+class CliArgParser:
+    def __init__(self, argv: Sequence[str], prog: str):
+        self.argv = argv
+        self.prog = prog
 
-        subparsers = parser.add_subparsers(dest="subcommand")
+        self.parser = self._create_parsers()
+
+    @staticmethod
+    def create() -> "CliArgParser":
+        return CliArgParser(sys.argv[1:], prog=NAME)
+
+    def _create_parsers(self) -> ArgumentParser:
+        parser = ArgumentParser(
+            prog=self.prog, description="Shine2MQTT CLI", formatter_class=_CustomHelpFormatter
+        )
+
+        subparsers = parser.add_subparsers(required=True)
 
         run_parser = subparsers.add_parser(
-            "run", description="Run the Shine2MQTT server", formatter_class=CustomHelpFormatter
+            "run",
+            description="Run the Shine2MQTT server",
+            formatter_class=_CustomHelpFormatter,
+            prog=self.prog,
         )
         run_parser.set_defaults(simulated_client__enabled=False)
 
         sim_parser = subparsers.add_parser(
             "sim",
             description="Run a simulated Shine Wifi-X client",
-            formatter_class=CustomHelpFormatter,
+            formatter_class=_CustomHelpFormatter,
+            prog=self.prog,
         )
         sim_parser.set_defaults(simulated_client__enabled=True)
 
         self._add_top_level_args(parser)
 
-        self._add_capture_data_args(run_parser)
-        self._add_mqtt_args(run_parser)
-        self._add_server_args(run_parser)
-        self._add_api_args(run_parser)
+        self._add_run_args(run_parser)
 
         self._add_simulated_client_args(sim_parser)
 
-        self.parser = parser
+        return parser
 
     def _add_top_level_args(self, parser: ArgumentParser) -> None:
         parser.add_argument(
@@ -56,6 +72,12 @@ class ArgParser:
         )
 
         parser.add_argument("-c", "--config-file", type=Path)
+
+    def _add_run_args(self, parser: ArgumentParser) -> None:
+        self._add_capture_data_args(parser)
+        self._add_mqtt_args(parser)
+        self._add_server_args(parser)
+        self._add_api_args(parser)
 
     def _add_capture_data_args(self, parser: ArgumentParser) -> None:
         parser.add_argument(
@@ -156,5 +178,5 @@ class ArgParser:
             metavar="PORT",
         )
 
-    def parse(self, argv: Sequence[str] | None = None) -> Namespace:
-        return self.parser.parse_args(argv)
+    def parse(self) -> Namespace:
+        return self.parser.parse_args(self.argv)

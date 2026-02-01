@@ -46,25 +46,25 @@ class GrowattServer:
     async def stop(self):
         logger.info("Stopping TCP server")
 
-        if self.session_task:
-            logger.info("Closing active TCP session")
-            self.session_task.cancel()
-
-            try:
-                await asyncio.wait_for(self.session_task, timeout=1.0)
-            except asyncio.CancelledError:
-                logger.debug("TCP session task closed")
-                raise
-            except TimeoutError:
-                logger.warning("TCP session cancellation timed out")
-
-            logger.info("Active TCP session closed")
+        await self._close_session()
 
         if self.server:
             logger.info("Closing TCP server")
             self.server.close()
             await self.server.wait_closed()
             logger.info("TCP server was closed")
+
+    async def _close_session(self):
+        if self.session_task:
+            logger.info("Closing active TCP session")
+            self.session_task.cancel()
+
+            try:
+                await asyncio.wait_for(self.session_task, timeout=1.0)
+            except TimeoutError:
+                logger.warning("TCP session cancellation timed out")
+
+            logger.info("Active TCP session closed")
 
     async def _handle_client(self, reader: StreamReader, writer: StreamWriter):
         addr = writer.get_extra_info("peername")
@@ -73,10 +73,11 @@ class GrowattServer:
 
         # Only allow a single session
         if self.session is not None:
-            logger.warning("Existing active session, rejecting new connection")
+            logger.warning("Existing active session detected, closing it")
             writer.close()
             await writer.wait_closed()
-            return
+            await self._close_session()
+            logger.info("Previous session closed, accepting new connection")
 
         self.session = GrowattTcpSession(
             reader,

@@ -3,9 +3,10 @@ import asyncio
 from loguru import logger
 
 from shine2mqtt.app.app import Application
-from shine2mqtt.app.cli.parser import ArgParser
+from shine2mqtt.app.cli.converter import CliArgDictConverter
+from shine2mqtt.app.cli.parser import CliArgParser
 from shine2mqtt.app.config.config import ApplicationConfig
-from shine2mqtt.app.config.loader import ConfigLoader
+from shine2mqtt.app.config.file import ConfigFileLoader
 from shine2mqtt.app.logger import LoggerConfigurator
 from shine2mqtt.growatt.client.config import SimulatedClientConfig
 from shine2mqtt.growatt.client.simulate import SimulatedClient
@@ -24,13 +25,24 @@ async def run_application(config: ApplicationConfig) -> None:
     await app.run()
 
 
+def load_config() -> ApplicationConfig:
+    args = CliArgParser.create().parse()
+
+    file_config = ConfigFileLoader.create().load(args.config_file)
+    cli_config = CliArgDictConverter.convert(args)
+
+    return ApplicationConfig.create(file_config, cli_config)
+
+
+def setup_logging(config: ApplicationConfig) -> None:
+    LoggerConfigurator.setup(log_level=config.log_level, color=config.log_color)
+
+
 async def main():
     try:
-        args = ArgParser().parse()
+        config = load_config()
 
-        config: ApplicationConfig = ConfigLoader().load(args)
-
-        LoggerConfigurator.setup(log_level=config.log_level, color=config.log_color)
+        setup_logging(config)
 
         logger.info(f"Loaded configuration: {config}")
 
