@@ -3,10 +3,10 @@ from loguru import logger
 from shine2mqtt.growatt.protocol.encoders import (
     AckPayloadEncoder,
     AnnouncePayloadEncoder,
-    BaseEncoder,
     BufferedDataPayloadEncoder,
     DataPayloadEncoder,
     GetConfigRequestPayloadEncoder,
+    PayloadEncoder,
     PingPayloadEncoder,
     SetConfigRequestPayloadEncoder,
 )
@@ -18,9 +18,11 @@ from shine2mqtt.growatt.protocol.messages import (
 
 class PayloadEncoderRegistry:
     def __init__(self):
-        self._encoder: dict[type[BaseMessage], BaseEncoder] = {}
+        self._encoder: dict[type[BaseMessage], PayloadEncoder] = {}
 
-    def register_encoder(self, encoder: BaseEncoder, message_type: type[BaseMessage] | None = None):
+    def register_encoder(
+        self, encoder: PayloadEncoder, message_type: type[BaseMessage] | None = None
+    ):
         """Register an encoder. If message_type is not provided, it will be extracted from encoder.message_type."""
         if message_type is None:
             message_type = encoder.message_type
@@ -31,7 +33,7 @@ class PayloadEncoderRegistry:
 
         self._encoder[message_type] = encoder
 
-    def get_encoder(self, message_type: type[BaseMessage]) -> BaseEncoder:
+    def get_encoder(self, message_type: type[BaseMessage]) -> PayloadEncoder:
         encoder = self._encoder.get(message_type, None)
         if encoder is None:
             message = f"No encoder registered for this message type: {message_type}"

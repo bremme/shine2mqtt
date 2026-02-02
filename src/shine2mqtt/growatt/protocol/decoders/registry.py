@@ -3,7 +3,7 @@ from loguru import logger
 from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.decoders.ack import AckMessageResponseDecoder
 from shine2mqtt.growatt.protocol.decoders.announce import AnnounceRequestDecoder
-from shine2mqtt.growatt.protocol.decoders.base import MessageDecoder
+from shine2mqtt.growatt.protocol.decoders.decoder import MessageDecoder
 from shine2mqtt.growatt.protocol.decoders.config import (
     GetConfigRequestDecoder,
     GetConfigResponseDecoder,

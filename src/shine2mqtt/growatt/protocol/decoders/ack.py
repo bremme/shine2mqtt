@@ -1,5 +1,5 @@
 from shine2mqtt.growatt.protocol.constants import ACK
-from shine2mqtt.growatt.protocol.decoders.base import MessageDecoder
+from shine2mqtt.growatt.protocol.decoders.decoder import MessageDecoder
 from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
 

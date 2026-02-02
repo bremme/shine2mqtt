@@ -9,9 +9,9 @@ from shine2mqtt.growatt.protocol.constants import (
     ENCRYPTION_KEY,
     FunctionCode,
 )
-from shine2mqtt.growatt.protocol.decoders.base import ByteDecoder
-from shine2mqtt.growatt.protocol.encoders.base import ByteEncoder
+from shine2mqtt.growatt.protocol.decoders.decoder import ByteDecoder
 from shine2mqtt.growatt.protocol.encoders.crc import CRCEncoder
+from shine2mqtt.growatt.protocol.encoders.encoder import ByteEncoder
 from shine2mqtt.growatt.protocol.encoders.header import HeaderEncoder
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.growatt.protocol.frame.crc import CRC16_LENGTH, CRCCalculator
@@ -96,21 +96,21 @@ class RawPayloadSanitizer:
 
     def _sanitize_announce_payload(self, payload: bytes) -> bytes:
         sanitized_payload = bytearray(payload)
-        sanitized_payload[0:10] = ByteEncoder.encode_string(DUMMY_DATALOGGER_SERIAL, 10)
-        sanitized_payload[30:40] = ByteEncoder.encode_string(DUMMY_INVERTER_SERIAL, 10)
+        sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
+        sanitized_payload[30:40] = ByteEncoder.encode_str(DUMMY_INVERTER_SERIAL, 10)
         return bytes(sanitized_payload)
 
     def _sanitize_data_payload(self, payload: bytes) -> bytes:
         sanitized_payload = bytearray(payload)
-        sanitized_payload[0:10] = ByteEncoder.encode_string(DUMMY_DATALOGGER_SERIAL, 10)
-        sanitized_payload[30:40] = ByteEncoder.encode_string(DUMMY_INVERTER_SERIAL, 10)
+        sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
+        sanitized_payload[30:40] = ByteEncoder.encode_str(DUMMY_INVERTER_SERIAL, 10)
         return bytes(sanitized_payload)
 
     def _sanitize_get_config_response_payload(self, payload: bytes) -> bytes:
         sanitized_payload = bytearray(payload)
-        sanitized_payload[0:10] = ByteEncoder.encode_string(DUMMY_DATALOGGER_SERIAL, 10)
+        sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
 
-        register = ByteDecoder.read_u16(payload, 30)
+        register = ByteDecoder.decode_u16(payload, 30)
 
         if register not in SENSITIVE_CONFIG_REGISTER_MAP:
             return bytes(sanitized_payload)
@@ -118,8 +118,8 @@ class RawPayloadSanitizer:
         sanitized_value = SENSITIVE_CONFIG_REGISTER_MAP[register]
 
         new_length = len(sanitized_value)
-        sanitized_payload[32:34] = ByteEncoder.encode_uint16(new_length)
-        sanitized_payload[34 : 34 + len(sanitized_value)] = ByteEncoder.encode_string(
+        sanitized_payload[32:34] = ByteEncoder.encode_u16(new_length)
+        sanitized_payload[34 : 34 + len(sanitized_value)] = ByteEncoder.encode_str(
             sanitized_value, new_length
         )
 
@@ -127,7 +127,7 @@ class RawPayloadSanitizer:
 
     def _sanitize_ping_payload(self, payload: bytes) -> bytes:
         sanitized_payload = bytearray(payload)
-        sanitized_payload[0:10] = ByteEncoder.encode_string(DUMMY_DATALOGGER_SERIAL, 10)
+        sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
         return bytes(sanitized_payload)
 
 

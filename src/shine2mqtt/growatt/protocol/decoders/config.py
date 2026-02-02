@@ -23,9 +23,9 @@ class GetConfigRequestDecoder(MessageDecoder[GrowattGetConfigRequestMessage]):
     """Decoder for GET_CONFIG requests (server → client)"""
 
     def decode(self, header: MBAPHeader, payload: bytes) -> GrowattGetConfigRequestMessage:
-        datalogger_serial = self.read_str(payload, 0, 10)
-        register_start = self.read_u16(payload, 10)
-        register_end = self.read_u16(payload, 12)
+        datalogger_serial = self.decode_str(payload, 0, 10)
+        register_start = self.decode_u16(payload, 10)
+        register_end = self.decode_u16(payload, 12)
 
         return GrowattGetConfigRequestMessage(
             header=header,
@@ -42,23 +42,23 @@ class SetConfigRequestDecoder(MessageDecoder[GrowattSetConfigRequestMessage]):
         self.config_registry = config_registry if config_registry else ConfigRegistry()
 
     def decode(self, header: MBAPHeader, payload: bytes) -> GrowattSetConfigRequestMessage:
-        datalogger_serial = self.read_str(payload, 0, 10)
-        register = self.read_u16(payload, 30)
-        length = self.read_u16(payload, 32)
+        datalogger_serial = self.decode_str(payload, 0, 10)
+        register = self.decode_u16(payload, 30)
+        length = self.decode_u16(payload, 32)
 
         # Decode value based on register config
         config = self.config_registry.get_register_info(register)
         if config is None:
             # Unknown register, read as bytes
-            value = self.read_str(payload, 34, length)
+            value = self.decode_str(payload, 34, length)
         elif config.fmt == "s":
-            value = self.read_str(payload, 34, length)
+            value = self.decode_str(payload, 34, length)
         elif config.fmt == "B":
-            value = self.read_u8(payload, 34)
+            value = self.decode_u8(payload, 34)
         elif config.fmt == "H":
-            value = self.read_u16(payload, 34)
+            value = self.decode_u16(payload, 34)
         else:
-            value = self.read_str(payload, 34, length)
+            value = self.decode_str(payload, 34, length)
 
         return GrowattSetConfigRequestMessage(
             header=header,
@@ -76,9 +76,9 @@ class GetConfigResponseDecoder(MessageDecoder[GrowattGetConfigResponseMessage]):
         self.config_registry = config_registry if config_registry else ConfigRegistry()
 
     def decode(self, header: MBAPHeader, payload: bytes) -> GrowattGetConfigResponseMessage:
-        datalogger_serial = self.read_str(payload, 0, 10)
-        register = self.read_u16(payload, 30)
-        length = self.read_u16(payload, 32)
+        datalogger_serial = self.decode_str(payload, 0, 10)
+        register = self.decode_u16(payload, 30)
+        length = self.decode_u16(payload, 32)
 
         try:
             data = payload[34 : 34 + length]
@@ -100,13 +100,13 @@ class GetConfigResponseDecoder(MessageDecoder[GrowattGetConfigResponseMessage]):
             )
 
         if config.fmt == "s":
-            value = self.read_str(payload, 34, length)
+            value = self.decode_str(payload, 34, length)
         elif config.fmt == "B":
-            value = self.read_u8(payload, 34)
+            value = self.decode_u8(payload, 34)
         elif config.fmt == "H":
-            value = self.read_u16(payload, 34)
+            value = self.decode_u16(payload, 34)
         elif config.fmt == "I":
-            value = self.read_u32(payload, 34)
+            value = self.decode_u32(payload, 34)
 
         return GrowattGetConfigResponseMessage(
             header=header,

@@ -10,20 +10,20 @@ class ByteEncoder:
         return struct.pack(">B", 1 if value else 0)
 
     @staticmethod
-    def encode_string(value: str, length: int) -> bytes:
-        return struct.pack(f">{length}s", value.encode("ascii"))
-
-    @staticmethod
-    def encode_uint8(value: int) -> bytes:
+    def encode_u8(value: int) -> bytes:
         return struct.pack(">B", value)
 
     @staticmethod
-    def encode_uint16(value: int) -> bytes:
+    def encode_u16(value: int) -> bytes:
         return struct.pack(">H", value)
 
     @staticmethod
-    def encode_uint32(value: int) -> bytes:
+    def encode_u32(value: int) -> bytes:
         return struct.pack(">I", value)
+
+    @staticmethod
+    def encode_str(value: str, length: int) -> bytes:
+        return struct.pack(f">{length}s", value.encode("ascii"))
 
     @staticmethod
     def set_bit(value: int, bit_index: int, bit_value: bool) -> int:
@@ -33,7 +33,7 @@ class ByteEncoder:
             return value & ~(1 << bit_index)
 
 
-class BaseEncoder[T: BaseMessage](ABC, ByteEncoder):
+class PayloadEncoder[T: BaseMessage](ABC, ByteEncoder):
     def __init__(self, message_type: type[T]):
         self.message_type = message_type
 

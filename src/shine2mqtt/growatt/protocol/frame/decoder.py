@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.decoders.base import MessageDecoder
+from shine2mqtt.growatt.protocol.decoders.decoder import MessageDecoder
 from shine2mqtt.growatt.protocol.decoders.header import HeaderDecoder
 from shine2mqtt.growatt.protocol.decoders.registry import DecoderRegistry
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
