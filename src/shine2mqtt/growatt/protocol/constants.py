@@ -31,7 +31,11 @@ class InverterStatus(Enum):
 
 
 UPDATE_INTERVAL_REGISTER = 4
+DATALOGGER_IP_ADDRESS_REGISTER = 14
+DATALOGGER_MAC_ADDRESS_REGISTER = 16
+DATALOGGER_SERVER_IP_ADDRESS_REGISTER = 17
 DATALOGGER_SW_VERSION_REGISTER = 21
+DATALOGGER_WIFI_SSID_REGISTER = 56
 DATALOGGER_WIFI_PASSWORD_REGISTER = 57
 
 CONFIG_REGISTERS = {
@@ -57,10 +61,22 @@ CONFIG_REGISTERS = {
         "fmt": "s",
     },
     # 9-13 are unknown
-    14: {"name": "ip_address", "description": "Local IP", "fmt": "s"},  # 0x0E
+    DATALOGGER_IP_ADDRESS_REGISTER: {
+        "name": "ip_address",
+        "description": "Local IP",
+        "fmt": "s",
+    },  # 0x0E
     15: {"name": "port", "description": "Local Port", "fmt": "s"},  # 0x0F
-    16: {"name": "mac_address", "description": "Mac Address", "fmt": "s"},  # 0x10
-    17: {"name": "server_ip_address", "description": "Server IP", "fmt": "s"},  # 0x11
+    DATALOGGER_MAC_ADDRESS_REGISTER: {
+        "name": "mac_address",
+        "description": "Mac Address",
+        "fmt": "s",
+    },  # 0x10
+    DATALOGGER_SERVER_IP_ADDRESS_REGISTER: {
+        "name": "server_ip_address",
+        "description": "Server IP",
+        "fmt": "s",
+    },  # 0x11
     18: {"name": "server_port", "description": "Server Port", "fmt": "s"},  # 0x12
     19: {"name": "server", "description": "Server", "fmt": "s"},  # 0x13
     20: {"name": "device_type", "description": "Device Type", "fmt": "s"},  # 0x14
@@ -79,7 +95,11 @@ CONFIG_REGISTERS = {
     # 27-30 are unknown
     31: {"name": "date", "description": "Date", "fmt": "s"},  # 0x1F
     32: {"name": "reboot", "description": "Reboot", "fmt": "s"},  # ?,  # ??? # 0x20
-    56: {"name": "wifi_ssid", "description": "WiFi SSID", "fmt": "s"},  # 0x38
+    DATALOGGER_WIFI_SSID_REGISTER: {
+        "name": "wifi_ssid",
+        "description": "WiFi SSID",
+        "fmt": "s",
+    },  # 0x38
     DATALOGGER_WIFI_PASSWORD_REGISTER: {
         "name": "wifi_password",
         "description": "WiFi password",
