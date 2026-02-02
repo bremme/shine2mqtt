@@ -39,6 +39,7 @@ class AnnounceRequestDecoder(MessageDecoder[GrowattAnnounceMessage]):
             # 10-30 is \x00
             inverter_serial=self.read_str(payload, 30, 10),
             # 40-60 is \x00
+            # timestamp=self._read_datetime(payload, offset=60, fmt="B"),
             # Holding registers (read/write) ###########################################
             # See 4.1 Holding Registers in Protocol document v1.20(page 9)
             # Offset of 71 in the announce payload, every register is 2 bytes

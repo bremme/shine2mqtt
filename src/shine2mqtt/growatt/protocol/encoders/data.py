@@ -6,13 +6,16 @@ from shine2mqtt.growatt.protocol.messages.data import (
     GrowattDataMessage,
 )
 
+# TODO verify size
+DATA_MESSAGE_PAYLOAD_SIZE = 575
+
 
 class DataPayloadEncoder(BaseEncoder[GrowattDataMessage]):
     def __init__(self):
         super().__init__(GrowattDataMessage)
 
     def encode(self, message: GrowattDataMessage) -> bytes:
-        payload = bytearray(197)
+        payload = bytearray(DATA_MESSAGE_PAYLOAD_SIZE)
 
         # Datalogger serial (0-10)
         payload[0:10] = self.encode_string(message.datalogger_serial, 10)

@@ -10,6 +10,9 @@ class CaptureHandler:
         self.capturer = capturer
         self.sanitizer = sanitizer
 
+    # def __call__(self, message: BaseMessage) -> None:
+    #     # TODO sanitize the raw frame instead of re-encoding the message
+
     def __call__(self, message: BaseMessage) -> None:
         sanitized_message = self.sanitizer.sanitize(message)
 

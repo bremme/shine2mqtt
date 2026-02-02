@@ -71,7 +71,9 @@ class DataRequestDecoder(MessageDecoder[GrowattDataMessage]):
             # energy_dc_3_today=self._read_u32_scaled(payload, 197, 0.1),
             # energy_dc_3_total=self._read_u32_scaled(payload, 201, 0.1),
             # Temperatures
-            temperature=self._read_u16_scaled(payload, 257, 0.1),
+            # FIXME
+            # temperature=self._read_u16_scaled(payload, 257, 0.1),
+            temperature=0.0,
             # temperature_ipm=self._read_u16_scaled(payload, 259, 0.1),
             # temperature_boost=self._read_u16_scaled(payload, 261, 0.1),
         )
