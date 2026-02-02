@@ -24,7 +24,7 @@ class FrameValidator:
     def _validate_crc(self, frame: bytes) -> None:
         offset = len(frame) - CRC16_LENGTH
         crc = struct.unpack_from("<H", frame, offset)[0]
-        computed_crc = self.crc_calculator.calculate_crc16(frame)
+        computed_crc = self.crc_calculator.calculate_crc16(frame[:-CRC16_LENGTH])
 
         if crc != computed_crc:
             raise ValueError(f"Invalid CRC: expected 0x{crc:04x}, got 0x{computed_crc:04x}.")

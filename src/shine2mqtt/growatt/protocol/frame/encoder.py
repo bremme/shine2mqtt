@@ -4,6 +4,7 @@ from shine2mqtt.growatt.protocol.encoders.registry import PayloadEncoderRegistry
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.growatt.protocol.frame.crc import CRC16_LENGTH, CRCCalculator
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
+from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
 
 
 class FrameEncoder:
@@ -36,7 +37,7 @@ class FrameEncoder:
 
         encrypted_payload = self.payload_cipher.encrypt(raw_payload, self.encryption_key)
 
-        crc = self.crc_calculator.calculate_crc16(raw_header + encrypted_payload + b"\x00\x00")
+        crc = self.crc_calculator.calculate_crc16(raw_header + encrypted_payload)
 
         frame = raw_header + encrypted_payload + self.crc_encoder.encode(crc)
 

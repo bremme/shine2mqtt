@@ -27,9 +27,9 @@ CRC16_LENGTH = 2
 
 
 class CRCCalculator:
-    def calculate_crc16(self, frame: bytes) -> int:
+    def calculate_crc16(self, data: bytes) -> int:
         crc = _CRC16_INITIAL_VALUE
-        for byte_value in frame[:-CRC16_LENGTH]:
-            table_index = (crc ^ byte_value) & 0xFF
+        for byte in data:
+            table_index = (crc ^ byte) & 0xFF
             crc = ((crc >> 8) & 0xFF) ^ _CRC16_LOOKUP_TABLE[table_index]
         return ((crc << 8) & 0xFF00) | ((crc >> 8) & 0x00FF)
