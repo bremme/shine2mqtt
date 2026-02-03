@@ -81,10 +81,8 @@ class RawPayloadSanitizer:
 
     def _sanitize_payload(self, function_code: FunctionCode, payload: bytes) -> bytes:
         match function_code:
-            case FunctionCode.ANNOUNCE:
-                return self._sanitize_announce_payload(payload)
-            case FunctionCode.DATA | FunctionCode.BUFFERED_DATA:
-                return self._sanitize_data_payload(payload)
+            case FunctionCode.ANNOUNCE | FunctionCode.BUFFERED_DATA | FunctionCode.DATA:
+                return self._sanitize_announce_or_data_payload(payload)
             case FunctionCode.GET_CONFIG:
                 return self._sanitize_get_config_response_payload(payload)
             case FunctionCode.PING:
@@ -94,13 +92,7 @@ class RawPayloadSanitizer:
 
         return payload
 
-    def _sanitize_announce_payload(self, payload: bytes) -> bytes:
-        sanitized_payload = bytearray(payload)
-        sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
-        sanitized_payload[30:40] = ByteEncoder.encode_str(DUMMY_INVERTER_SERIAL, 10)
-        return bytes(sanitized_payload)
-
-    def _sanitize_data_payload(self, payload: bytes) -> bytes:
+    def _sanitize_announce_or_data_payload(self, payload: bytes) -> bytes:
         sanitized_payload = bytearray(payload)
         sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
         sanitized_payload[30:40] = ByteEncoder.encode_str(DUMMY_INVERTER_SERIAL, 10)
