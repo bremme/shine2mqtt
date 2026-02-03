@@ -4,7 +4,6 @@ from shine2mqtt.growatt.protocol.encoders.registry import PayloadEncoderRegistry
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.growatt.protocol.frame.crc import CRC16_LENGTH, CRCCalculator
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
 
 
 class FrameEncoder:
