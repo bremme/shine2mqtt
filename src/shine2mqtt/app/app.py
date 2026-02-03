@@ -16,7 +16,7 @@ from shine2mqtt.growatt.protocol.frame import (
     FrameFactory,
 )
 from shine2mqtt.growatt.protocol.frame.capturer import CaptureHandler
-from shine2mqtt.growatt.protocol.processor.processor import ProtocolProcessor
+from shine2mqtt.growatt.protocol.processor.coordinator import ProtocolCoordinator
 from shine2mqtt.growatt.server import GrowattServer
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
 from shine2mqtt.mqtt.bridge import MqttBridge
@@ -43,7 +43,7 @@ class Application:
         else:
             decoder = FrameFactory.server_decoder()
 
-        self.protocol_processor = ProtocolProcessor(
+        self.coordinator = ProtocolCoordinator(
             decoder=decoder,
             encoder=encoder,
             incoming_frames=incoming_frames,
@@ -55,7 +55,7 @@ class Application:
         self.tcp_server = GrowattServer(
             incoming_frames=incoming_frames,
             outgoing_frames=outgoing_frames,
-            protocol_processor=self.protocol_processor,
+            coordinator=self.coordinator,
             config=config.server,
         )
 
@@ -107,7 +107,7 @@ class Application:
 
             tasks = [
                 asyncio.create_task(self.tcp_server.serve()),
-                asyncio.create_task(self.protocol_processor.run()),
+                asyncio.create_task(self.coordinator.run()),
                 asyncio.create_task(self.mqtt_bridge.run()),
             ]
 

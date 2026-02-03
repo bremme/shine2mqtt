@@ -41,6 +41,7 @@ class DataGenerator:
                 rate_of_change_of_frequency_protection=True,
                 frequency_derating_recovery=False,
             ),
+            power_factor_memory=False,
             active_power_ac_max=100,
             reactive_power_ac_max=0,
             power_factor=1.0,
@@ -89,6 +90,8 @@ class DataGenerator:
             voltage_ac_l1_l2=232.4,
             voltage_ac_l2_l3=0.0,
             voltage_ac_l3_l1=0.0,
+            # total run time
+            total_run_time=39822,
             # Energy values
             energy_ac_today=1.5,
             energy_ac_total=7428.8,
@@ -97,6 +100,8 @@ class DataGenerator:
             energy_dc_1_total=7504.9,
             energy_dc_2_today=0.0,
             energy_dc_2_total=0.0,
+            # temperature
+            temperature=32.1,
         )
 
     def generate_ping_message(self, transaction_id: int) -> GrowattPingMessage:

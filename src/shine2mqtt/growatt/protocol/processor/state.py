@@ -1,4 +1,3 @@
-from asyncio import Future
 from dataclasses import dataclass, field
 
 from shine2mqtt.growatt.protocol.constants import FunctionCode
@@ -23,7 +22,16 @@ class SessionState:
             FunctionCode.GET_CONFIG: 0,
         }
     )
-    command_futures: dict[tuple[FunctionCode, int], Future] = field(default_factory=dict)
+    # command_futures: dict[tuple[FunctionCode, int], Future] = field(default_factory=dict)
+
+    def reset(self):
+        self.announced = False
+        self.protocol_id = 0
+        self.unit_id = 0
+        self.datalogger_serial = ""
+        for function_code in self.last_transaction_id:
+            self.last_transaction_id[function_code] = 0
+        # self.command_futures.clear() --- IGNORE ---
 
     def is_announced(self) -> bool:
         return self.announced
@@ -41,5 +49,5 @@ class SessionState:
     def update_transaction_id(self, header: MBAPHeader) -> None:
         self.last_transaction_id[header.function_code] = header.transaction_id
 
-    def store_command_future(self, header: MBAPHeader, future: Future) -> None:
-        self.command_futures[(header.function_code, header.transaction_id)] = future
+    # def store_command_future(self, header: MBAPHeader, future: Future) -> None:
+    #     self.command_futures[(header.function_code, header.transaction_id)] = future

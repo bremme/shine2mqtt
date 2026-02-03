@@ -4,7 +4,7 @@ from asyncio import Server, StreamReader, StreamWriter
 from loguru import logger
 
 from shine2mqtt.app.queues import IncomingFrames, OutgoingFrames
-from shine2mqtt.growatt.protocol.processor.processor import ProtocolProcessor
+from shine2mqtt.growatt.protocol.processor.coordinator import ProtocolCoordinator
 from shine2mqtt.growatt.server.config import GrowattServerConfig
 from shine2mqtt.growatt.server.session import GrowattTcpSession
 
@@ -14,7 +14,7 @@ class GrowattServer:
         self,
         incoming_frames: IncomingFrames,
         outgoing_frames: OutgoingFrames,
-        protocol_processor: ProtocolProcessor,
+        coordinator: ProtocolCoordinator,
         config: GrowattServerConfig,
     ) -> None:
         self.host = config.host
@@ -25,7 +25,7 @@ class GrowattServer:
         self.session_task = None
         self._incoming_frames = incoming_frames
         self._outgoing_frames = outgoing_frames
-        self._protocol_processor = protocol_processor
+        self._coordinator = coordinator
 
     async def start(self):
         logger.info("Creating TCP server")
@@ -83,7 +83,7 @@ class GrowattServer:
             self._incoming_frames,
             self._outgoing_frames,
         )
-        self._protocol_processor.reset()
+        self._coordinator.reset()
         self.session_task = asyncio.create_task(self.session.run())
 
         try:

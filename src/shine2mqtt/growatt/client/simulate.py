@@ -154,7 +154,7 @@ class SimulatedClient:
                 logger.debug(f"← Full frame ({len(frame)} bytes): {frame.hex()}")
                 logger.debug(f"← Payload ({len(raw_message_data)} bytes): {raw_message_data.hex()}")
 
-                message = self.decoder.decode(header, frame)
+                message = self.decoder.decode(frame)
 
                 await self._handle_server_message(message)
         except asyncio.IncompleteReadError:
