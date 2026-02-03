@@ -25,13 +25,16 @@ class CliArgParser:
 
     def _create_parsers(self) -> ArgumentParser:
         parser = ArgumentParser(
-            prog=self.prog, description="Shine2MQTT CLI", formatter_class=_CustomHelpFormatter
+            prog=self.prog,
+            description="Shine2MQTT acts as a local server for your Growatt Shine (Wifi-X) datalogger, capturing data that would normally be sent to Growatt's cloud servers. It publishes this data via MQTT in a Home Assistant-friendly format, giving you complete local control of your solar inverter data.",
+            formatter_class=_CustomHelpFormatter,
         )
 
         subparsers = parser.add_subparsers(required=True)
 
         run_parser = subparsers.add_parser(
             "run",
+            help="Run the Shine2MQTT server",
             description="Run the Shine2MQTT server",
             formatter_class=_CustomHelpFormatter,
             prog=self.prog,
@@ -40,7 +43,8 @@ class CliArgParser:
 
         sim_parser = subparsers.add_parser(
             "sim",
-            description="Run a simulated Shine Wifi-X client",
+            help="Simulate a Shine Wifi-X client",
+            description="Simulate a Shine Wifi-X client. Send data to a Shine2MQTT server, for testing purposes.",
             formatter_class=_CustomHelpFormatter,
             prog=self.prog,
         )
@@ -58,20 +62,22 @@ class CliArgParser:
         parser.add_argument(
             "-l",
             "--log-level",
-            help="Set the logging level (e.g., DEBUG, INFO, WARNING, ERROR)",
+            help="Set the logging level (e.g. DEBUG, INFO, WARNING, ERROR)",
             choices=list(logging.getLevelNamesMapping().keys()),
             type=str,
             dest="log_level",
+            metavar="LEVEL",
         )
         parser.add_argument(
+            "-C",
             "--log-color",
-            help="Enable colored logging output",
+            help="Enable or disable colored logging output",
             action="store_true",
             default=None,
             dest="log_color",
         )
 
-        parser.add_argument("-c", "--config-file", type=Path)
+        parser.add_argument("-c", "--config-file", help="Path to configuration file", type=Path)
 
     def _add_run_args(self, parser: ArgumentParser) -> None:
         self._add_capture_data_args(parser)
@@ -151,7 +157,7 @@ class CliArgParser:
     def _add_api_args(self, parser: ArgumentParser) -> None:
         parser.add_argument(
             "--api",
-            help="Enable RESTTful API",
+            help="Enable RESTfull API",
             action="store_true",
             default=None,
             dest="api__enabled",
