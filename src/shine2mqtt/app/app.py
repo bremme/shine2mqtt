@@ -10,10 +10,6 @@ from shine2mqtt.growatt.protocol.frame import (
     FrameFactory,
 )
 from shine2mqtt.growatt.protocol.frame.capturer import CaptureHandler
-from shine2mqtt.growatt.protocol.frame.capturer.capturer import FileFrameCapturer
-from shine2mqtt.growatt.protocol.frame.capturer.sanitizer import (
-    RawPayloadSanitizer,
-)
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
 from shine2mqtt.growatt.protocol.processor.processor import ProtocolProcessor
 from shine2mqtt.growatt.server import GrowattServer
@@ -36,9 +32,7 @@ class Application:
 
         if config.capture_data:
             logger.info("Frame data capturing is enabled.")
-            capturer = FileFrameCapturer(Path("./captured_frames"))
-            sanitizer = RawPayloadSanitizer.create()
-            capture_handler = CaptureHandler(encoder, capturer, sanitizer)
+            capture_handler = CaptureHandler.create(Path("./captured_frames"), encoder)
             decoder = FrameFactory.server_decoder(on_decode=capture_handler)
         else:
             decoder = FrameFactory.server_decoder()
