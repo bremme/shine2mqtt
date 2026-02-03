@@ -23,6 +23,8 @@ class DataPayloadEncoder(PayloadEncoder[GrowattDataMessage]):
         payload[30:40] = self.encode_str(message.inverter_serial, 10)
         # 40-60 is \x00 (padding)
 
+        # TODO timestamp?
+
         # System datetime (60-67) - format as bytes (B)
         payload[60] = struct.pack(">B", message.timestamp.year % 100)[0]
         payload[61] = struct.pack(">B", message.timestamp.month)[0]
@@ -63,6 +65,8 @@ class DataPayloadEncoder(PayloadEncoder[GrowattDataMessage]):
         payload[149:151] = self.encode_u16(int(message.voltage_ac_l2_l3 * 10))
         payload[151:153] = self.encode_u16(int(message.voltage_ac_l3_l1 * 10))
 
+        payload[165:169] = self._encode_total_run_time(message.total_run_time)
+
         # Energy AC (169-178)
         payload[169:173] = self.encode_u32(int(message.energy_ac_today * 10))
         payload[173:177] = self.encode_u32(int(message.energy_ac_total * 10))
@@ -74,7 +78,13 @@ class DataPayloadEncoder(PayloadEncoder[GrowattDataMessage]):
         payload[189:193] = self.encode_u32(int(message.energy_dc_2_today * 10))
         payload[193:197] = self.encode_u32(int(message.energy_dc_2_total * 10))
 
+        payload[257:259] = self.encode_u16(int(message.temperature * 10))
+
         return bytes(payload)
+
+    def _encode_total_run_time(self, total_run_time: int) -> bytes:
+        total_run_time_seconds = total_run_time * 3600
+        return self.encode_u32(total_run_time_seconds)
 
 
 class BufferedDataPayloadEncoder(DataPayloadEncoder):

@@ -22,7 +22,7 @@ class TestFrameValidator:
         return MBAPHeader(
             transaction_id=18,
             protocol_id=6,
-            length=199,
+            length=577,
             unit_id=1,
             function_code=FunctionCode.DATA,
         )
