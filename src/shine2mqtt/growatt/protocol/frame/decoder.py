@@ -25,7 +25,7 @@ class FrameDecoder:
         frame_validator: FrameValidator,
         payload_cipher: PayloadCipher,
         decoder_registry: DecoderRegistry,
-        on_decode: Callable[[BaseMessage], None] | None = None,
+        on_decode: Callable[[MBAPHeader, bytes], None] | None = None,
     ):
         self.decryption_key = decryption_key
         self.header_decoder = header_decoder
@@ -57,7 +57,7 @@ class FrameDecoder:
             # Hook: capture frame after successful decode
             try:
                 if self.on_decode:
-                    self.on_decode(message)
+                    self.on_decode(header, raw_payload)
             except Exception as e:
                 logger.error(f"on_decode hook failed: {e}")
 

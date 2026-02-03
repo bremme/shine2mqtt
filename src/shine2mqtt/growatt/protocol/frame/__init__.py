@@ -3,7 +3,7 @@ from .capturer import (
     CaptureHandler,
     FileFrameCapturer,
     FrameCapturer,
-    MessageSanitizer,
+    RawPayloadSanitizer,
 )
 from .cipher import PayloadCipher
 from .crc import CRCCalculator
@@ -16,7 +16,7 @@ __all__ = [
     "CaptureHandler",
     "CapturedFrame",
     "FrameCapturer",
-    "MessageSanitizer",
+    "RawPayloadSanitizer",
     "FileFrameCapturer",
     "PayloadCipher",
     "CRCCalculator",

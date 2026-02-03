@@ -1,10 +1,10 @@
 from .capturer import CapturedFrame, FileFrameCapturer, FrameCapturer
-from .handler import CaptureHandler, MessageSanitizer
+from .handler import CaptureHandler, RawPayloadSanitizer
 
 __all__ = [
     "CapturedFrame",
     "CaptureHandler",
     "FileFrameCapturer",
     "FrameCapturer",
-    "MessageSanitizer",
+    "RawPayloadSanitizer",
 ]
