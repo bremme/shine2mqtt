@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -24,6 +25,11 @@ class TestCliArgParser:
     def test_run_with_full_mqtt_config(self) -> None:
         args = CliArgParser(
             [
+                "--log-level",
+                "DEBUG",
+                "--log-color",
+                "--config-file",
+                "/path/to/config.yaml",
                 "run",
                 "--mqtt-host",
                 "broker.local",
@@ -45,6 +51,9 @@ class TestCliArgParser:
             ],
             "app",
         ).parse()
+        assert args.log_level == "DEBUG"
+        assert args.log_color is True
+        assert args.config_file == Path("/path/to/config.yaml")
         assert args.mqtt__server__host == "broker.local"
         assert args.mqtt__server__port == 1883
         assert args.mqtt__server__username == "user"

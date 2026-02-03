@@ -9,7 +9,7 @@ from shine2mqtt import NAME
 
 class _CustomHelpFormatter(HelpFormatter):
     def __init__(self, prog: str) -> None:
-        super().__init__(prog, max_help_position=60, width=100)
+        super().__init__(prog, max_help_position=60, width=120)
 
 
 class CliArgParser:
@@ -34,7 +34,7 @@ class CliArgParser:
 
         run_parser = subparsers.add_parser(
             "run",
-            help="Run the Shine2MQTT server",
+            help="Run the Shine2MQTT server (use 'shine2mqtt run --help' for more info)",
             description="Run the Shine2MQTT server",
             formatter_class=_CustomHelpFormatter,
             prog=self.prog,
@@ -43,7 +43,7 @@ class CliArgParser:
 
         sim_parser = subparsers.add_parser(
             "sim",
-            help="Simulate a Shine Wifi-X client",
+            help="Simulate a Shine Wifi-X client (use 'shine2mqtt sim --help' for more info)",
             description="Simulate a Shine Wifi-X client. Send data to a Shine2MQTT server, for testing purposes.",
             formatter_class=_CustomHelpFormatter,
             prog=self.prog,
