@@ -6,7 +6,6 @@ from shine2mqtt.growatt.protocol.messages.data import (
     GrowattDataMessage,
 )
 
-# TODO verify size
 DATA_MESSAGE_PAYLOAD_SIZE = 575
 
 

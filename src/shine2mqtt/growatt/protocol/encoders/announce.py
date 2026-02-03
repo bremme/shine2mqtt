@@ -4,8 +4,7 @@ from shine2mqtt.growatt.protocol.decoders.announce import LCD_LANGUAGE_MAP, POWE
 from shine2mqtt.growatt.protocol.encoders.encoder import PayloadEncoder
 from shine2mqtt.growatt.protocol.messages.announce import GrowattAnnounceMessage, SafetyFunction
 
-# TODO I think this should be 575 bytes, double check
-ANNOUNCE_MESSAGE_PAYLOAD_SIZE = 573
+ANNOUNCE_MESSAGE_PAYLOAD_SIZE = 575
 
 
 class AnnouncePayloadEncoder(PayloadEncoder[GrowattAnnounceMessage]):
