@@ -22,7 +22,7 @@
 
 > **A local Growatt server which listens to your Shine Wifi-X datalogger and publishes to MQTT**
 
-Shine2MQTT acts as a local server for your Growatt Shine Wifi-X datalogger, capturing data that would normally be sent to Growatt's cloud servers. It publishes this data via MQTT in a Home Assistant-friendly format, giving you complete local control of your solar inverter data.
+Shine2MQTT acts as a local server for your Growatt Shine (Wifi-X) datalogger, capturing data that would normally be sent to Growatt's cloud servers. It publishes this data via MQTT in a Home Assistant-friendly format, giving you complete local control of your solar inverter data.
 
 ## ✨ Features
 
