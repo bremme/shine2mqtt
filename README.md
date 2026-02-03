@@ -1,6 +1,6 @@
 # 🌟 Shine2MQTT
 
-> ⚠️ Currently in Alpha stage. Use at your own risk. The first images image's I've build seem to work fine, but the whole project is still under heavy development.
+> ⚠️ Currently in Alpha stage. Use at your own risk. The first images I've build seem to work fine, but the whole project is still under heavy development.
 
 [![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/bremme/shine2mqtt/actions/workflows/main.yaml/badge.svg)](https://github.com/bremme/shine2mqtt/actions/workflows/main.yaml)
@@ -26,7 +26,7 @@ Shine2MQTT acts as a local server for your Growatt Shine (Wifi-X) datalogger, ca
 
 ## ✨ Features
 
-- 🏠 **Home Assistant Integration** - Native MQTT discovery support
+- 🏠 **Home Assistant Integration** - Full MQTT discovery support
 - 🔒 **Local Control** - Keep your data private, no cloud dependency
 - 🐳 **Docker Support** - Easy deployment with Docker/Docker Compose
 - ⚡ **Real-time Data** - Instant solar production metrics
@@ -95,22 +95,27 @@ docker compose up
 
 > 💡 See [docker-compose.example.yaml](docker-compose.example.yaml) for all available options.
 
-### Option 2: UV (Python Package Manager)
+### Option 2: Installed Python package
 
 ```bash
-# Install UV if you haven't already
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Run directly with UV
-uv run shine2mqtt
-
-# Or install globally
+# Install using your favorite Python package manager, for example
 uv tool install shine2mqtt
-# And run
-shine2mqtt
+# or using pip:
+pip install shine2mqtt
+
+# Run the application
+shine2mqtt \
+  run \
+  --mqtt-server-host your-mqtt-broker \
+  --mqtt-server-port 1883 \
+  --mqtt-server-username username \
+  --mqtt-server-password password \
+  --mqtt-discovery-inverter-model "MIC 3000TL-X" \
+  --mqtt-discovery-datalogger-model "Shine WiFi-X"
+
 ```
 
-### Option 3: Python Module from src
+### Option 3: Run from source
 
 ```bash
 # Clone the repository
@@ -121,7 +126,14 @@ cd shine2mqtt
 uv sync --no-dev
 
 # Run the application
-uv run shine2mqtt
+uv run shine2mqtt \
+  run \
+  --mqtt-server-host your-mqtt-broker \
+  --mqtt-server-port 1883 \
+  --mqtt-server-username username \
+  --mqtt-server-password password \
+  --mqtt-discovery-inverter-model "MIC 3000TL-X" \
+  --mqtt-discovery-datalogger-model "Shine WiFi-X"
 ```
 
 ## ⚙️ Configuration
@@ -133,64 +145,61 @@ Shine2MQTT can be configured through **CLI arguments**, **environment variables*
 3. Configuration file
 4. Default values
 
-### Configuration options
+All configuration options are available through any of these methods.
 
-| Option                            | Default         | Description                                        |
-| --------------------------------- | --------------- | -------------------------------------------------- |
-| `log_level`                       | `INFO`          | Logging level (DEBUG, INFO, WARNING, ERROR)        |
-| `log_color`                       | `false`         | Force colored logging output                       |
-| `capture_data`                    | `false`         | Capture raw frames and store in `captured_frames/` |
-| `mqtt.base_topic`                 | `solar`         | Base MQTT topic for publishing data                |
-| `mqtt.availability_topic`         | `solar/state`   | MQTT topic for availability status                 |
-| `mqtt.server.host`                | `localhost`     | MQTT broker host                                   |
-| `mqtt.server.port`                | `1883`          | MQTT broker port                                   |
-| `mqtt.server.username`            |                 | MQTT broker username                               |
-| `mqtt.server.password`            |                 | MQTT broker password                               |
-| `mqtt.server.client_id`           | `shine2mqtt`    | MQTT client identifier                             |
-| `mqtt.discovery.enabled`          | `false`         | Enable Home Assistant MQTT discovery               |
-| `mqtt.discovery.prefix_topic`     | `homeassistant` | MQTT discovery topic prefix                        |
-| `mqtt.discovery.inverter.model`   |                 | Inverter model for Home Assistant                  |
-| `mqtt.discovery.datalogger.model` |                 | Datalogger model for Home Assistant                |
-| `server.host`                     | `0.0.0.0`       | TCP server host                                    |
-| `server.port`                     | `5279`          | TCP server port                                    |
-| `api.enabled`                     | `false`         | Enable RESTful API                                 |
-| `api.host`                        | `0.0.0.0`       | RESTful API host                                   |
-| `api.port`                        | `8000`          | RESTful API port                                   |
-| `simulated_client`                | `false`         | Enable simulated client for testing                |
-| `simulated_client.server_host`    | `localhost`     | Simulated client server host                       |
-| `simulated_client.server_port`    | `5279`          | Simulated client server port                       |
+### YAML Configuration File (Recommended)
 
-All options can be set via any of the configuration methods.
+To use a configuration file, have a look at the [config.example.yaml](config.example.yaml) file and create your own `config.yaml`. The file will be automatically picked up in the default location (`./config.yaml`), but you can also specify a custom path with the `--config-file` CLI argument or `SHINE2MQTT_CONFIG_FILE` environment variable.
 
-### CLI Arguments
+### Command line arguments
 
-For cli arguments `_`, or `.` need to be converted to `-`. For example:
-
-- `log_level` becomes `--log-level`
-- `mqtt.base_topic` becomes `--mqtt-base-topic`
-
-For all available options run:
+For all available command line arguments run:
 
 ```shell
+# Get generic arguments
 uv run shine2mqtt --help
+
+# Get 'run' command arguments (most important)
+uv run shine2mqtt run --help
+
+# Get 'simulate client' command arguments (for testing)
+uv run shine2mqtt sim --help
 ```
 
 ### Environment Variables
 
-For environmental variables prefix with `SHINE2MQTT_`, use uppercase, convert `-` to `_` and `.` to `__`. For example:
+The table below lists all available environment variables with their default values and descriptions.
 
-- `log_level` becomes `SHINE2MQTT_LOG_LEVEL`
-- `mqtt.base_topic` becomes `SHINE2MQTT_MQTT__BASE_TOPIC`
-
-### YAML Configuration File
-
-To use a configuration file, have a look at the [config.example.yaml](config.example.yaml) file and create your own `config.yaml`. The file will be automatically picked up in the default location (`./config.yaml`), but you can also specify a custom path with the `--config-file` CLI argument or `SHINE2MQTT_CONFIG_FILE` environment variable.
+| Option                                       | Default         | Description                                        |
+| -------------------------------------------- | --------------- | -------------------------------------------------- |
+| `SHINE2MQTT_LOG_LEVEL`                       | `INFO`          | Logging level (DEBUG, INFO, WARNING, ERROR)        |
+| `SHINE2MQTT_LOG_COLOR`                       | `false`         | Force colored logging output                       |
+| `SHINE2MQTT_CAPTURE_DATA`                    | `false`         | Capture raw frames and store in `captured_frames/` |
+| `SHINE2MQTT_MQTT__BASE_TOPIC`                | `solar`         | Base MQTT topic for publishing data                |
+| `SHINE2MQTT_MQTT__availability_topic`        | `solar/state`   | MQTT topic for availability status                 |
+| `SHINE2MQTT_MQTT___SERVER__HOST`             | `localhost`     | MQTT broker host                                   |
+| `SHINE2MQTT_MQTT___SERVER__PORT`             | `1883`          | MQTT broker port                                   |
+| `SHINE2MQTT_MQTT___SERVER__USERNAME`         |                 | MQTT broker username                               |
+| `SHINE2MQTT_MQTT___SERVER__PASSWORD`         |                 | MQTT broker password                               |
+| `SHINE2MQTT_MQTT___SERVER__CLIENT_ID`        | `shine2mqtt`    | MQTT client identifier                             |
+| `SHINE2MQTT_MQTT___DISCOVERY__ENABLED`       | `false`         | Enable Home Assistant MQTT discovery               |
+| `SHINE2MQTT_MQTT___DISCOVERY__PREFIX_TOPIC`  | `homeassistant` | MQTT discovery topic prefix                        |
+| `SHINE2MQTT_MQTT___DISCOVERY__INVERTER__MODEL`    |            | Inverter model for Home Assistant                  |
+| `SHINE2MQTT_MQTT___DISCOVERY__DATALOGGER__MODEL`  |            | Datalogger model for Home Assistant                |
+| `SHINE2MQTT_SERVER__HOST`                    | `0.0.0.0`       | TCP server host                                    |
+| `SHINE2MQTT_SERVER__PORT`                    | `5279`          | TCP server port                                    |
+| `SHINE2MQTT_API__ENABLED`                    | `false`         | Enable RESTful API                                 |
+| `SHINE2MQTT_API__HOST`                       | `0.0.0.0`       | RESTful API host                                   |
+| `SHINE2MQTT_API__PORT`                       | `8000`          | RESTful API port                                   |
+| `SHINE2MQTT_SIMULATED_CLIENT`                | `false`         | Enable simulated client for testing                |
+| `SHINE2MQTT_SIMULATED_CLIENT__SERVER_HOST`   | `localhost`     | Simulated client server host                       |
+| `SHINE2MQTT_SIMULATED_CLIENT__SERVER_PORT`   | `5279`          | Simulated client server port                       |
 
 ## 🚀 Usage
 
 ### 1. Configure Your Shine Datalogger
 
-Point your Shine datalogger to the IP address where Shine2MQTT is running:
+In order to start sending data to Shine2MQTT, you need to configure your Shine Wifi-X datalogger to point to the IP address of your Shine2MQTT instance:
 
 1. Connect to your datalogger's WiFi network
    1. Press the button on the bottom, and wait for the blue LED.
@@ -388,18 +397,17 @@ uv build
 docker build -t bremme/shine2mqtt:latest .
 ```
 
-### Running Locally
+### Running Locally with simulated Client
+
+Run the main application in one terminal, and the simulated client in another terminal:
+
 
 ```bash
-# Run application
-uv run shine2mqtt
-
-# Run  with simulated client
-
 # run shine2mqtt on different port (to prevent datalogger conflicts)
-uv run shine2mqtt --server-port 4000
+uv run shine2mqtt run --server-port 4000
+
 # run simulated client
-uv run shine2mqtt --simulate-client --simulated-client-server-port 4000
+uv run shine2mqtt sim --server-port 4000
 ```
 
 ## 📚 Resources
