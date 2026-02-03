@@ -54,6 +54,7 @@ addopts = [
   "--cov=shine2mqtt",
   "--cov-report=xml",
   "--cov-report=term",
+  "-vv",
 ]
 
 # [tool.pytest.coverage.run]
