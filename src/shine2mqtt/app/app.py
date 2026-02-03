@@ -6,6 +6,7 @@ from loguru import logger
 
 from shine2mqtt.api.api import RestApi
 from shine2mqtt.app.config.config import ApplicationConfig
+from shine2mqtt.growatt.protocol.command import BaseCommand
 from shine2mqtt.growatt.protocol.frame import (
     FrameFactory,
 )
@@ -23,10 +24,10 @@ class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
 
-        incoming_messages = asyncio.Queue(maxsize=100)
-        outgoing_frames = asyncio.Queue(maxsize=100)
-        protocol_commands = asyncio.Queue(maxsize=100)
-        protocol_events = asyncio.Queue(maxsize=100)
+        incoming_messages = asyncio.Queue[BaseMessage](maxsize=100)
+        outgoing_frames = asyncio.Queue[bytes](maxsize=100)
+        protocol_commands = asyncio.Queue[BaseCommand](maxsize=100)
+        protocol_events = asyncio.Queue[BaseMessage](maxsize=100)
 
         encoder = FrameFactory.encoder()
 
