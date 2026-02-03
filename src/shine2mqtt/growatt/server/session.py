@@ -3,6 +3,7 @@ from asyncio import StreamReader, StreamWriter
 
 from loguru import logger
 
+from shine2mqtt.app.queues import IncomingFrames, OutgoingFrames
 from shine2mqtt.growatt.protocol.frame.decoder import HEADER_LENGTH, FrameDecoder
 
 
@@ -11,14 +12,14 @@ class GrowattTcpSession:
         self,
         reader: StreamReader,
         writer: StreamWriter,
-        incoming_frames: asyncio.Queue[bytes],
-        outgoing_frames: asyncio.Queue[bytes],
+        incoming_frames: IncomingFrames,
+        outgoing_frames: OutgoingFrames,
     ):
         self.reader = reader
         self.writer = writer
 
-        self._incoming_frames: asyncio.Queue[bytes] = incoming_frames
-        self._outgoing_frames: asyncio.Queue[bytes] = outgoing_frames
+        self._incoming_frames = incoming_frames
+        self._outgoing_frames = outgoing_frames
 
     async def run(self):
         try:

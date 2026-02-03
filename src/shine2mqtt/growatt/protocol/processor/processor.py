@@ -1,8 +1,13 @@
 import asyncio
-from asyncio import Queue
 
 from loguru import logger
 
+from shine2mqtt.app.queues import (
+    IncomingFrames,
+    OutgoingFrames,
+    ProtocolCommands,
+    ProtocolEvents,
+)
 from shine2mqtt.growatt.protocol.command import (
     BaseCommand,
     GetConfigByNameCommand,
@@ -37,10 +42,10 @@ class ProtocolProcessor:
         self,
         decoder: FrameDecoder,
         encoder: FrameEncoder,
-        incoming_frames: Queue[bytes],
-        outgoing_frames: Queue[bytes],
-        protocol_commands: Queue[BaseCommand],
-        protocol_events: Queue[BaseMessage],
+        incoming_frames: IncomingFrames,
+        outgoing_frames: OutgoingFrames,
+        protocol_commands: ProtocolCommands,
+        protocol_events: ProtocolEvents,
     ):
         self.decoder = decoder
         self.encoder = encoder

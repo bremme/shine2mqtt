@@ -1,9 +1,9 @@
 import asyncio
-from asyncio import Queue, Server, StreamReader, StreamWriter
+from asyncio import Server, StreamReader, StreamWriter
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
+from shine2mqtt.app.queues import IncomingFrames, OutgoingFrames
 from shine2mqtt.growatt.protocol.processor.processor import ProtocolProcessor
 from shine2mqtt.growatt.server.config import GrowattServerConfig
 from shine2mqtt.growatt.server.session import GrowattTcpSession
@@ -12,8 +12,8 @@ from shine2mqtt.growatt.server.session import GrowattTcpSession
 class GrowattServer:
     def __init__(
         self,
-        incoming_frames: Queue[bytes],
-        outgoing_frames: Queue[bytes],
+        incoming_frames: IncomingFrames,
+        outgoing_frames: OutgoingFrames,
         protocol_processor: ProtocolProcessor,
         config: GrowattServerConfig,
     ) -> None:
@@ -23,8 +23,8 @@ class GrowattServer:
         self.server: Server | None = None
         self.session: GrowattTcpSession | None = None
         self.session_task = None
-        self._incoming_frames: Queue[bytes] = incoming_frames
-        self._outgoing_frames: Queue[bytes] = outgoing_frames
+        self._incoming_frames = incoming_frames
+        self._outgoing_frames = outgoing_frames
         self._protocol_processor = protocol_processor
 
     async def start(self):

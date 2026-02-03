@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from loguru import logger
 
+from shine2mqtt.app.queues import ProtocolCommands
 from shine2mqtt.growatt.protocol.command import (
     GetConfigByNameCommand,
     GetConfigByRegistersCommand,
@@ -11,7 +12,7 @@ from shine2mqtt.growatt.protocol.command import (
 
 
 class RestApi:
-    def __init__(self, protocol_commands: asyncio.Queue):
+    def __init__(self, protocol_commands: ProtocolCommands):
         self.protocol_commands = protocol_commands
         self.app = FastAPI()
 

@@ -6,12 +6,16 @@ from loguru import logger
 
 from shine2mqtt.api.api import RestApi
 from shine2mqtt.app.config.config import ApplicationConfig
-from shine2mqtt.growatt.protocol.command import BaseCommand
+from shine2mqtt.app.queues import (
+    IncomingFrames,
+    OutgoingFrames,
+    ProtocolCommands,
+    ProtocolEvents,
+)
 from shine2mqtt.growatt.protocol.frame import (
     FrameFactory,
 )
 from shine2mqtt.growatt.protocol.frame.capturer import CaptureHandler
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
 from shine2mqtt.growatt.protocol.processor.processor import ProtocolProcessor
 from shine2mqtt.growatt.server import GrowattServer
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
@@ -24,11 +28,11 @@ class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
 
-        incoming_frames = asyncio.Queue[bytes](maxsize=100)
-        outgoing_frames = asyncio.Queue[bytes](maxsize=100)
+        incoming_frames = IncomingFrames(maxsize=100)
+        outgoing_frames = OutgoingFrames(maxsize=100)
 
-        protocol_commands = asyncio.Queue[BaseCommand](maxsize=100)
-        protocol_events = asyncio.Queue[BaseMessage](maxsize=100)
+        protocol_commands = ProtocolCommands(maxsize=100)
+        protocol_events = ProtocolEvents(maxsize=100)
 
         encoder = FrameFactory.encoder()
 
@@ -60,7 +64,7 @@ class Application:
         self.rest_server = self._setup_rest_server(config, protocol_commands)
 
     def _setup_mqtt_bridge(
-        self, protocol_events: asyncio.Queue[BaseMessage], config: ApplicationConfig
+        self, protocol_events: ProtocolEvents, config: ApplicationConfig
     ) -> MqttBridge:
         discovery_builder = MqttDiscoveryBuilder(config=config.mqtt.discovery)
 
@@ -79,7 +83,7 @@ class Application:
     def _setup_rest_server(
         self,
         config: ApplicationConfig,
-        protocol_commands: asyncio.Queue,
+        protocol_commands: ProtocolCommands,
     ):
         if not config.api.enabled:
             return None

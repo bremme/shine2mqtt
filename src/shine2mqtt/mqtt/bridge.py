@@ -1,12 +1,11 @@
 import asyncio
-from asyncio import Queue
 from dataclasses import asdict
 
 import aiomqtt
 from aiomqtt import Client
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
+from shine2mqtt.app.queues import ProtocolEvents
 from shine2mqtt.mqtt.client import MqttClient
 from shine2mqtt.mqtt.processor import MqttDataloggerMessageProcessor
 
@@ -16,7 +15,7 @@ class MqttBridge:
 
     def __init__(
         self,
-        protocol_events: Queue[BaseMessage],
+        protocol_events: ProtocolEvents,
         event_processor: MqttDataloggerMessageProcessor,
         client: MqttClient,
     ):
