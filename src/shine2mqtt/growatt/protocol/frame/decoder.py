@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.decoders.decoder import MessageDecoder
+from shine2mqtt.growatt.protocol.decoders.decoder import ByteDecoder, MessageDecoder
 from shine2mqtt.growatt.protocol.decoders.header import HeaderDecoder
 from shine2mqtt.growatt.protocol.decoders.registry import DecoderRegistry
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
@@ -34,10 +34,15 @@ class FrameDecoder:
         self.decoder_registry = decoder_registry
         self.on_decode = on_decode
 
+    @staticmethod
+    def extract_payload_length(raw_header: bytes) -> int:
+        return ByteDecoder.decode_u16(raw_header, 4)
+
     def decode_header(self, raw_header: bytes) -> MBAPHeader:
         return self.header_decoder.decode(raw_header)
 
-    def decode(self, header: MBAPHeader, frame: bytes) -> BaseMessage:
+    def decode(self, frame: bytes) -> BaseMessage:
+        header: MBAPHeader = self.decode_header(frame[:HEADER_LENGTH])
         self.validator.validate(frame, header)
 
         encrypted_payload = frame[HEADER_LENGTH : HEADER_LENGTH + header.length - CRC_LENGTH]

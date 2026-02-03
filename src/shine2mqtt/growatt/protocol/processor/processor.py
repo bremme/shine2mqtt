@@ -13,6 +13,7 @@ from shine2mqtt.growatt.protocol.constants import (
     DATALOGGER_SW_VERSION_REGISTER,
     FunctionCode,
 )
+from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.growatt.protocol.messages import (
     BaseMessage,
@@ -34,14 +35,16 @@ class ProtocolProcessor:
 
     def __init__(
         self,
+        decoder: FrameDecoder,
         encoder: FrameEncoder,
-        incoming_messages: Queue[BaseMessage],
+        incoming_frames: Queue[bytes],
         outgoing_frames: Queue[bytes],
         protocol_commands: Queue[BaseCommand],
         protocol_events: Queue[BaseMessage],
     ):
+        self.decoder = decoder
         self.encoder = encoder
-        self.incoming_messages = incoming_messages
+        self.incoming_frames = incoming_frames
         self.outgoing_frames = outgoing_frames
         self.protocol_commands = protocol_commands
         self.protocol_events = protocol_events
@@ -51,16 +54,18 @@ class ProtocolProcessor:
 
     async def run(self):
         try:
-            await asyncio.gather(self._message_processor_loop(), self._command_processor_loop())
+            await asyncio.gather(self._frame_processor_loop(), self._command_processor_loop())
         finally:
             logger.info("Protocol processor fully closed")
 
     def reset(self):
         self.session_state = SessionState()
 
-    async def _message_processor_loop(self):
+    async def _frame_processor_loop(self):
         while True:
-            message: BaseMessage = await self.incoming_messages.get()
+            frame: bytes = await self.incoming_frames.get()
+
+            message: BaseMessage = self.decoder.decode(frame)
 
             logger.info(
                 f"Processing incoming {message.header.function_code.name} ({message.header.function_code.value:#02x}) message."

@@ -12,21 +12,19 @@ from shine2mqtt.growatt.server.session import GrowattTcpSession
 class GrowattServer:
     def __init__(
         self,
-        decoder: FrameDecoder,
-        incoming_messages: Queue,
-        outgoing_frames: Queue,
+        incoming_frames: Queue[bytes],
+        outgoing_frames: Queue[bytes],
         protocol_processor: ProtocolProcessor,
         config: GrowattServerConfig,
     ) -> None:
-        self._decoder = decoder
         self.host = config.host
         self.port = config.port
 
         self.server: Server | None = None
         self.session: GrowattTcpSession | None = None
         self.session_task = None
-        self._incoming_messages = incoming_messages
-        self._outgoing_frames = outgoing_frames
+        self._incoming_frames: Queue[bytes] = incoming_frames
+        self._outgoing_frames: Queue[bytes] = outgoing_frames
         self._protocol_processor = protocol_processor
 
     async def start(self):
@@ -82,8 +80,7 @@ class GrowattServer:
         self.session = GrowattTcpSession(
             reader,
             writer,
-            self._decoder,
-            self._incoming_messages,
+            self._incoming_frames,
             self._outgoing_frames,
         )
         self._protocol_processor.reset()

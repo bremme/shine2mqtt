@@ -24,8 +24,9 @@ class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
 
-        incoming_messages = asyncio.Queue[BaseMessage](maxsize=100)
+        incoming_frames = asyncio.Queue[bytes](maxsize=100)
         outgoing_frames = asyncio.Queue[bytes](maxsize=100)
+
         protocol_commands = asyncio.Queue[BaseCommand](maxsize=100)
         protocol_events = asyncio.Queue[BaseMessage](maxsize=100)
 
@@ -39,16 +40,16 @@ class Application:
             decoder = FrameFactory.server_decoder()
 
         self.protocol_processor = ProtocolProcessor(
+            decoder=decoder,
             encoder=encoder,
-            incoming_messages=incoming_messages,
+            incoming_frames=incoming_frames,
             outgoing_frames=outgoing_frames,
             protocol_commands=protocol_commands,
             protocol_events=protocol_events,
         )
 
         self.tcp_server = GrowattServer(
-            decoder=decoder,
-            incoming_messages=incoming_messages,
+            incoming_frames=incoming_frames,
             outgoing_frames=outgoing_frames,
             protocol_processor=self.protocol_processor,
             config=config.server,

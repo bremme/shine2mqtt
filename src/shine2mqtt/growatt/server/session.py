@@ -3,7 +3,7 @@ from asyncio import StreamReader, StreamWriter
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
+from shine2mqtt.growatt.protocol.frame.decoder import HEADER_LENGTH, FrameDecoder
 
 
 class GrowattTcpSession:
@@ -11,16 +11,14 @@ class GrowattTcpSession:
         self,
         reader: StreamReader,
         writer: StreamWriter,
-        decoder: FrameDecoder,
-        incoming_messages: asyncio.Queue,
-        outgoing_frames: asyncio.Queue,
+        incoming_frames: asyncio.Queue[bytes],
+        outgoing_frames: asyncio.Queue[bytes],
     ):
         self.reader = reader
         self.writer = writer
-        self.decoder = decoder
 
-        self._incoming_messages = incoming_messages
-        self._outgoing_frames = outgoing_frames
+        self._incoming_frames: asyncio.Queue[bytes] = incoming_frames
+        self._outgoing_frames: asyncio.Queue[bytes] = outgoing_frames
 
     async def run(self):
         try:
@@ -36,14 +34,14 @@ class GrowattTcpSession:
         logger.info("Starting TCP Session reader loop, waiting for messages")
         try:
             while True:
-                raw_header = await self.reader.readexactly(8)
-                header = self.decoder.decode_header(raw_header)
+                raw_header = await self.reader.readexactly(HEADER_LENGTH)
 
-                raw_message_data = await self.reader.readexactly(header.length)
+                raw_payload_length = FrameDecoder.extract_payload_length(raw_header)
 
-                message = self.decoder.decode(header, raw_header + raw_message_data)
+                raw_payload = await self.reader.readexactly(raw_payload_length)
 
-                self._incoming_messages.put_nowait(message)
+                self._incoming_frames.put_nowait(raw_header + raw_payload)
+
         except asyncio.IncompleteReadError:
             logger.error("Can't read from client, client disconnected")
             raise

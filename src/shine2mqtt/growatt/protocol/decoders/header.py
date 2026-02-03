@@ -4,14 +4,12 @@ from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
 
 
 class HeaderDecoder(ByteDecoder):
-    @staticmethod
-    def decode(frame: bytes) -> MBAPHeader:
-        transaction_id = HeaderDecoder.decode_u16(frame, 0)
-
-        protocol_id = HeaderDecoder.decode_u16(frame, 2)
-        length = HeaderDecoder.decode_u16(frame, 4)
-        unit_id = HeaderDecoder.decode_u8(frame, 6)
-        function_code = FunctionCode(HeaderDecoder.decode_u8(frame, 7))
+    def decode(self, frame: bytes) -> MBAPHeader:
+        transaction_id = self.decode_u16(frame, 0)
+        protocol_id = self.decode_u16(frame, 2)
+        length = self.decode_u16(frame, 4)
+        unit_id = self.decode_u8(frame, 6)
+        function_code = FunctionCode(self.decode_u8(frame, 7))
 
         return MBAPHeader(
             transaction_id=transaction_id,

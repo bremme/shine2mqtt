@@ -8,7 +8,6 @@ from shine2mqtt.growatt.protocol.frame.factory import FrameFactory
 from shine2mqtt.growatt.protocol.messages import (
     BaseMessage,
     GrowattAnnounceMessage,
-    MBAPHeader,
 )
 from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.messages.announce import SafetyFunction
@@ -153,12 +152,12 @@ EXPECTED_MESSAGES = [
 
 
 CASES = [
-    (announce_frames[0], announce_headers[0], EXPECTED_MESSAGES[0]),
-    (buffered_data_frames[0], buffered_data_headers[0], EXPECTED_MESSAGES[1]),
-    (data_frames[0], data_headers[0], EXPECTED_MESSAGES[2]),
-    (get_config_frames[14], get_config_headers[14], EXPECTED_MESSAGES[3]),
-    (ack_frames[0], ack_headers[0], EXPECTED_MESSAGES[4]),
-    (ping_frames[0], ping_headers[0], EXPECTED_MESSAGES[5]),
+    (announce_frames[0], EXPECTED_MESSAGES[0]),
+    (buffered_data_frames[0], EXPECTED_MESSAGES[1]),
+    (data_frames[0], EXPECTED_MESSAGES[2]),
+    (get_config_frames[14], EXPECTED_MESSAGES[3]),
+    (ack_frames[0], EXPECTED_MESSAGES[4]),
+    (ping_frames[0], EXPECTED_MESSAGES[5]),
 ]
 
 
@@ -167,14 +166,13 @@ class TestFrameDecoder:
     def decoder(self):
         return FrameFactory.server_decoder()
 
-    @pytest.mark.parametrize("frame,header,expected_message", CASES, ids=list(range(len(CASES))))
+    @pytest.mark.parametrize("frame,expected_message", CASES, ids=list(range(len(CASES))))
     def test_decode_valid_frame_success(
         self,
         decoder: FrameDecoder,
         frame: bytes,
-        header: MBAPHeader,
         expected_message: BaseMessage,
     ):
-        message = decoder.decode(header, frame)
+        message = decoder.decode(frame)
 
         assert message == expected_message
