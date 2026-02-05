@@ -13,14 +13,11 @@ class GrowattTcpSession:
         self,
         reader: StreamReader,
         writer: StreamWriter,
-        # incoming_frames: IncomingFrames,
         outgoing_frames: OutgoingFrames,
         protocol_session: ProtocolSession,
     ):
         self.reader = reader
         self.writer = writer
-
-        # self._incoming_frames = incoming_frames
         self._outgoing_frames = outgoing_frames
         self._protocol_session = protocol_session
 
@@ -44,7 +41,6 @@ class GrowattTcpSession:
 
                 raw_payload = await self.reader.readexactly(raw_payload_length)
 
-                # self._incoming_frames.put_nowait(raw_header + raw_payload)
                 self._protocol_session.handle_frame(raw_header + raw_payload)
 
         except asyncio.IncompleteReadError:

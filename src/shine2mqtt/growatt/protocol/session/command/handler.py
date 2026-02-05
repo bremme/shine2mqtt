@@ -6,7 +6,7 @@ from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
 from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigRequestMessage
 from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
-from shine2mqtt.growatt.protocol.processor.command.command import (
+from shine2mqtt.growatt.protocol.session.command.command import (
     BaseCommand,
     GetConfigByNameCommand,
     GetConfigByRegistersCommand,

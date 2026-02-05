@@ -6,9 +6,9 @@ from shine2mqtt.growatt.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
-from shine2mqtt.growatt.protocol.processor.command.handler import CommandHandler
-from shine2mqtt.growatt.protocol.processor.message.handler import MessageHandler
-from shine2mqtt.growatt.protocol.processor.state import SessionState
+from shine2mqtt.growatt.protocol.session.command.handler import CommandHandler
+from shine2mqtt.growatt.protocol.session.message.handler import MessageHandler
+from shine2mqtt.growatt.protocol.session.state import SessionState
 
 
 class ProtocolSessionFactory:

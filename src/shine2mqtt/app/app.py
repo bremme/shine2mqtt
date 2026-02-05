@@ -40,15 +40,6 @@ class Application:
         else:
             decoder = FrameFactory.server_decoder()
 
-        # self.coordinator = ProtocolCoordinator(
-        #     decoder=decoder,
-        #     encoder=encoder,
-        #     incoming_frames=incoming_frames,
-        #     outgoing_frames=outgoing_frames,
-        #     protocol_commands=protocol_commands,
-        #     protocol_events=protocol_events,
-        # )
-
         config_registry = ConfigRegistry()
 
         self.session_factory = ProtocolSessionFactory(
@@ -61,8 +52,6 @@ class Application:
         session_registry = ProtocolSessionRegistry()
 
         self.tcp_server = GrowattServer(
-            # incoming_frames=incoming_frames,
-            # outgoing_frames=outgoing_frames,
             config=config.server,
             session_factory=self.session_factory,
             session_registry=session_registry,

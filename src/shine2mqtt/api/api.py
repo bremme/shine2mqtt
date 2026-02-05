@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from loguru import logger
 
 from shine2mqtt.app.queues import ProtocolCommands
-from shine2mqtt.growatt.protocol.processor.command.command import (
+from shine2mqtt.growatt.protocol.session.command.command import (
     GetConfigByNameCommand,
     GetConfigByRegistersCommand,
 )
