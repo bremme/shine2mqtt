@@ -55,7 +55,8 @@ class MqttBridge:
 
     async def _publisher(self, client: Client) -> None:
         while True:
-            message = await self._protocol_events.get()
+            event = await self._protocol_events.get()
+            message = event.message
 
             logger.debug(
                 f"Processing incoming {message.header.function_code.name} ({message.header.function_code.value:#02x}) message."
@@ -73,7 +74,8 @@ class MqttBridge:
 
     async def _flush_protocol_events(self, client: Client) -> None:
         while not self._protocol_events.empty():
-            message = self._protocol_events.get_nowait()
+            event = self._protocol_events.get_nowait()
+            message = event.message
             try:
                 for mqtt_message in self._event_processor.process(message):
                     await client.publish(**asdict(mqtt_message), timeout=0.5)

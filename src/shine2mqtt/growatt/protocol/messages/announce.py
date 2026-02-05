@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
+from shine2mqtt.growatt.protocol.messages.base import DataloggerMessage
 
 
 @dataclass
@@ -21,8 +21,7 @@ class SafetyFunction:
 # Client messages ######################################################################
 # requests
 @dataclass
-class GrowattAnnounceMessage(BaseMessage):
-    datalogger_serial: str
+class GrowattAnnounceMessage(DataloggerMessage):
     inverter_serial: str
 
     remote_on_off: bool

@@ -225,14 +225,14 @@ class SimulatedClient:
         )
         await self._send_message(message)
 
-    async def _send_ack(self, message: BaseMessage):
+    async def _send_ack(self, message: BaseMessage) -> None:
         """Send ACK message"""
         logger.info(f"→ Sending ACK for {message.header.function_code.name}")
-        message = self._generator.generate_ack_message(
+        ack_message = self._generator.generate_ack_message(
             transaction_id=message.header.transaction_id,
             function_code=message.header.function_code,
         )
-        await self._send_message(message)
+        await self._send_message(ack_message)
 
     async def _send_message(self, message: BaseMessage):
         """Encode and send a message to the server"""

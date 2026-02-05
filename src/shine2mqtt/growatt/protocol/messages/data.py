@@ -2,15 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from shine2mqtt.growatt.protocol.constants import InverterStatus
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
+from shine2mqtt.growatt.protocol.messages.base import DataloggerMessage
 
 
 # Client messages ######################################################################
 # requests
 @dataclass
-class GrowattDataMessage(BaseMessage):
-    datalogger_serial: str
+class GrowattDataMessage(DataloggerMessage):
     inverter_serial: str
+    #
     timestamp: datetime
     inverter_status: InverterStatus
     # DC

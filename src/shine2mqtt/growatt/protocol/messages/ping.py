@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
+from shine2mqtt.growatt.protocol.messages.base import DataloggerMessage
 
 
 @dataclass
-class GrowattPingMessage(BaseMessage):
-    datalogger_serial: str
+class GrowattPingMessage(DataloggerMessage):
+    pass

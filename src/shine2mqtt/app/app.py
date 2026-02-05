@@ -7,16 +7,16 @@ from loguru import logger
 from shine2mqtt.api.api import RestApi
 from shine2mqtt.app.config.config import ApplicationConfig
 from shine2mqtt.app.queues import (
-    IncomingFrames,
-    OutgoingFrames,
     ProtocolCommands,
     ProtocolEvents,
 )
+from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.frame import (
     FrameFactory,
 )
 from shine2mqtt.growatt.protocol.frame.capturer import CaptureHandler
-from shine2mqtt.growatt.protocol.processor.coordinator import ProtocolCoordinator
+from shine2mqtt.growatt.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.growatt.protocol.session.session import ProtocolSessionFactory
 from shine2mqtt.growatt.server import GrowattServer
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
 from shine2mqtt.mqtt.bridge import MqttBridge
@@ -27,9 +27,6 @@ from shine2mqtt.mqtt.processor import MqttDataloggerMessageProcessor
 class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
-
-        incoming_frames = IncomingFrames(maxsize=100)
-        outgoing_frames = OutgoingFrames(maxsize=100)
 
         protocol_commands = ProtocolCommands(maxsize=100)
         protocol_events = ProtocolEvents(maxsize=100)
@@ -43,20 +40,32 @@ class Application:
         else:
             decoder = FrameFactory.server_decoder()
 
-        self.coordinator = ProtocolCoordinator(
+        # self.coordinator = ProtocolCoordinator(
+        #     decoder=decoder,
+        #     encoder=encoder,
+        #     incoming_frames=incoming_frames,
+        #     outgoing_frames=outgoing_frames,
+        #     protocol_commands=protocol_commands,
+        #     protocol_events=protocol_events,
+        # )
+
+        config_registry = ConfigRegistry()
+
+        self.session_factory = ProtocolSessionFactory(
             decoder=decoder,
             encoder=encoder,
-            incoming_frames=incoming_frames,
-            outgoing_frames=outgoing_frames,
-            protocol_commands=protocol_commands,
+            config_registry=config_registry,
             protocol_events=protocol_events,
         )
 
+        session_registry = ProtocolSessionRegistry()
+
         self.tcp_server = GrowattServer(
-            incoming_frames=incoming_frames,
-            outgoing_frames=outgoing_frames,
-            coordinator=self.coordinator,
+            # incoming_frames=incoming_frames,
+            # outgoing_frames=outgoing_frames,
             config=config.server,
+            session_factory=self.session_factory,
+            session_registry=session_registry,
         )
 
         self.mqtt_bridge = self._setup_mqtt_bridge(protocol_events, config)
@@ -107,7 +116,7 @@ class Application:
 
             tasks = [
                 asyncio.create_task(self.tcp_server.serve()),
-                asyncio.create_task(self.coordinator.run()),
+                # asyncio.create_task(self.coordinator.run()),
                 asyncio.create_task(self.mqtt_bridge.run()),
             ]
 

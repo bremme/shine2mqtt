@@ -1,14 +1,13 @@
 from dataclasses import dataclass
 
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
+from shine2mqtt.growatt.protocol.messages.base import DataloggerMessage
 
 
 # Client messages ######################################################################
 # requests
 # responses
 @dataclass
-class GrowattGetConfigResponseMessage(BaseMessage):
-    datalogger_serial: str
+class GrowattGetConfigResponseMessage(DataloggerMessage):
     register: int
     length: int
     data: bytes
@@ -21,15 +20,13 @@ class GrowattGetConfigResponseMessage(BaseMessage):
 # responses
 # request
 @dataclass
-class GrowattSetConfigRequestMessage(BaseMessage):
-    datalogger_serial: str
+class GrowattSetConfigRequestMessage(DataloggerMessage):
     register: int
     length: int
     value: int | str
 
 
 @dataclass
-class GrowattGetConfigRequestMessage(BaseMessage):
-    datalogger_serial: str
+class GrowattGetConfigRequestMessage(DataloggerMessage):
     register_start: int
     register_end: int

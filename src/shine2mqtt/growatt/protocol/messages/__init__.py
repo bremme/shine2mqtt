@@ -1,6 +1,6 @@
 from .ack import GrowattAckMessage
 from .announce import GrowattAnnounceMessage
-from .base import BaseMessage
+from .base import BaseMessage, DataloggerMessage
 from .config import (
     GrowattGetConfigRequestMessage,
     GrowattGetConfigResponseMessage,
@@ -13,6 +13,7 @@ from .ping import GrowattPingMessage
 __all__ = [
     "MBAPHeader",
     "BaseMessage",
+    "DataloggerMessage",
     "GrowattAnnounceMessage",
     "GrowattAckMessage",
     "GrowattDataMessage",
