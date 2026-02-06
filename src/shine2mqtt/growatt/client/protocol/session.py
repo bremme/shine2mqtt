@@ -10,7 +10,6 @@ from shine2mqtt.growatt.protocol.frame.capturer.sanitizer import DUMMY_DATALOGGE
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
 from shine2mqtt.growatt.protocol.messages.config import (
     GrowattGetConfigRequestMessage,
     GrowattSetConfigRequestMessage,
@@ -27,27 +26,20 @@ class ClientProtocolSession:
         session_state: ClientProtocolSessionState,
         clock: ClockService,
         generator: DataGenerator,
-        announce_interval: int,
-        data_interval: int,
-        ping_interval: int,
+        config: SimulatedClientConfig,
     ):
         self.encoder = encoder
         self.decoder = decoder
         self.session_state = session_state
         self.clock = clock
         self.generator = generator
-        self.announce_interval = announce_interval
-        self.data_interval = data_interval
-        self.ping_interval = ping_interval
+        self.announce_interval = config.announce_interval
+        self.data_interval = config.data_interval
+        self.ping_interval = config.ping_interval
 
     def handle_frame(self, frame: bytes) -> bytes | None:
         message = self.decoder.decode(frame)
-        # logger.info(f"Received message: {message}")
 
-        if response_frame := self._message_handler(message):
-            return response_frame
-
-    def _message_handler(self, message: BaseMessage) -> bytes | None:
         function_code = message.header.function_code
 
         match message:
@@ -168,7 +160,5 @@ class ClientProtocolSessionFactory:
             session_state=session_state,
             clock=self.clock,
             generator=self.generator,
-            announce_interval=self.config.announce_interval,
-            data_interval=self.config.data_interval,
-            ping_interval=self.config.ping_interval,
+            config=self.config,
         )

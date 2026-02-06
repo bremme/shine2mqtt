@@ -11,12 +11,6 @@ from shine2mqtt.app.logger import LoggerConfigurator
 from shine2mqtt.growatt.client.client import SimulatedClient
 from shine2mqtt.growatt.client.config import SimulatedClientConfig
 
-# async def run_simulated_client(config: SimulatedClientConfig) -> None:
-#     decoder = FrameFactory.client_decoder()
-#     encoder = FrameFactory.encoder()
-#     client = SimulatedClient(encoder, decoder, config)
-#     await client.run()
-
 
 async def run_simulated_client(config: SimulatedClientConfig) -> None:
     datalogger = SimulatedClient(config)
