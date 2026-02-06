@@ -24,8 +24,8 @@ class DataGenerator:
         self.data_headers = cycle(data_headers)
         self.data_payloads = cycle(data_payloads)
 
-        self.get_config_headers = {k: v for k, v in enumerate(get_config_headers)}
-        self.get_config_payloads = {k: v for k, v in enumerate(get_config_payloads)}
+        self.get_config_headers = dict(enumerate(get_config_headers))
+        self.get_config_payloads = dict(enumerate(get_config_payloads))
 
         self.ping_headers = cycle(ping_headers)
         self.ping_payloads = cycle(ping_payloads)
