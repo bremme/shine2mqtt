@@ -5,7 +5,7 @@ import aiomqtt
 from aiomqtt import Client
 from loguru import logger
 
-from shine2mqtt.app.queues import ProtocolEvents
+from shine2mqtt.growatt.server.protocol.queues import ProtocolEvents
 from shine2mqtt.mqtt.client import MqttClient
 from shine2mqtt.mqtt.processor import MqttDataloggerMessageProcessor
 

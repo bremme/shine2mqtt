@@ -1,14 +1,14 @@
 from loguru import logger
 
-from shine2mqtt.app.queues import OutgoingFrames, ProtocolEvents
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
-from shine2mqtt.growatt.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
-from shine2mqtt.growatt.protocol.session.command.handler import CommandHandler
-from shine2mqtt.growatt.protocol.session.message.handler import MessageHandler
-from shine2mqtt.growatt.protocol.session.state import SessionState
+from shine2mqtt.growatt.server.protocol.event import ProtocolEvent
+from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames, ProtocolEvents
+from shine2mqtt.growatt.server.protocol.session.command.handler import CommandHandler
+from shine2mqtt.growatt.server.protocol.session.message.handler import MessageHandler
+from shine2mqtt.growatt.server.protocol.session.state import ProtocolSessionState
 
 
 class ProtocolSessionFactory:
@@ -25,7 +25,7 @@ class ProtocolSessionFactory:
         self.protocol_events = protocol_events
 
     def create(self) -> "ProtocolSession":
-        session_state = SessionState()
+        session_state = ProtocolSessionState()
         outgoing_frames = OutgoingFrames()
 
         command_handler = CommandHandler(session_state, self.config_registry)
@@ -60,7 +60,7 @@ class ProtocolSession:
         self.command_handler = command_handler
         self.message_handler = message_handler
 
-    def handle_frame(self, frame: bytes):
+    def handle_frame(self, frame: bytes) -> None:
         message: BaseMessage = self.decoder.decode(frame)
 
         self.command_handler.resolve_response(message)

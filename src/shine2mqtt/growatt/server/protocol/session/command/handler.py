@@ -6,7 +6,7 @@ from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.messages.base import BaseMessage
 from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigRequestMessage
 from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
-from shine2mqtt.growatt.protocol.session.command.command import (
+from shine2mqtt.growatt.server.protocol.session.command.command import (
     BaseCommand,
     GetConfigByNameCommand,
     GetConfigByRegistersCommand,
@@ -18,9 +18,6 @@ class CommandHandler:
         self.session_state = session_state
         self.command_futures: dict[tuple[FunctionCode, int], Future] = {}
         self.config_registry = config_registry
-
-    def reset(self):
-        self.command_futures.clear()
 
     def handle_command(self, command: BaseCommand) -> BaseMessage | None:
         if isinstance(command, GetConfigByNameCommand):
@@ -57,7 +54,8 @@ class CommandHandler:
         self.command_futures[(header.function_code, header.transaction_id)] = future
 
     def retrieve_command_future(self, header: MBAPHeader) -> Future | None:
-        return self.command_futures.pop((header.function_code, header.transaction_id), None)
+        key = (header.function_code, header.transaction_id)
+        return self.command_futures.pop(key, None)
 
     def _build_get_config_request_message(self, register_start, register_end=None):
         if register_end is None:

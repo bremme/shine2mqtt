@@ -1,4 +1,4 @@
-from shine2mqtt.growatt.protocol.session.session import ProtocolSession
+from .session import ProtocolSession
 
 
 class ProtocolSessionRegistry:

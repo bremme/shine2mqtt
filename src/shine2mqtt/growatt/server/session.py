@@ -3,9 +3,9 @@ from asyncio import StreamReader, StreamWriter
 
 from loguru import logger
 
-from shine2mqtt.app.queues import OutgoingFrames
 from shine2mqtt.growatt.protocol.frame.decoder import HEADER_LENGTH, FrameDecoder
-from shine2mqtt.growatt.protocol.session.session import ProtocolSession
+from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames
+from shine2mqtt.growatt.server.protocol.session.session import ProtocolSession
 
 
 class GrowattTcpSession:

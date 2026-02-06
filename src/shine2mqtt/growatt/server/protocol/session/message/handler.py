@@ -12,17 +12,15 @@ from shine2mqtt.growatt.protocol.messages import (
     GrowattPingMessage,
     MBAPHeader,
 )
+from shine2mqtt.growatt.server.protocol.session.state import ProtocolSessionState
 
 
 class MessageHandler:
     _GET_CONFIG_REGISTER_START = 0
     _GET_CONFIG_REGISTER_END = 61
 
-    def __init__(self, session_state):
+    def __init__(self, session_state: ProtocolSessionState):
         self.session_state = session_state
-
-    def reset(self):
-        pass
 
     def handle_message(self, message: BaseMessage) -> list[BaseMessage]:
         logger.info(

@@ -6,7 +6,7 @@ from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
 
 
 @dataclass
-class SessionState:
+class ProtocolSessionState:
     announced: bool = False
     protocol_id: int = 0
     unit_id: int = 0
