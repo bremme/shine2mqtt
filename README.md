@@ -174,26 +174,30 @@ The table below lists all available environment variables with their default val
 | -------------------------------------------- | --------------- | -------------------------------------------------- |
 | `SHINE2MQTT_LOG_LEVEL`                       | `INFO`          | Logging level (DEBUG, INFO, WARNING, ERROR)        |
 | `SHINE2MQTT_LOG_COLOR`                       | `false`         | Force colored logging output                       |
+| `SHINE2MQTT_CONFIG_FILE`                     | `./config.yaml` | Path to YAML configuration file                    |
 | `SHINE2MQTT_CAPTURE_DATA`                    | `false`         | Capture raw frames and store in `captured_frames/` |
 | `SHINE2MQTT_MQTT__BASE_TOPIC`                | `solar`         | Base MQTT topic for publishing data                |
 | `SHINE2MQTT_MQTT__availability_topic`        | `solar/state`   | MQTT topic for availability status                 |
-| `SHINE2MQTT_MQTT___SERVER__HOST`             | `localhost`     | MQTT broker host                                   |
-| `SHINE2MQTT_MQTT___SERVER__PORT`             | `1883`          | MQTT broker port                                   |
-| `SHINE2MQTT_MQTT___SERVER__USERNAME`         |                 | MQTT broker username                               |
-| `SHINE2MQTT_MQTT___SERVER__PASSWORD`         |                 | MQTT broker password                               |
-| `SHINE2MQTT_MQTT___SERVER__CLIENT_ID`        | `shine2mqtt`    | MQTT client identifier                             |
-| `SHINE2MQTT_MQTT___DISCOVERY__ENABLED`       | `false`         | Enable Home Assistant MQTT discovery               |
-| `SHINE2MQTT_MQTT___DISCOVERY__PREFIX_TOPIC`  | `homeassistant` | MQTT discovery topic prefix                        |
-| `SHINE2MQTT_MQTT___DISCOVERY__INVERTER__MODEL`    |            | Inverter model for Home Assistant                  |
-| `SHINE2MQTT_MQTT___DISCOVERY__DATALOGGER__MODEL`  |            | Datalogger model for Home Assistant                |
+| `SHINE2MQTT_MQTT__SERVER__HOST`              | `localhost`     | MQTT broker host                                   |
+| `SHINE2MQTT_MQTT__SERVER__PORT`              | `1883`          | MQTT broker port                                   |
+| `SHINE2MQTT_MQTT__SERVER__USERNAME`          |                 | MQTT broker username                               |
+| `SHINE2MQTT_MQTT__SERVER__PASSWORD`          |                 | MQTT broker password                               |
+| `SHINE2MQTT_MQTT__SERVER__CLIENT_ID`         | `shine2mqtt`    | MQTT client identifier                             |
+| `SHINE2MQTT_MQTT__DISCOVERY__ENABLED`        | `false`         | Enable Home Assistant MQTT discovery               |
+| `SHINE2MQTT_MQTT__DISCOVERY__PREFIX_TOPIC`   | `homeassistant` | MQTT discovery topic prefix                        |
+| `SHINE2MQTT_MQTT__DISCOVERY__INVERTER__MODEL`    |            | Inverter model for Home Assistant                  |
+| `SHINE2MQTT_MQTT__DISCOVERY__DATALOGGER__MODEL`  |            | Datalogger model for Home Assistant                |
 | `SHINE2MQTT_SERVER__HOST`                    | `0.0.0.0`       | TCP server host                                    |
 | `SHINE2MQTT_SERVER__PORT`                    | `5279`          | TCP server port                                    |
 | `SHINE2MQTT_API__ENABLED`                    | `false`         | Enable RESTful API                                 |
 | `SHINE2MQTT_API__HOST`                       | `0.0.0.0`       | RESTful API host                                   |
 | `SHINE2MQTT_API__PORT`                       | `8000`          | RESTful API port                                   |
-| `SHINE2MQTT_SIMULATED_CLIENT`                | `false`         | Enable simulated client for testing                |
+| `SHINE2MQTT_SIMULATED_CLIENT__ENABLED`       | `false`         | Enable simulated client for testing                |
 | `SHINE2MQTT_SIMULATED_CLIENT__SERVER_HOST`   | `localhost`     | Simulated client server host                       |
 | `SHINE2MQTT_SIMULATED_CLIENT__SERVER_PORT`   | `5279`          | Simulated client server port                       |
+| `SHINE2MQTT_SIMULATED_CLIENT__ANNOUNCE_INTERVAL` | `5`         | Simulated client announce message interval (seconds)  |
+| `SHINE2MQTT_SIMULATED_CLIENT__DATA_INTERVAL`     | `20`        | Simulated client data message interval (seconds)      |
+| `SHINE2MQTT_SIMULATED_CLIENT__PING_INTERVAL`     | `10`        | Simulated client ping message interval (seconds)      |
 
 ## 🚀 Usage
 
