@@ -4,9 +4,8 @@ from pydantic import BaseModel, Field
 
 
 class DeviceConfig(BaseModel):
-    # FIXME model should be knows since we can not support everything, or at least we have to know
-    model: str = "Unknown"
     brand: str = "Growatt"
+    model: str = "Unknown"
 
     @property
     def device_id(self) -> str:
@@ -17,7 +16,7 @@ class DeviceConfig(BaseModel):
 
     @property
     def name(self) -> str:
-        return f"{self.brand} {self.model}"
+        return f"{self.brand.title()} {self.model.title()}"
 
 
 class HassDiscoveryConfig(BaseModel):
