@@ -3,8 +3,7 @@ from typing import Protocol
 
 
 class ClockService(Protocol):
-    def now(self) -> float:
-        pass
+    def now(self) -> float: ...
 
 
 class MonotonicClockService:
