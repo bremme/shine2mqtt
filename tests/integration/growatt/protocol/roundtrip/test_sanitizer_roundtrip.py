@@ -2,6 +2,7 @@ import pytest
 
 from shine2mqtt.growatt.protocol.decoders.announce import AnnounceRequestDecoder
 from shine2mqtt.growatt.protocol.decoders.config import GetConfigResponseDecoder
+from shine2mqtt.growatt.protocol.decoders.crc import CRCDecoder
 from shine2mqtt.growatt.protocol.decoders.data import DataRequestDecoder
 from shine2mqtt.growatt.protocol.decoders.ping import PingRequestDecoder
 from shine2mqtt.growatt.protocol.frame.capturer.sanitizer import (
@@ -36,7 +37,7 @@ def sanitizer():
 
 @pytest.fixture
 def validator():
-    return FrameValidator(CRCCalculator())
+    return FrameValidator(CRCCalculator(), CRCDecoder())
 
 
 class TestSanitizerRoundtrip:

@@ -1,12 +1,12 @@
-import struct
-
+from shine2mqtt.growatt.protocol.decoders.crc import CRCDecoder
 from shine2mqtt.growatt.protocol.frame.crc import CRC16_LENGTH, CRCCalculator
 from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
 
 
 class FrameValidator:
-    def __init__(self, crc_calculator: CRCCalculator):
+    def __init__(self, crc_calculator: CRCCalculator, crc_decoder: CRCDecoder):
         self.crc_calculator = crc_calculator
+        self.crc_decoder = crc_decoder
 
     def validate(self, frame: bytes, header: MBAPHeader) -> None:
         self._validate_payload_length(frame, header.length)
@@ -23,7 +23,7 @@ class FrameValidator:
 
     def _validate_crc(self, frame: bytes) -> None:
         offset = len(frame) - CRC16_LENGTH
-        crc = struct.unpack_from("<H", frame, offset)[0]
+        crc = self.crc_decoder.decode(frame[offset : offset + CRC16_LENGTH])
         computed_crc = self.crc_calculator.calculate_crc16(frame[:-CRC16_LENGTH])
 
         if crc != computed_crc:
