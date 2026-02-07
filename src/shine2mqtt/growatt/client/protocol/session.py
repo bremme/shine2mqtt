@@ -37,7 +37,7 @@ class ClientProtocolSession:
         self.data_interval = config.data_interval
         self.ping_interval = config.ping_interval
 
-    def handle_frame(self, frame: bytes) -> bytes | None:
+    def handle_incoming_frame(self, frame: bytes) -> bytes | None:
         message = self.decoder.decode(frame)
 
         function_code = message.header.function_code
@@ -61,7 +61,7 @@ class ClientProtocolSession:
             case _:
                 logger.warning(f"⚠ Unhandled message type: {type(message)}")
 
-    def get_periodic_frames(self) -> Iterator[bytes]:
+    def get_periodic_frame_to_send(self) -> Iterator[bytes]:
         if self._need_to_send_announce():
             frame = self._build_announce_frame()
             self.session_state.last_announce_time = self.clock.now()

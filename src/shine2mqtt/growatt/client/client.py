@@ -51,7 +51,7 @@ class SimulatedClient:
                 logger.info(f"Reconnecting in {self.RETRY_DELAY} seconds...")
                 await asyncio.sleep(self.RETRY_DELAY)
             except CancelledError:
-                logger.info("DataLogger run cancelled, shutting down")
+                logger.info("Simulated client run cancelled, shutting down")
                 await self.client.close()
                 raise
             except Exception as e:
@@ -62,11 +62,11 @@ class SimulatedClient:
     async def _receive_loop(self, session: ClientProtocolSession):
         while True:
             frame = await self.client.read()
-            if response_frame := session.handle_frame(frame):
+            if response_frame := session.handle_incoming_frame(frame):
                 await self.client.write(response_frame)
 
     async def _send_loop(self, session: ClientProtocolSession):
         while True:
             await asyncio.sleep(1)
-            for frame in session.get_periodic_frames():
+            for frame in session.get_periodic_frame_to_send():
                 await self.client.write(frame)
