@@ -43,7 +43,7 @@ class PayloadEncoderRegistry:
         return encoder
 
     @classmethod
-    def default(cls) -> "PayloadEncoderRegistry":
+    def default(cls) -> PayloadEncoderRegistry:
         """Create a registry with all default encoders registered."""
 
         registry = cls()
