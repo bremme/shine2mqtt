@@ -21,7 +21,7 @@ class CaptureHandler:
         self.sanitizer = sanitizer
 
     @staticmethod
-    def create(capture_dir: Path, encoder: FrameEncoder) -> "CaptureHandler":
+    def create(capture_dir: Path, encoder: FrameEncoder) -> CaptureHandler:
         capturer = FileFrameCapturer(capture_dir)
         sanitizer = RawPayloadSanitizer.create()
 

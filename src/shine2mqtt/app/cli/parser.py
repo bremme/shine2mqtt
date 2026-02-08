@@ -20,7 +20,7 @@ class CliArgParser:
         self.parser = self._create_parsers()
 
     @staticmethod
-    def create() -> "CliArgParser":
+    def create() -> CliArgParser:
         return CliArgParser(sys.argv[1:], prog=NAME)
 
     def _create_parsers(self) -> ArgumentParser:

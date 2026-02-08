@@ -32,6 +32,6 @@ class ApplicationConfig(BaseSettings):
     )
 
     @staticmethod
-    def create(base: dict, override: dict) -> "ApplicationConfig":
+    def create(base: dict, override: dict) -> ApplicationConfig:
         merged_config = util.merge_dict(base=base, override=override)
         return ApplicationConfig(**merged_config)

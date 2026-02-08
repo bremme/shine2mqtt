@@ -22,7 +22,7 @@ class MBAPHeader:
         }
 
     @classmethod
-    def fromdict(cls, data: dict) -> "MBAPHeader":
+    def fromdict(cls, data: dict) -> MBAPHeader:
         """Deserialize header from dict with function_code as hex value"""
         return cls(
             transaction_id=data["transaction_id"],

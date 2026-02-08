@@ -58,7 +58,7 @@ class MessageHandler:
         if not self.session_state.is_announced():
             self.session_state.announce(message)
             # get software version first to enable device discovery
-            # FIXME this should be configurable
+            # TODO this should be configurable
             response_messages.append(
                 self._build_get_config_request_message(
                     register_start=DATALOGGER_SW_VERSION_REGISTER,

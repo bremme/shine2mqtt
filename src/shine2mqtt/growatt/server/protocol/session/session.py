@@ -24,7 +24,7 @@ class ProtocolSessionFactory:
         self.config_registry = config_registry
         self.protocol_events = protocol_events
 
-    def create(self) -> "ProtocolSession":
+    def create(self) -> ProtocolSession:
         session_state = ProtocolSessionState()
         outgoing_frames = OutgoingFrames()
 
