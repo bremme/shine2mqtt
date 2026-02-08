@@ -52,7 +52,6 @@ EXPECTED_MESSAGES = [
     )
 ]
 
-# Build test cases from captured data
 CASES = list(zip(headers, payloads, EXPECTED_MESSAGES, strict=True))
 
 

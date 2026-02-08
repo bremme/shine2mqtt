@@ -3,10 +3,7 @@ from datetime import datetime
 import pytest
 
 from shine2mqtt.growatt.protocol.constants import InverterStatus
-from shine2mqtt.growatt.protocol.decoders.data import (
-    DataRequestDecoder,
-)
-from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
+from shine2mqtt.growatt.protocol.decoders.data import DataRequestDecoder
 from shine2mqtt.growatt.protocol.messages.data import GrowattDataMessage
 from tests.utils.loader import CapturedFrameLoader
 
@@ -79,7 +76,7 @@ EXPECTED_MESSAGES = [
         temperature=26.1,
     ),
 ]
-# Build test cases from captured data
+
 CASES = list(zip(headers[:2], payloads[:2], EXPECTED_MESSAGES, strict=True))
 
 
@@ -88,14 +85,12 @@ class TestDataRequestDecoder:
     def decoder(self):
         return DataRequestDecoder()
 
-    @pytest.mark.parametrize("header,payload,expected_message", CASES, ids=list(range(len(CASES))))
-    def test_decode_announce_request_valid_header_and_payload_success(
-        self,
-        decoder: DataRequestDecoder,
-        header: MBAPHeader,
-        payload: bytes,
-        expected_message: GrowattDataMessage,
+    @pytest.mark.parametrize(
+        "header,payload,expected", CASES, ids=[f"{i}" for i in range(len(CASES))]
+    )
+    def test_decode_data_request_valid_header_and_payload_success(
+        self, decoder, header, payload, expected
     ):
         message = decoder.decode(header, payload)
 
-        assert message == expected_message
+        assert message == expected

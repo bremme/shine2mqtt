@@ -4,7 +4,11 @@ import sys
 from loguru import logger
 
 
-class InterceptHandler(logging.Handler):
+def _should_log_record(record):
+    return "paho.mqtt" not in record["name"]
+
+
+class _InterceptHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         try:
             level = logger.level(record.levelname).name
@@ -23,12 +27,23 @@ class InterceptHandler(logging.Handler):
 class LoggerConfigurator:
     @staticmethod
     def setup(log_level: str, color: bool | None = None) -> None:
+        LoggerConfigurator._clear_existing_handlers()
+        LoggerConfigurator._redirect_standard_logging()
+        LoggerConfigurator._configure_third_party_loggers()
+        LoggerConfigurator._configure_loguru(log_level, color)
+
+    @staticmethod
+    def _clear_existing_handlers() -> None:
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
 
-        logging.basicConfig(handlers=[InterceptHandler()], level=logging.NOTSET)
+    @staticmethod
+    def _redirect_standard_logging() -> None:
+        logging.basicConfig(handlers=[_InterceptHandler()], level=logging.NOTSET)
 
-        loggers = (
+    @staticmethod
+    def _configure_third_party_loggers() -> None:
+        intercepted_loggers = (
             "uvicorn",
             "uvicorn.access",
             "uvicorn.error",
@@ -37,15 +52,17 @@ class LoggerConfigurator:
             "starlette",
         )
 
-        for logger_name in loggers:
-            logging_logger = logging.getLogger(logger_name)
-            logging_logger.handlers = []
-            logging_logger.propagate = True
+        for logger_name in intercepted_loggers:
+            third_party_logger = logging.getLogger(logger_name)
+            third_party_logger.handlers = []
+            third_party_logger.propagate = True
 
-        log_format = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{module}</cyan> - <level>{message}</level>"
+    @staticmethod
+    def _configure_loguru(log_level: str, color: bool | None) -> None:
+        standard_format = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{module}</cyan> - <level>{message}</level>"
+        debug_format = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
 
-        if log_level == "DEBUG":
-            log_format = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+        log_format = debug_format if log_level == "DEBUG" else standard_format
 
         logger.remove()
         logger.add(
@@ -54,5 +71,5 @@ class LoggerConfigurator:
             level=log_level,
             colorize=color,
             enqueue=True,
-            filter=lambda record: "paho.mqtt" not in record["name"],
+            filter=_should_log_record,
         )
