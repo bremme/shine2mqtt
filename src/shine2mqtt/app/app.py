@@ -19,6 +19,7 @@ from shine2mqtt.growatt.server.protocol.queues import (
 from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
 from shine2mqtt.growatt.server.protocol.session.session import ProtocolSessionFactory
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
+from shine2mqtt.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 from shine2mqtt.mqtt.bridge import MqttBridge
 from shine2mqtt.mqtt.client import MqttClient
 from shine2mqtt.mqtt.processor import MqttDataloggerMessageProcessor
@@ -64,7 +65,11 @@ class Application:
     def _setup_mqtt_bridge(
         self, protocol_events: ProtocolEvents, config: ApplicationConfig
     ) -> MqttBridge:
-        discovery_builder = MqttDiscoveryBuilder(config=config.mqtt.discovery)
+        discovery_builder = MqttDiscoveryBuilder(
+            config=config.mqtt.discovery,
+            datalogger_sensor_map=DATALOGGER_SENSOR_MAP,
+            inverter_sensor_map=INVERTER_SENSOR_MAP,
+        )
 
         mqtt_event_processor = MqttDataloggerMessageProcessor(
             discovery=discovery_builder, config=config.mqtt
