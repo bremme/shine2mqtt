@@ -2,7 +2,7 @@ import pytest
 
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.decoders.config import SetConfigRequestDecoder
+from shine2mqtt.growatt.protocol.decoders.set_config import SetConfigRequestDecoder
 from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
 
 DATALOGGER_SERIAL = "XGDABCDEFG"

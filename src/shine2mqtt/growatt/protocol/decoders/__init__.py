@@ -1,17 +1,20 @@
 from .announce import AnnounceRequestDecoder
-from .config import GetConfigResponseDecoder, SetConfigResponseDecoder
 from .data import BufferDataRequestDecoder, DataRequestDecoder
+from .get_config import GetConfigRequestDecoder, GetConfigResponseDecoder
 from .header import HeaderDecoder
 from .ping import PingRequestDecoder
 from .registry import DecoderRegistry
+from .set_config import SetConfigRequestDecoder, SetConfigResponseDecoder
 
 __all__ = [
     "AnnounceRequestDecoder",
-    "GetConfigResponseDecoder",
-    "SetConfigResponseDecoder",
     "DataRequestDecoder",
     "BufferDataRequestDecoder",
+    "GetConfigRequestDecoder",
+    "GetConfigResponseDecoder",
     "HeaderDecoder",
     "PingRequestDecoder",
+    "SetConfigRequestDecoder",
+    "SetConfigResponseDecoder",
     "DecoderRegistry",
 ]

@@ -1,9 +1,7 @@
 import pytest
 
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
-from shine2mqtt.growatt.protocol.decoders.config import (
-    GetConfigResponseDecoder,
-)
+from shine2mqtt.growatt.protocol.decoders.get_config import GetConfigResponseDecoder
 from shine2mqtt.growatt.protocol.messages.config import (
     GrowattGetConfigResponseMessage,
 )

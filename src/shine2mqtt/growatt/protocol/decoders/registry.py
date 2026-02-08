@@ -3,17 +3,17 @@ from loguru import logger
 from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.decoders.ack import AckMessageResponseDecoder
 from shine2mqtt.growatt.protocol.decoders.announce import AnnounceRequestDecoder
-from shine2mqtt.growatt.protocol.decoders.config import (
-    GetConfigRequestDecoder,
-    GetConfigResponseDecoder,
-    SetConfigRequestDecoder,
-)
 from shine2mqtt.growatt.protocol.decoders.data import (
     BufferDataRequestDecoder,
     DataRequestDecoder,
 )
 from shine2mqtt.growatt.protocol.decoders.decoder import MessageDecoder
+from shine2mqtt.growatt.protocol.decoders.get_config import (
+    GetConfigRequestDecoder,
+    GetConfigResponseDecoder,
+)
 from shine2mqtt.growatt.protocol.decoders.ping import PingRequestDecoder
+from shine2mqtt.growatt.protocol.decoders.set_config import SetConfigRequestDecoder
 
 
 class DecoderRegistry:
@@ -34,7 +34,7 @@ class DecoderRegistry:
         return decoder
 
     @classmethod
-    def server(cls) -> "DecoderRegistry":
+    def server(cls) -> DecoderRegistry:
         """
         Create a registry for the server (decodes messages FROM client/datalogger).
 
@@ -59,7 +59,7 @@ class DecoderRegistry:
         return registry
 
     @classmethod
-    def client(cls) -> "DecoderRegistry":
+    def client(cls) -> DecoderRegistry:
         """
         Create a registry for the client/datalogger (decodes messages FROM server).
 

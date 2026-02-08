@@ -1,12 +1,13 @@
 from .ack import AckPayloadEncoder
 from .announce import AnnouncePayloadEncoder
-from .config import GetConfigRequestPayloadEncoder, SetConfigRequestPayloadEncoder
 from .crc import CRCEncoder
 from .data import BufferedDataPayloadEncoder, DataPayloadEncoder
 from .encoder import PayloadEncoder
+from .get_config import GetConfigRequestPayloadEncoder, GetConfigResponsePayloadEncoder
 from .header import HeaderEncoder
 from .ping import PingPayloadEncoder
 from .registry import PayloadEncoderRegistry
+from .set_config import SetConfigRequestPayloadEncoder
 
 __all__ = [
     "AckPayloadEncoder",
@@ -14,8 +15,9 @@ __all__ = [
     "PayloadEncoder",
     "BufferedDataPayloadEncoder",
     "DataPayloadEncoder",
-    "SetConfigRequestPayloadEncoder",
     "GetConfigRequestPayloadEncoder",
+    "GetConfigResponsePayloadEncoder",
+    "SetConfigRequestPayloadEncoder",
     "CRCEncoder",
     "HeaderEncoder",
     "PingPayloadEncoder",
