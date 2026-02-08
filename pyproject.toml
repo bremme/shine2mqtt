@@ -28,6 +28,9 @@ dev = [
   "pytest-cov>=7.0.0",
   "ruff>=0.14.14",
   "ty>=0.0.13",
+  # Overrides
+  # transient dependency of pip-audit, pip 25.03 contains CVE-2026-1703
+  "pip>=26.0",
 ]
 
 [project.urls]
