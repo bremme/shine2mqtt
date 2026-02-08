@@ -7,13 +7,18 @@ class SetConfigRequestPayloadEncoder(PayloadEncoder[GrowattSetConfigRequestMessa
         super().__init__(GrowattSetConfigRequestMessage)
 
     def encode(self, message: GrowattSetConfigRequestMessage) -> bytes:
-        payload = self.encode_str(message.datalogger_serial, 10)
-        payload += self.encode_u16(message.register)
-        payload += self.encode_u16(message.length)
         if type(message.value) is int:
-            payload += self.encode_u16(message.value)
+            value_bytes = self.encode_u16(message.value)
         elif type(message.value) is str:
-            payload += self.encode_str(message.value, message.length)
+            value_bytes = self.encode_str(message.value, message.length)
         else:
             raise ValueError("Invalid type of value attribute")
-        return payload
+
+        size = 10 + 20 + 2 + 2 + len(value_bytes)
+        payload = bytearray(size)
+        payload[0:10] = self.encode_str(message.datalogger_serial, 10)
+        # 10-30 is \x00 (padding)
+        payload[30:32] = self.encode_u16(message.register)
+        payload[32:34] = self.encode_u16(message.length)
+        payload[34 : 34 + len(value_bytes)] = value_bytes
+        return bytes(payload)

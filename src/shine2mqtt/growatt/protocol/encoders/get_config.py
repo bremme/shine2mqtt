@@ -10,10 +10,11 @@ class GetConfigRequestPayloadEncoder(PayloadEncoder[GrowattGetConfigRequestMessa
         super().__init__(GrowattGetConfigRequestMessage)
 
     def encode(self, message: GrowattGetConfigRequestMessage) -> bytes:
-        payload = self.encode_str(message.datalogger_serial, 10)
-        payload += self.encode_u16(message.register_start)
-        payload += self.encode_u16(message.register_end)
-        return payload
+        payload = bytearray(14)
+        payload[0:10] = self.encode_str(message.datalogger_serial, 10)
+        payload[10:12] = self.encode_u16(message.register_start)
+        payload[12:14] = self.encode_u16(message.register_end)
+        return bytes(payload)
 
 
 class GetConfigResponsePayloadEncoder(PayloadEncoder[GrowattGetConfigResponseMessage]):

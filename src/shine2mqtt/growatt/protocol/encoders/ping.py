@@ -7,5 +7,6 @@ class PingPayloadEncoder(PayloadEncoder[GrowattPingMessage]):
         super().__init__(GrowattPingMessage)
 
     def encode(self, message: GrowattPingMessage) -> bytes:
-        payload = self.encode_str(message.datalogger_serial, 10)
-        return payload
+        payload = bytearray(10)
+        payload[0:10] = self.encode_str(message.datalogger_serial, 10)
+        return bytes(payload)

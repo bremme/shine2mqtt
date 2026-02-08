@@ -31,7 +31,8 @@ class TestSetConfigRequestPayloadEncoder:
 
         payload = encoder.encode(message)
 
-        assert payload == b"XGDABCDEFG\x00\x05\x00\x02\x00\x2a"
+        expected = b"XGDABCDEFG" + b"\x00" * 20 + b"\x00\x05\x00\x02\x00\x2a"
+        assert payload == expected
 
     def test_encode_set_config_request_with_string_value(self, encoder):
         header = MBAPHeader(
@@ -51,4 +52,5 @@ class TestSetConfigRequestPayloadEncoder:
 
         payload = encoder.encode(message)
 
-        assert payload == b"XGDABCDEFG\x00\x08\x00\x0aTestString"
+        expected = b"XGDABCDEFG" + b"\x00" * 20 + b"\x00\x08\x00\x0aTestString"
+        assert payload == expected

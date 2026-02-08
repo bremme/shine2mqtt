@@ -4,15 +4,15 @@ from shine2mqtt.growatt.protocol.decoders.announce import LCD_LANGUAGE_MAP, POWE
 from shine2mqtt.growatt.protocol.encoders.encoder import PayloadEncoder
 from shine2mqtt.growatt.protocol.messages.announce import GrowattAnnounceMessage, SafetyFunction
 
-ANNOUNCE_MESSAGE_PAYLOAD_SIZE = 575
-
 
 class AnnouncePayloadEncoder(PayloadEncoder[GrowattAnnounceMessage]):
+    ANNOUNCE_MESSAGE_PAYLOAD_SIZE = 575
+
     def __init__(self):
         super().__init__(GrowattAnnounceMessage)
 
     def encode(self, message: GrowattAnnounceMessage) -> bytes:
-        payload = bytearray(ANNOUNCE_MESSAGE_PAYLOAD_SIZE)
+        payload = bytearray(self.ANNOUNCE_MESSAGE_PAYLOAD_SIZE)
 
         # Custom Announce block ########################################################
         # first 70 bytes
