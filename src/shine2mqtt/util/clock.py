@@ -11,6 +11,8 @@ class MonotonicClockService:
         return time.monotonic()
 
 
-def has_interval_elapsed(now: float, last_time: float, interval: int) -> bool:
+def has_interval_elapsed(now: float, last_time: float | None, interval: int) -> bool:
+    if last_time is None:
+        return True
     elapsed = now - last_time
     return elapsed >= interval

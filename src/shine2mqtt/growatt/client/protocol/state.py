@@ -12,7 +12,7 @@ class ClientProtocolSessionState:
     datalogger_serial: str
     announced: bool = False
 
-    last_transaction_id: dict[FunctionCode, int] = field(
+    _transaction_id: dict[FunctionCode, int] = field(
         default_factory=lambda: {
             FunctionCode.PING: 0,
             FunctionCode.ANNOUNCE: 0,
@@ -22,10 +22,21 @@ class ClientProtocolSessionState:
             FunctionCode.GET_CONFIG: 0,
         }
     )
+    _last_send_time: dict[FunctionCode, float | None] = field(
+        default_factory=lambda: {
+            FunctionCode.PING: None,
+            FunctionCode.ANNOUNCE: None,
+            FunctionCode.DATA: None,
+            FunctionCode.SET_CONFIG: None,
+            FunctionCode.GET_CONFIG: None,
+        }
+    )
 
-    last_announce_time: float = 0.0
-    last_data_time: float = 0.0
-    last_ping_time: float = 0.0
+    def get_last_send(self, function_code: FunctionCode) -> float | None:
+        return self._last_send_time[function_code]
+
+    def update_last_send(self, function_code: FunctionCode, timestamp: float) -> None:
+        self._last_send_time[function_code] = timestamp
 
     def is_announced(self) -> bool:
         return self.announced
@@ -33,11 +44,11 @@ class ClientProtocolSessionState:
     def announce(self, message: GrowattAckMessage) -> None:
         self.announced = message.ack
 
-    def get_transaction_id(self, function_code: FunctionCode) -> int:
+    def get_next_transaction_id(self, function_code: FunctionCode) -> int:
         """Get a new transaction ID for a given function code to use in outgoing messages."""
-        self.last_transaction_id[function_code] += 1
-        return self.last_transaction_id[function_code]
+        self._transaction_id[function_code] += 1
+        return self._transaction_id[function_code]
 
-    def set_transaction_id(self, header: MBAPHeader) -> None:
+    def set_incoming_transaction_id(self, header: MBAPHeader) -> None:
         """Update the transaction ID for a given function code from incoming message."""
-        self.last_transaction_id[header.function_code] = header.transaction_id
+        self._transaction_id[header.function_code] = header.transaction_id

@@ -5,7 +5,7 @@ from loguru import logger
 
 from shine2mqtt.growatt.protocol.frame.decoder import HEADER_LENGTH, FrameDecoder
 from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames
-from shine2mqtt.growatt.server.protocol.session.session import ProtocolSession
+from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSession
 
 
 class GrowattTcpSession:
@@ -14,7 +14,7 @@ class GrowattTcpSession:
         reader: StreamReader,
         writer: StreamWriter,
         outgoing_frames: OutgoingFrames,
-        protocol_session: ProtocolSession,
+        protocol_session: ServerProtocolSession,
     ):
         self.reader = reader
         self.writer = writer
@@ -41,7 +41,7 @@ class GrowattTcpSession:
 
                 raw_payload = await self.reader.readexactly(raw_payload_length)
 
-                self._protocol_session.handle_frame(raw_header + raw_payload)
+                self._protocol_session.handle_incoming_frame(raw_header + raw_payload)
 
         except asyncio.IncompleteReadError:
             logger.error("Can't read from client, client disconnected")

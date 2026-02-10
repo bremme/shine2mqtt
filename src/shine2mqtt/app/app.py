@@ -17,7 +17,7 @@ from shine2mqtt.growatt.server.protocol.queues import (
     ProtocolEvents,
 )
 from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
-from shine2mqtt.growatt.server.protocol.session.session import ProtocolSessionFactory
+from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSessionFactory
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
 from shine2mqtt.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 from shine2mqtt.mqtt.bridge import MqttBridge
@@ -43,7 +43,7 @@ class Application:
 
         config_registry = ConfigRegistry()
 
-        self.session_factory = ProtocolSessionFactory(
+        self.session_factory = ServerProtocolSessionFactory(
             decoder=decoder,
             encoder=encoder,
             config_registry=config_registry,

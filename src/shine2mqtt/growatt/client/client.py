@@ -4,6 +4,8 @@ from asyncio import CancelledError, IncompleteReadError
 from loguru import logger
 
 from shine2mqtt.growatt.client.config import SimulatedClientConfig
+from shine2mqtt.growatt.client.protocol.generator import FrameGenerator
+from shine2mqtt.growatt.client.protocol.handler import ClientMessageHandler
 from shine2mqtt.growatt.client.protocol.session import (
     ClientProtocolSession,
     ClientProtocolSessionFactory,
@@ -20,23 +22,27 @@ class SimulatedClient:
 
     def __init__(self, config: SimulatedClientConfig):
         self.config = config
-        self.client = TCPTransport()
+        self.transport = TCPTransport()
 
         encoder = FrameFactory.encoder()
         decoder = FrameFactory.client_decoder()
         clock = MonotonicClockService()
 
+        generator = FrameGenerator(encoder=encoder)
+        message_handler = ClientMessageHandler(generator=generator)
+
         self.session_factory = ClientProtocolSessionFactory(
-            encoder=encoder,
             decoder=decoder,
             config=config,
             clock=clock,
+            generator=generator,
+            message_handler=message_handler,
         )
 
     async def run(self):
         while True:
             try:
-                await self.client.connect(self.config.server_host, self.config.server_port)
+                await self.transport.connect(self.config.server_host, self.config.server_port)
 
                 logger.info("Starting protocol session")
                 session = self.session_factory.create()
@@ -47,26 +53,29 @@ class SimulatedClient:
                 )
             except (IncompleteReadError, ConnectionRefusedError) as e:
                 logger.warning(f"Connection lost or failed: {e}")
-                await self.client.close()
+                await self.transport.close()
                 logger.info(f"Reconnecting in {self.RETRY_DELAY} seconds...")
                 await asyncio.sleep(self.RETRY_DELAY)
             except CancelledError:
                 logger.info("Simulated client run cancelled, shutting down")
-                await self.client.close()
+                await self.transport.close()
                 raise
             except Exception as e:
                 logger.error(f"Unexpected error: {e}")
-                await self.client.close()
+                await self.transport.close()
                 raise
 
     async def _receive_loop(self, session: ClientProtocolSession):
         while True:
-            frame = await self.client.read()
+            frame = await self.transport.read()
             if response_frame := session.handle_incoming_frame(frame):
-                await self.client.write(response_frame)
+                await self.transport.write(response_frame)
 
     async def _send_loop(self, session: ClientProtocolSession):
         while True:
             await asyncio.sleep(1)
-            for frame in session.get_periodic_frame_to_send():
-                await self.client.write(frame)
+
+            for action in session.get_pending_actions():
+                if frame := session.get_send_message_frame(action):
+                    logger.info(f"→ Sending {action.function_code.value} message")
+                    await self.transport.write(frame)

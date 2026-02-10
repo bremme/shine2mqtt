@@ -5,7 +5,7 @@ from loguru import logger
 
 from shine2mqtt.growatt.server.config import GrowattServerConfig
 from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
-from shine2mqtt.growatt.server.protocol.session.session import ProtocolSessionFactory
+from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSessionFactory
 from shine2mqtt.growatt.server.session import GrowattTcpSession
 
 
@@ -13,7 +13,7 @@ class GrowattServer:
     def __init__(
         self,
         config: GrowattServerConfig,
-        session_factory: ProtocolSessionFactory,
+        session_factory: ServerProtocolSessionFactory,
         session_registry: ProtocolSessionRegistry,
     ) -> None:
         self.host = config.host

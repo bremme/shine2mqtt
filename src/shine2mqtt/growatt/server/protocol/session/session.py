@@ -11,7 +11,7 @@ from shine2mqtt.growatt.server.protocol.session.message.handler import MessageHa
 from shine2mqtt.growatt.server.protocol.session.state import ProtocolSessionState
 
 
-class ProtocolSessionFactory:
+class ServerProtocolSessionFactory:
     def __init__(
         self,
         decoder: FrameDecoder,
@@ -24,14 +24,14 @@ class ProtocolSessionFactory:
         self.config_registry = config_registry
         self.protocol_events = protocol_events
 
-    def create(self) -> ProtocolSession:
+    def create(self) -> ServerProtocolSession:
         session_state = ProtocolSessionState()
         outgoing_frames = OutgoingFrames()
 
         command_handler = CommandHandler(session_state, self.config_registry)
         message_handler = MessageHandler(session_state)
 
-        return ProtocolSession(
+        return ServerProtocolSession(
             decoder=self.decoder,
             encoder=self.encoder,
             outgoing_frames=outgoing_frames,
@@ -41,7 +41,7 @@ class ProtocolSessionFactory:
         )
 
 
-class ProtocolSession:
+class ServerProtocolSession:
     def __init__(
         self,
         decoder: FrameDecoder,
@@ -60,7 +60,7 @@ class ProtocolSession:
         self.command_handler = command_handler
         self.message_handler = message_handler
 
-    def handle_frame(self, frame: bytes) -> None:
+    def handle_incoming_frame(self, frame: bytes) -> None:
         message: BaseMessage = self.decoder.decode(frame)
 
         self.command_handler.resolve_response(message)

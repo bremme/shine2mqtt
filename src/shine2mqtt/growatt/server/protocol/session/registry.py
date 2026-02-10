@@ -1,9 +1,9 @@
-from .session import ProtocolSession
+from .session import ServerProtocolSession
 
 
 class ProtocolSessionRegistry:
     def __init__(self):
         self.sessions = []
 
-    def add(self, session: ProtocolSession):
+    def add(self, session: ServerProtocolSession):
         self.sessions.append(session)
