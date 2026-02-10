@@ -29,25 +29,28 @@ class ClientMessageHandler:
 
     def handle_message(self, message: BaseMessage) -> bytes | None:
         function_code = message.header.function_code
+        hex_value = f"0x{function_code.value:02x}"
 
         match message:
             case GrowattAckMessage() if function_code == FunctionCode.ANNOUNCE:
-                logger.info("✓ Received ACK response for ANNOUNCE, datalogger is now announced")
+                logger.info(
+                    f"✓ Received ACK for ANNOUNCE ({hex_value}) response, datalogger is now ANNOUNCED!"
+                )
                 self._announce_callback(message) if self._announce_callback else None
             case GrowattAckMessage() if function_code == FunctionCode.DATA:
-                logger.info("✓ Received ACK response for DATA")
+                logger.info(f"✓ Received ACK for DATA ({hex_value}) response")
             case GrowattAckMessage() if function_code == FunctionCode.BUFFERED_DATA:
-                logger.info("✓ Received ACK response for BUFFERED_DATA")
+                logger.info(f"✓ Received ACK for BUFFERED_DATA ({hex_value}) response")
             case GrowattPingMessage():
-                logger.info("✓ Received PING message response")
+                logger.info(f"✓ Received PING ({hex_value}) response")
             case GrowattGetConfigRequestMessage():
-                logger.info("✓ Received GET_CONFIG request message")
+                logger.info(f"✓ Received GET_CONFIG request ({hex_value})")
                 return self._build_get_config_response_frame(message)
             case GrowattSetConfigRequestMessage():
-                logger.info("✓ Received SET_CONFIG request")
+                logger.info(f"✓ Received SET_CONFIG request ({hex_value})")
                 return self._build_ack_frame(message)
             case _:
-                logger.warning(f"⚠ Unhandled message type: {type(message)}")
+                logger.warning(f"Unhandled message type: {type(message)}")
 
     def _build_get_config_response_frame(
         self, request_message: GrowattGetConfigRequestMessage

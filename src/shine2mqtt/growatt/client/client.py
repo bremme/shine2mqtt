@@ -57,7 +57,7 @@ class SimulatedClient:
                 logger.info(f"Reconnecting in {self.RETRY_DELAY} seconds...")
                 await asyncio.sleep(self.RETRY_DELAY)
             except CancelledError:
-                logger.info("Simulated client run cancelled, shutting down")
+                logger.warning("Simulated client run cancelled, shutting down")
                 await self.transport.close()
                 raise
             except Exception as e:
@@ -77,5 +77,7 @@ class SimulatedClient:
 
             for action in session.get_pending_actions():
                 if frame := session.get_send_message_frame(action):
-                    logger.info(f"→ Sending {action.function_code.value} message")
+                    logger.info(
+                        f"→ Sending {action.function_code.name} (0x{action.function_code.value:02x}) message"
+                    )
                     await self.transport.write(frame)
