@@ -25,9 +25,6 @@ class MessageHandler:
         self.session_state = session_state
 
     def handle_message(self, message: BaseMessage) -> list[BaseMessage]:
-        logger.info(
-            f"Processing incoming {message.header.function_code.name} ({message.header.function_code.value:#02x}) message."
-        )
         logger.debug(f"Message content: {message}")
 
         self.session_state.set_incoming_transaction_id(message.header)

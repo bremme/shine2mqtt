@@ -66,11 +66,15 @@ class ServerProtocolSession:
         self.command_handler.resolve_response(message)
         self._publish_protocol_event(message)
 
+        logger.info(
+            f"✓ Receive {message.header.function_code.name} ({message.header.function_code.value:#02x}) message."
+        )
+
         response_messages = self.message_handler.handle_message(message)
 
         for response_message in response_messages:
             logger.info(
-                f"Enqueue response {response_message.header.function_code.name} ({response_message.header.function_code.value:#02x})"
+                f"→ Enqueue {response_message.header.function_code.name} ({response_message.header.function_code.value:#02x}) response"
             )
             logger.debug(f"Response message content: {response_message}")
 

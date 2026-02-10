@@ -57,7 +57,7 @@ def run():
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Application stopped by CTRL+C (Interrupted by user)")
+        logger.warning("Application stopped by CTRL+C (Interrupted by user)")
 
 
 if __name__ == "__main__":

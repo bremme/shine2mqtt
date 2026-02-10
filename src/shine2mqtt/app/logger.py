@@ -59,8 +59,8 @@ class LoggerConfigurator:
 
     @staticmethod
     def _configure_loguru(log_level: str, color: bool | None) -> None:
-        standard_format = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{module}</cyan> - <level>{message}</level>"
-        debug_format = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+        standard_format = "<green>{time:HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{module: <10}</cyan> - <level>{message}</level>"
+        debug_format = "<green>{time:HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
 
         log_format = debug_format if log_level == "DEBUG" else standard_format
 
