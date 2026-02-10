@@ -3,7 +3,9 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from loguru import logger
-from shine2mqtt.growatt.protocol.messages import BaseMessage, MBAPHeader
+
+from shine2mqtt.growatt.protocol.base.message import BaseMessage
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 class ByteDecoder:

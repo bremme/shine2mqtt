@@ -2,7 +2,7 @@
 import json
 import sys
 
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 def load_capture_file(file_path: str) -> tuple[list[bytes], list[MBAPHeader], list[bytes]]:

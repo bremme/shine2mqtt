@@ -6,9 +6,11 @@ from shine2mqtt.growatt.client.protocol.generator import FrameGenerator
 from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.constants import FunctionCode
+from shine2mqtt.growatt.protocol.get_config.get_config import (
+    GrowattGetConfigRequestMessage,
+)
 from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
 from shine2mqtt.growatt.protocol.set_config.set_config import (
-    GrowattGetConfigRequestMessage,
     GrowattSetConfigRequestMessage,
 )
 

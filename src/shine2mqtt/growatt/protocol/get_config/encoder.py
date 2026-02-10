@@ -1,5 +1,5 @@
 from shine2mqtt.growatt.protocol.base.encoder import PayloadEncoder
-from shine2mqtt.growatt.protocol.set_config.set_config import (
+from shine2mqtt.growatt.protocol.get_config.get_config import (
     GrowattGetConfigRequestMessage,
     GrowattGetConfigResponseMessage,
 )

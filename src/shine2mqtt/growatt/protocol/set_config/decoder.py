@@ -1,13 +1,12 @@
-from shine2mqtt.growatt.protocol.messages import (
-    GrowattSetConfigRequestMessage,
-    MBAPHeader,
-)
-
 from shine2mqtt.growatt.protocol.ack.decoder import (
     AckMessageResponseDecoder,
     MessageDecoder,
 )
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
+from shine2mqtt.growatt.protocol.set_config.set_config import (
+    GrowattSetConfigRequestMessage,
+)
 
 
 class SetConfigResponseDecoder(AckMessageResponseDecoder):

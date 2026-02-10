@@ -2,10 +2,10 @@ import pytest
 
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.get_config.decoder import GetConfigResponseDecoder
-from shine2mqtt.growatt.protocol.header.header import MBAPHeader
-from shine2mqtt.growatt.protocol.set_config.set_config import (
+from shine2mqtt.growatt.protocol.get_config.get_config import (
     GrowattGetConfigResponseMessage,
 )
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 from tests.utils.loader import CapturedFrameLoader
 
 frames, headers, payloads = CapturedFrameLoader.load("get_config_message")

@@ -1,11 +1,9 @@
 from loguru import logger
-from shine2mqtt.growatt.protocol.messages import (
-    BaseMessage,
-)
 
 from shine2mqtt.growatt.protocol.ack.encoder import AckPayloadEncoder
 from shine2mqtt.growatt.protocol.announce.encoder import AnnouncePayloadEncoder
 from shine2mqtt.growatt.protocol.base.encoder import PayloadEncoder
+from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.data.encoder import (
     BufferedDataPayloadEncoder,
     DataPayloadEncoder,

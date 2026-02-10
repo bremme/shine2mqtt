@@ -1,5 +1,5 @@
-from shine2mqtt.growatt.protocol.encoders import PayloadEncoder
-from shine2mqtt.growatt.protocol.messages import GrowattPingMessage
+from shine2mqtt.growatt.protocol.base.encoder import PayloadEncoder
+from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
 
 
 class PingPayloadEncoder(PayloadEncoder[GrowattPingMessage]):

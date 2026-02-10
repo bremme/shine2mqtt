@@ -1,14 +1,14 @@
 import struct
 
 from loguru import logger
-from shine2mqtt.growatt.protocol.messages import (
-    GrowattGetConfigRequestMessage,
-    GrowattGetConfigResponseMessage,
-    MBAPHeader,
-)
 
 from shine2mqtt.growatt.protocol.ack.decoder import MessageDecoder
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
+from shine2mqtt.growatt.protocol.get_config.get_config import (
+    GrowattGetConfigRequestMessage,
+    GrowattGetConfigResponseMessage,
+)
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 class GetConfigRequestDecoder(MessageDecoder[GrowattGetConfigRequestMessage]):

@@ -1,5 +1,5 @@
 from shine2mqtt.growatt.protocol.base.encoder import ByteEncoder
-from shine2mqtt.growatt.protocol.base.message import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 class HeaderEncoder(ByteEncoder):

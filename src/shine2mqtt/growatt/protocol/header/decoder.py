@@ -1,6 +1,6 @@
 from shine2mqtt.growatt.protocol.base.decoder import ByteDecoder
-from shine2mqtt.growatt.protocol.base.message import MBAPHeader
 from shine2mqtt.growatt.protocol.constants import FunctionCode
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 class HeaderDecoder(ByteDecoder):
