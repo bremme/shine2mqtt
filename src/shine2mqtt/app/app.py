@@ -110,7 +110,6 @@ class Application:
 
             tasks = [
                 asyncio.create_task(self.tcp_server.serve()),
-                # asyncio.create_task(self.coordinator.run()),
                 asyncio.create_task(self.mqtt_bridge.run()),
             ]
 
