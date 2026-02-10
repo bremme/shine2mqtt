@@ -51,6 +51,7 @@ Use these instructions when writing code for the project
 * Apply KISS and YAGNI principle
   * Make things as simple as possible, only support use cases that are actually needed
 * Local reasoning is important
+* Always use type hints
 
 ### Unit testing instructions
 
@@ -104,8 +105,11 @@ Use these instructions when writing code for the project
 
 ### General
 
-- One behavior per test, but don't overdo it
-  - be pragmatic to avoid an explosion of test cases
+- Cover all paths
+- Test behavior, not implementation
+- Only test public methods and functions (no private methods/functions starting with `_`)
+- Be pragmatic to avoid an explosion of test cases
 - Tests must be deterministic and order-independent
 - No shared mutable state
 - Tests should read like executable documentation
+- Make it explicit when using mocks, stubs or fakes by naming them accordingly (e.g. `StubSessionState` instead of `SessionState`)
