@@ -12,14 +12,14 @@ from shine2mqtt.growatt.protocol.messages import (
     GrowattPingMessage,
     MBAPHeader,
 )
-from shine2mqtt.growatt.server.protocol.session.state import ProtocolSessionState
+from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
 
 
 class MessageHandler:
     _GET_CONFIG_REGISTER_START = 0
     _GET_CONFIG_REGISTER_END = 61
 
-    def __init__(self, session_state: ProtocolSessionState):
+    def __init__(self, session_state: ServerProtocolSessionState):
         self.session_state = session_state
 
     def handle_message(self, message: BaseMessage) -> list[BaseMessage]:
@@ -28,7 +28,7 @@ class MessageHandler:
         )
         logger.debug(f"Message content: {message}")
 
-        self.session_state.update_transaction_id(message.header)
+        self.session_state.set_incoming_transaction_id(message.header)
 
         match message:
             case GrowattPingMessage():
@@ -79,7 +79,7 @@ class MessageHandler:
             register_end = register_start
 
         function_code = FunctionCode.GET_CONFIG
-        transaction_id = self.session_state.get_transaction_id(function_code)
+        transaction_id = self.session_state.get_next_transaction_id(function_code)
 
         header = MBAPHeader(
             transaction_id=transaction_id,

@@ -8,7 +8,7 @@ from shine2mqtt.growatt.server.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames, ProtocolEvents
 from shine2mqtt.growatt.server.protocol.session.command.handler import CommandHandler
 from shine2mqtt.growatt.server.protocol.session.message.handler import MessageHandler
-from shine2mqtt.growatt.server.protocol.session.state import ProtocolSessionState
+from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
 
 
 class ServerProtocolSessionFactory:
@@ -25,7 +25,7 @@ class ServerProtocolSessionFactory:
         self.protocol_events = protocol_events
 
     def create(self) -> ServerProtocolSession:
-        session_state = ProtocolSessionState()
+        session_state = ServerProtocolSessionState()
         outgoing_frames = OutgoingFrames()
 
         command_handler = CommandHandler(session_state, self.config_registry)
