@@ -1,3 +1,5 @@
+import pytest
+
 from shine2mqtt.growatt.protocol.decoders.ack import AckMessageResponseDecoder
 from shine2mqtt.growatt.protocol.encoders.ack import AckPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
@@ -5,17 +7,17 @@ from tests.utils.loader import CapturedFrameLoader
 _, headers, payloads = CapturedFrameLoader.load("ack_message")
 
 
-class TestAckRoundtrip:
-    @staticmethod
-    def test_encode_decode_roundtrip_preserves_data() -> None:
-        decoder = AckMessageResponseDecoder()
-        encoder = AckPayloadEncoder()
+@pytest.mark.parametrize(
+    "header,payload", zip(headers, payloads, strict=True), ids=range(len(headers))
+)
+def test_encode_decode_ack_message_roundtrip_preserves_data(header, payload) -> None:
+    decoder = AckMessageResponseDecoder()
+    encoder = AckPayloadEncoder()
 
-        for header, payload in zip(headers, payloads, strict=True):
-            decoded_message = decoder.decode(header, payload)
+    decoded_message = decoder.decode(header, payload)
 
-            encoded_payload = encoder.encode(decoded_message)
+    encoded_payload = encoder.encode(decoded_message)
 
-            redecoded_message = decoder.decode(header, encoded_payload)
+    redecoded_message = decoder.decode(header, encoded_payload)
 
-            assert decoded_message == redecoded_message
+    assert decoded_message == redecoded_message

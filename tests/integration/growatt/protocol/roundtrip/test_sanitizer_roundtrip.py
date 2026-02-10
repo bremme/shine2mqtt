@@ -40,86 +40,91 @@ def validator():
     return FrameValidator(CRCCalculator(), CRCDecoder())
 
 
-class TestSanitizerRoundtrip:
-    @staticmethod
-    @pytest.mark.parametrize(
-        "frame, header, payload",
-        zip(announce_frames, announce_headers, announce_payloads, strict=False),
-    )
-    def test_sanitizer_announce_payload(frame, header, payload, sanitizer, validator) -> None:
-        decoder = AnnounceRequestDecoder()
+@pytest.mark.parametrize(
+    "frame,header,payload",
+    zip(announce_frames, announce_headers, announce_payloads, strict=True),
+    ids=range(len(announce_frames)),
+)
+def test_sanitize_announce_message_preserves_structure(
+    frame, header, payload, sanitizer, validator
+) -> None:
+    decoder = AnnounceRequestDecoder()
 
-        sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(header, payload)
+    sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(header, payload)
 
-        validator.validate(sanitized_frame, sanitized_header)
+    validator.validate(sanitized_frame, sanitized_header)
 
-        sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
+    sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
 
-        assert len(sanitized_frame) == len(frame)
-        assert len(sanitized_payload) == len(payload)
-        assert sanitized_header == header
-        assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL
-        assert sanitized_message.inverter_serial == DUMMY_INVERTER_SERIAL
+    assert len(sanitized_frame) == len(frame)
+    assert len(sanitized_payload) == len(payload)
+    assert sanitized_header == header
+    assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL
+    assert sanitized_message.inverter_serial == DUMMY_INVERTER_SERIAL
 
-    @staticmethod
-    @pytest.mark.parametrize(
-        "frame, header, payload",
-        zip(data_frames, data_headers, data_payloads, strict=False),
-    )
-    def test_sanitizer_data_payload(frame, header, payload, sanitizer, validator) -> None:
-        decoder = DataRequestDecoder()
 
-        sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(header, payload)
+@pytest.mark.parametrize(
+    "frame,header,payload",
+    zip(data_frames, data_headers, data_payloads, strict=True),
+    ids=range(len(data_frames)),
+)
+def test_sanitize_data_message_preserves_structure(
+    frame, header, payload, sanitizer, validator
+) -> None:
+    decoder = DataRequestDecoder()
 
-        validator.validate(sanitized_frame, sanitized_header)
+    sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(header, payload)
 
-        sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
+    validator.validate(sanitized_frame, sanitized_header)
 
-        assert len(sanitized_frame) == len(frame)
-        assert len(sanitized_payload) == len(payload)
-        assert sanitized_header == header
-        assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL
-        assert sanitized_message.inverter_serial == DUMMY_INVERTER_SERIAL
+    sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
 
-    @staticmethod
-    @pytest.mark.parametrize(
-        "frame, header, payload",
-        zip(get_config_frames, get_config_headers, get_config_payloads, strict=False),
-    )
-    def test_sanitize_get_config_payload(frame, header, payload, sanitizer, validator) -> None:
-        decoder = GetConfigResponseDecoder()
+    assert len(sanitized_frame) == len(frame)
+    assert len(sanitized_payload) == len(payload)
+    assert sanitized_header == header
+    assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL
+    assert sanitized_message.inverter_serial == DUMMY_INVERTER_SERIAL
 
-        sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(header, payload)
-        validator.validate(sanitized_frame, sanitized_header)
 
-        sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
+@pytest.mark.parametrize(
+    "frame,header,payload",
+    zip(get_config_frames, get_config_headers, get_config_payloads, strict=True),
+    ids=range(len(get_config_frames)),
+)
+def test_sanitize_config_message_preserves_structure(
+    frame, header, payload, sanitizer, validator
+) -> None:
+    decoder = GetConfigResponseDecoder()
 
-        if sanitized_message.register in SENSITIVE_CONFIG_REGISTER_MAP:
-            assert (
-                sanitized_message.value == SENSITIVE_CONFIG_REGISTER_MAP[sanitized_message.register]
-            )
+    sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(header, payload)
+    validator.validate(sanitized_frame, sanitized_header)
 
-        assert sanitized_header == header
-        assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL
+    sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
 
-    @staticmethod
-    @pytest.mark.parametrize(
-        "frame, header, payload",
-        zip(ping_frames, ping_headers, ping_payloads, strict=False),
-    )
-    def test_sanitizer_ping_payload(frame, header, payload, sanitizer, validator) -> None:
-        decoder = PingRequestDecoder()
+    if sanitized_message.register in SENSITIVE_CONFIG_REGISTER_MAP:
+        assert sanitized_message.value == SENSITIVE_CONFIG_REGISTER_MAP[sanitized_message.register]
 
-        for frame, header, payload in zip(ping_frames, ping_headers, ping_payloads, strict=True):
-            sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(
-                header, payload
-            )
+    assert sanitized_header == header
+    assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL
 
-            validator.validate(sanitized_frame, sanitized_header)
 
-            sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
+@pytest.mark.parametrize(
+    "frame,header,payload",
+    zip(ping_frames, ping_headers, ping_payloads, strict=True),
+    ids=range(len(ping_frames)),
+)
+def test_sanitize_ping_message_preserves_structure(
+    frame, header, payload, sanitizer, validator
+) -> None:
+    decoder = PingRequestDecoder()
 
-            assert len(sanitized_frame) == len(frame)
-            assert len(sanitized_payload) == len(payload)
-            assert sanitized_header == header
-            assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL
+    sanitized_frame, sanitized_header, sanitized_payload = sanitizer.sanitize(header, payload)
+
+    validator.validate(sanitized_frame, sanitized_header)
+
+    sanitized_message = decoder.decode(sanitized_header, sanitized_payload)
+
+    assert len(sanitized_frame) == len(frame)
+    assert len(sanitized_payload) == len(payload)
+    assert sanitized_header == header
+    assert sanitized_message.datalogger_serial == DUMMY_DATALOGGER_SERIAL

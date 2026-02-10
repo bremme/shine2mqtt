@@ -1,6 +1,3 @@
-import json
-from pathlib import Path
-
 import pytest
 
 from shine2mqtt.growatt.protocol.constants import FunctionCode
@@ -77,26 +74,6 @@ CASES = [
     (MESSAGES[2], FRAMES[2]),
     (MESSAGES[3], FRAMES[3]),
 ]
-
-
-def load_captured_frames(message_type: str):
-    """Load captured frames from JSON for a specific message type"""
-    # Path from test file: tests/integration/protocol/frame/test_*.py
-    # Target: tests/data/captured/...
-    base_path = Path(__file__).parent.parent.parent.parent / "data" / "captured"
-    json_file = base_path / "shine_wifi_x" / "mic_3000tl_x" / f"{message_type}.json"
-
-    if not json_file.exists():
-        return []
-
-    with open(json_file) as f:
-        data = json.load(f)
-
-    frames = [bytes.fromhex(f) for f in data["frames"]]
-    headers = [MBAPHeader.fromdict(header) for header in data["headers"]]
-    payloads = [bytes.fromhex(p) for p in data["payloads"]]
-
-    return frames, headers, payloads
 
 
 class TestFrameEncoder:
