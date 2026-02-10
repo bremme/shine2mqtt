@@ -1,7 +1,7 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.decoders.ack import AckMessageResponseDecoder
-from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
+from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
+from shine2mqtt.growatt.protocol.ack.decoder import AckMessageResponseDecoder
 from tests.utils.loader import CapturedFrameLoader
 
 frames, headers, payloads = CapturedFrameLoader.load("ack_message")

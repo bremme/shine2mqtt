@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 
+from shine2mqtt.growatt.protocol.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.messages.announce import GrowattAnnounceMessage
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 @dataclass

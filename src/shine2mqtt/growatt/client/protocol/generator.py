@@ -3,7 +3,7 @@ from itertools import cycle
 from shine2mqtt.growatt.client.protocol.loader import CapturedFrameLoader
 from shine2mqtt.growatt.protocol.constants import ACK, NACK, FunctionCode
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")
 buffered_data_frames, buffered_data_headers, buffered_data_payloads = CapturedFrameLoader.load(

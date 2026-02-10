@@ -1,9 +1,9 @@
 import pytest
 
 from shine2mqtt.growatt.client.protocol.state import ClientProtocolSessionState
+from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 class TestClientProtocolSessionState:

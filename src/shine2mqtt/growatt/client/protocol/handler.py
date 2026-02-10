@@ -3,14 +3,14 @@ from collections.abc import Callable
 from loguru import logger
 
 from shine2mqtt.growatt.client.protocol.generator import FrameGenerator
+from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
+from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
-from shine2mqtt.growatt.protocol.messages.config import (
+from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
+from shine2mqtt.growatt.protocol.set_config.set_config import (
     GrowattGetConfigRequestMessage,
     GrowattSetConfigRequestMessage,
 )
-from shine2mqtt.growatt.protocol.messages.ping import GrowattPingMessage
 
 
 class ClientMessageHandler:

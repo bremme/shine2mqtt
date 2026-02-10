@@ -1,7 +1,7 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.encoders.ping import PingPayloadEncoder
-from shine2mqtt.growatt.protocol.messages.ping import GrowattPingMessage
+from shine2mqtt.growatt.protocol.ping.encoder import PingPayloadEncoder
+from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
 from tests.utils.loader import CapturedFrameLoader
 
 frames, headers, payloads = CapturedFrameLoader.load("ping_message")

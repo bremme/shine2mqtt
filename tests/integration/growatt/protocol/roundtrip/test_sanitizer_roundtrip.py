@@ -1,10 +1,8 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.decoders.announce import AnnounceRequestDecoder
-from shine2mqtt.growatt.protocol.decoders.crc import CRCDecoder
-from shine2mqtt.growatt.protocol.decoders.data import DataRequestDecoder
-from shine2mqtt.growatt.protocol.decoders.get_config import GetConfigResponseDecoder
-from shine2mqtt.growatt.protocol.decoders.ping import PingRequestDecoder
+from shine2mqtt.growatt.protocol.announce.decoder import AnnounceRequestDecoder
+from shine2mqtt.growatt.protocol.crc.decoder import CRCDecoder
+from shine2mqtt.growatt.protocol.data.decoder import DataRequestDecoder
 from shine2mqtt.growatt.protocol.frame.capturer.sanitizer import (
     DUMMY_DATALOGGER_SERIAL,
     DUMMY_INVERTER_SERIAL,
@@ -12,6 +10,8 @@ from shine2mqtt.growatt.protocol.frame.capturer.sanitizer import (
 )
 from shine2mqtt.growatt.protocol.frame.crc import CRCCalculator
 from shine2mqtt.growatt.protocol.frame.validator import FrameValidator
+from shine2mqtt.growatt.protocol.get_config.decoder import GetConfigResponseDecoder
+from shine2mqtt.growatt.protocol.ping.decoder import PingRequestDecoder
 from tests.utils.loader import CapturedFrameLoader
 
 announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")

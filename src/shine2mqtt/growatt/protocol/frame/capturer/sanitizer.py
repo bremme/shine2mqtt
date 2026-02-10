@@ -1,5 +1,7 @@
 from dataclasses import replace
 
+from shine2mqtt.growatt.protocol.base.decoder import ByteDecoder
+from shine2mqtt.growatt.protocol.base.encoder import ByteEncoder
 from shine2mqtt.growatt.protocol.constants import (
     DATALOGGER_IP_ADDRESS_REGISTER,
     DATALOGGER_MAC_ADDRESS_REGISTER,
@@ -9,13 +11,11 @@ from shine2mqtt.growatt.protocol.constants import (
     ENCRYPTION_KEY,
     FunctionCode,
 )
-from shine2mqtt.growatt.protocol.decoders.decoder import ByteDecoder
-from shine2mqtt.growatt.protocol.encoders.crc import CRCEncoder
-from shine2mqtt.growatt.protocol.encoders.encoder import ByteEncoder
-from shine2mqtt.growatt.protocol.encoders.header import HeaderEncoder
+from shine2mqtt.growatt.protocol.crc.encoder import CRCEncoder
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.growatt.protocol.frame.crc import CRC16_LENGTH, CRCCalculator
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.encoder import HeaderEncoder
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 DUMMY_DATALOGGER_SERIAL = "XGDABCDEFG"
 DUMMY_INVERTER_SERIAL = "MLG0A12345"

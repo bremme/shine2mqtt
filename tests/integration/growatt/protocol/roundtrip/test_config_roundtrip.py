@@ -1,7 +1,7 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.decoders.get_config import GetConfigResponseDecoder
-from shine2mqtt.growatt.protocol.encoders.get_config import GetConfigResponsePayloadEncoder
+from shine2mqtt.growatt.protocol.get_config.decoder import GetConfigResponseDecoder
+from shine2mqtt.growatt.protocol.get_config.encoder import GetConfigResponsePayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
 _, headers, payloads = CapturedFrameLoader.load("get_config_message")

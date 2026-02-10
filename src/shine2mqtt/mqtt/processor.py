@@ -10,7 +10,7 @@ from shine2mqtt.growatt.protocol.messages import (
     GrowattBufferedDataMessage,
     GrowattDataMessage,
 )
-from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigResponseMessage
+from shine2mqtt.growatt.protocol.set_config.set_config import GrowattGetConfigResponseMessage
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
 from shine2mqtt.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 from shine2mqtt.mqtt.config import MqttConfig

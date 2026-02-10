@@ -9,7 +9,7 @@ from shine2mqtt.growatt.protocol.frame.capturer.sanitizer import (
     RawPayloadSanitizer,
 )
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 
 class CaptureHandler:

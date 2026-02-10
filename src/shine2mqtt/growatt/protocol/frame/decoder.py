@@ -2,12 +2,12 @@ from collections.abc import Callable
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.decoders.decoder import ByteDecoder, MessageDecoder
-from shine2mqtt.growatt.protocol.decoders.header import HeaderDecoder
-from shine2mqtt.growatt.protocol.decoders.registry import DecoderRegistry
+from shine2mqtt.growatt.protocol.base.decoder import ByteDecoder, MessageDecoder
+from shine2mqtt.growatt.protocol.base.decoder_registry import DecoderRegistry
+from shine2mqtt.growatt.protocol.base.message import BaseMessage, MBAPHeader
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.growatt.protocol.frame.validator import FrameValidator
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage, MBAPHeader
+from shine2mqtt.growatt.protocol.header.decoder import HeaderDecoder
 
 HEADER_LENGTH = 8
 CRC_LENGTH = 2

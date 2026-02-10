@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 
-from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
+from shine2mqtt.growatt.protocol.base.message import MBAPHeader
 
 
 @dataclass

@@ -1,7 +1,7 @@
 import json
 
 from shine2mqtt import PROJECT_ROOT
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 CAPTURED_FRAMES_DIR = PROJECT_ROOT / "tests" / "data" / "captured"
 

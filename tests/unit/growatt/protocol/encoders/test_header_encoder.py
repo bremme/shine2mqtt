@@ -1,8 +1,8 @@
 import pytest
 
+from shine2mqtt.growatt.protocol.base.message import MBAPHeader
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.encoders.header import HeaderEncoder
-from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
+from shine2mqtt.growatt.protocol.header.encoder import HeaderEncoder
 
 
 class TestHeaderEncoder:

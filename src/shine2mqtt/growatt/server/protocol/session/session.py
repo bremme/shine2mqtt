@@ -1,9 +1,9 @@
 from loguru import logger
 
+from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
 from shine2mqtt.growatt.server.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames, ProtocolEvents
 from shine2mqtt.growatt.server.protocol.session.command.handler import CommandHandler
@@ -78,7 +78,7 @@ class ServerProtocolSession:
             self.outgoing_frames.put_nowait(outgoing_frame)
 
     def _publish_protocol_event(self, message: BaseMessage):
-        from shine2mqtt.growatt.protocol.messages.base import DataloggerMessage
+        from shine2mqtt.growatt.protocol.base.message import DataloggerMessage
 
         if isinstance(message, DataloggerMessage):
             event = ProtocolEvent(

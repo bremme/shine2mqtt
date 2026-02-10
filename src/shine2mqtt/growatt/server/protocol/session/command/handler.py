@@ -2,10 +2,10 @@ from asyncio import Future
 
 from loguru import logger
 
+from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
-from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigRequestMessage
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
+from shine2mqtt.growatt.protocol.set_config.set_config import GrowattGetConfigRequestMessage
 from shine2mqtt.growatt.server.protocol.session.command.command import (
     BaseCommand,
     GetConfigByNameCommand,

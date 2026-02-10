@@ -1,12 +1,12 @@
 import pytest
 
+from shine2mqtt.growatt.protocol.base.message import MBAPHeader
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.encoders.get_config import (
+from shine2mqtt.growatt.protocol.get_config.encoder import (
     GetConfigRequestPayloadEncoder,
     GetConfigResponsePayloadEncoder,
 )
-from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
-from shine2mqtt.growatt.protocol.messages.config import (
+from shine2mqtt.growatt.protocol.set_config.set_config import (
     GrowattGetConfigRequestMessage,
     GrowattGetConfigResponseMessage,
 )

@@ -1,7 +1,7 @@
 import pytest
 
+from shine2mqtt.growatt.protocol.base.decoder_registry import DecoderRegistry
 from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.decoders.registry import DecoderRegistry
 from shine2mqtt.growatt.protocol.frame.factory import FrameFactory
 
 

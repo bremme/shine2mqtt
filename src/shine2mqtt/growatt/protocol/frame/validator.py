@@ -1,6 +1,6 @@
-from shine2mqtt.growatt.protocol.decoders.crc import CRCDecoder
+from shine2mqtt.growatt.protocol.base.message import MBAPHeader
+from shine2mqtt.growatt.protocol.crc.decoder import CRCDecoder
 from shine2mqtt.growatt.protocol.frame.crc import CRC16_LENGTH, CRCCalculator
-from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
 
 
 class FrameValidator:
