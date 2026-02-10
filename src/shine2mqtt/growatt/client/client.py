@@ -4,11 +4,11 @@ from asyncio import CancelledError, IncompleteReadError
 from loguru import logger
 
 from shine2mqtt.growatt.client.config import SimulatedClientConfig
+from shine2mqtt.growatt.client.protocol.factory import ClientProtocolSessionFactory
 from shine2mqtt.growatt.client.protocol.generator import FrameGenerator
 from shine2mqtt.growatt.client.protocol.handler import ClientMessageHandler
 from shine2mqtt.growatt.client.protocol.session import (
     ClientProtocolSession,
-    ClientProtocolSessionFactory,
 )
 from shine2mqtt.growatt.client.transport import TCPTransport
 from shine2mqtt.growatt.protocol.frame.factory import FrameFactory

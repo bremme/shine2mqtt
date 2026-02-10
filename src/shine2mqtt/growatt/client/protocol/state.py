@@ -10,8 +10,8 @@ class ClientProtocolSessionState:
     protocol_id: int
     unit_id: int
     datalogger_serial: str
-    announced: bool = False
 
+    _announced: bool = False
     _transaction_id: dict[FunctionCode, int] = field(
         default_factory=lambda: {
             FunctionCode.PING: 0,
@@ -27,6 +27,7 @@ class ClientProtocolSessionState:
             FunctionCode.PING: None,
             FunctionCode.ANNOUNCE: None,
             FunctionCode.DATA: None,
+            FunctionCode.BUFFERED_DATA: None,
             FunctionCode.SET_CONFIG: None,
             FunctionCode.GET_CONFIG: None,
         }
@@ -39,10 +40,10 @@ class ClientProtocolSessionState:
         self._last_send_time[function_code] = timestamp
 
     def is_announced(self) -> bool:
-        return self.announced
+        return self._announced
 
     def announce(self, message: GrowattAckMessage) -> None:
-        self.announced = message.ack
+        self._announced = message.ack
 
     def get_next_transaction_id(self, function_code: FunctionCode) -> int:
         """Get a new transaction ID for a given function code to use in outgoing messages."""
