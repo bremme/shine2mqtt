@@ -1,6 +1,6 @@
 [project]
 name = "shine2mqtt"
-version = "0.1.0"
+version = "0.2.0"
 authors = [{ name = "Bram Harmsen", email = "crazed-lint-kisser@duck.com" }]
 description = "A local Growatt server which listens to your Shine Wifi-X datalogger and publishes to MQTT"
 readme = "README.md"
