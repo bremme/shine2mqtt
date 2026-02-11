@@ -16,13 +16,16 @@ def main() -> None:
     repository_root = Path(__file__).resolve().parents[2]
     pyproject_version = read_pyproject_version(repository_root / "pyproject.toml")
 
-    tag = os.environ["GITHUB_REF_NAME"]
+    tag = normalize_tag(os.environ.get("GITHUB_REF_NAME", ""))
     tag_version = normalize_tag(tag)
 
     if tag_version != pyproject_version:
         raise SystemExit(
             f"Tag version does not match pyproject.toml version: tag={tag!r} pyproject={pyproject_version!r}"
         )
+    print(
+        f"Tag version matches pyproject.toml version: tag={tag!r} pyproject={pyproject_version!r}"
+    )
 
 
 if __name__ == "__main__":
