@@ -36,4 +36,4 @@ EXPOSE 5279
 
 ENTRYPOINT ["shine2mqtt"]
 
-CMD []
+CMD ["run"]
