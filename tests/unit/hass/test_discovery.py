@@ -55,7 +55,7 @@ class TestMqttDiscoveryBuilder:
     def test_discovery_origin_contains_package_info(self):
         assert MqttDiscoveryBuilder.DISCOVERY_ORIGIN == {
             "name": "shine2mqtt",
-            "sw_version": "0.0.2",
+            "sw_version": "0.1.0",
             "support_url": "https://github.com/bremme/shine2mqtt",
         }
 
