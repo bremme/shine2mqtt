@@ -30,24 +30,27 @@ class ClientMessageHandler:
     def handle_message(self, message: BaseMessage) -> bytes | None:
         function_code = message.header.function_code
         hex_value = f"0x{function_code.value:02x}"
+        transaction_id = message.header.transaction_id
 
         match message:
             case GrowattAckMessage() if function_code == FunctionCode.ANNOUNCE:
                 logger.info(
-                    f"✓ Received ACK for ANNOUNCE ({hex_value}) response, datalogger is now ANNOUNCED!"
+                    f"✓ Received ACK for ANNOUNCE ({hex_value}) response, {transaction_id=}, datalogger is now ANNOUNCED!"
                 )
                 self._announce_callback(message) if self._announce_callback else None
             case GrowattAckMessage() if function_code == FunctionCode.DATA:
-                logger.info(f"✓ Received ACK for DATA ({hex_value}) response")
+                logger.info(f"✓ Received ACK for DATA ({hex_value}) response, {transaction_id=}")
             case GrowattAckMessage() if function_code == FunctionCode.BUFFERED_DATA:
-                logger.info(f"✓ Received ACK for BUFFERED_DATA ({hex_value}) response")
+                logger.info(
+                    f"✓ Received ACK for BUFFERED_DATA ({hex_value}) response, {transaction_id=}"
+                )
             case GrowattPingMessage():
-                logger.info(f"✓ Received PING ({hex_value}) response")
+                logger.info(f"✓ Received PING ({hex_value}) response, {transaction_id=}")
             case GrowattGetConfigRequestMessage():
-                logger.info(f"✓ Received GET_CONFIG request ({hex_value})")
+                logger.info(f"✓ Received GET_CONFIG request ({hex_value}), {transaction_id=}")
                 return self._build_get_config_response_frame(message)
             case GrowattSetConfigRequestMessage():
-                logger.info(f"✓ Received SET_CONFIG request ({hex_value})")
+                logger.info(f"✓ Received SET_CONFIG request ({hex_value}), {transaction_id=}")
                 return self._build_ack_frame(message)
             case _:
                 logger.warning(f"Unhandled message type: {type(message)}")
