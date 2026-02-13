@@ -5,6 +5,16 @@ from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
+# TEMP
+default_function_codes = [
+    FunctionCode.ANNOUNCE,
+    FunctionCode.PING,
+    FunctionCode.DATA,
+    FunctionCode.BUFFERED_DATA,
+    FunctionCode.SET_CONFIG,
+    FunctionCode.GET_CONFIG,
+]
+
 
 class TestClientProtocolSessionState:
     @pytest.fixture
@@ -41,7 +51,7 @@ class TestClientProtocolSessionState:
             ack=False,
         )
 
-    @pytest.mark.parametrize("function_code", list(FunctionCode))
+    @pytest.mark.parametrize("function_code", default_function_codes)
     def test_initial_state(self, state, function_code):
         assert state.protocol_id == 1
         assert state.unit_id == 1

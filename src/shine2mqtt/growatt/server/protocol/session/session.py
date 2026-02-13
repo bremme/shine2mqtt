@@ -6,6 +6,7 @@ from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.growatt.server.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames, ProtocolEvents
+from shine2mqtt.growatt.server.protocol.session.command.command import BaseCommand
 from shine2mqtt.growatt.server.protocol.session.command.handler import CommandHandler
 from shine2mqtt.growatt.server.protocol.session.message.handler import MessageHandler
 from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
@@ -66,15 +67,17 @@ class ServerProtocolSession:
         self.command_handler.resolve_response(message)
         self._publish_protocol_event(message)
 
+        transaction_id = message.header.transaction_id
         logger.info(
-            f"✓ Receive {message.header.function_code.name} ({message.header.function_code.value:#02x}) message."
+            f"✓ Receive {message.header.function_code.name} ({message.header.function_code.value:#02x}) message, {transaction_id=}"
         )
 
         response_messages = self.message_handler.handle_message(message)
 
         for response_message in response_messages:
+            transaction_id = response_message.header.transaction_id
             logger.info(
-                f"→ Enqueue {response_message.header.function_code.name} ({response_message.header.function_code.value:#02x}) response"
+                f"→ Enqueue {response_message.header.function_code.name} ({response_message.header.function_code.value:#02x}) response, {transaction_id=}"
             )
             logger.debug(f"Response message content: {response_message}")
 
@@ -91,7 +94,11 @@ class ServerProtocolSession:
             )
             self.protocol_events.put_nowait(event)
 
-    def handle_command(self, command):
+    def handle_command(self, command: BaseCommand) -> None:
         if message := self.command_handler.handle_command(command):
+            transaction_id = message.header.transaction_id
+            logger.info(
+                f"→ Enqueue {message.header.function_code.name} ({message.header.function_code.value:#02x}) message for command {command.__class__.__name__}, {transaction_id=}"
+            )
             frame = self.encoder.encode(message)
             self.outgoing_frames.put_nowait(frame)

@@ -13,6 +13,7 @@ from shine2mqtt.growatt.protocol.get_config.encoder import (
     GetConfigResponsePayloadEncoder,
 )
 from shine2mqtt.growatt.protocol.ping.encoder import PingPayloadEncoder
+from shine2mqtt.growatt.protocol.raw.encoder import RawRequestPayloadEncoder
 from shine2mqtt.growatt.protocol.set_config.encoder import SetConfigRequestPayloadEncoder
 
 
@@ -56,5 +57,6 @@ class PayloadEncoderRegistry:
         registry.register_encoder(GetConfigRequestPayloadEncoder())
         registry.register_encoder(SetConfigRequestPayloadEncoder())
         registry.register_encoder(GetConfigResponsePayloadEncoder())
+        registry.register_encoder(RawRequestPayloadEncoder())
 
         return registry

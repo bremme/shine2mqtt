@@ -7,6 +7,16 @@ from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
 
+# TEMP
+default_function_codes = [
+    FunctionCode.ANNOUNCE,
+    FunctionCode.PING,
+    FunctionCode.DATA,
+    FunctionCode.BUFFERED_DATA,
+    FunctionCode.SET_CONFIG,
+    FunctionCode.GET_CONFIG,
+]
+
 
 class TestServerProtocolSessionState:
     @pytest.fixture
@@ -60,7 +70,7 @@ class TestServerProtocolSessionState:
             power_factor_control_mode="Unity PF",
         )
 
-    @pytest.mark.parametrize("function_code", list(FunctionCode))
+    @pytest.mark.parametrize("function_code", default_function_codes)
     def test_initial_state(self, state, function_code):
         assert state.protocol_id == 1
         assert state.unit_id == 1

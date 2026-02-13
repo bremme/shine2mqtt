@@ -9,19 +9,39 @@ DECRYPTION_KEY = ENCRYPTION_KEY
 # Modbus function codes
 # https://en.wikipedia.org/wiki/Modbus#Public_function_codes
 READ_INPUT_REGISTERS = 4
-READ_HOLDING_REGISTERS = 3
+READ_MULTIPLE_HOLDING_REGISTERS = 3
 WRITE_SINGLE_HOLDING_REGISTER = 6
 WRITE_MULTIPLE_HOLDING_REGISTERS = 16
 
 
 class FunctionCode(Enum):
+    ANNOUNCE = 0x03  # 3 (READ_MULTIPLE_HOLDING_REGISTERS)
+    DATA = 0x04  # 4 (READ_INPUT_REGISTERS)
     PING = 0x16  # 22
-    ANNOUNCE = 0x03  # 3 (holding_registers, config, read/write)
-    DATA = 0x04  # 4 (input_registers, state, read)
-    BUFFERED_DATA = 0x50  # 80
     SET_CONFIG = 0x18  # 24
     GET_CONFIG = 0x19  # 25
+    BUFFERED_DATA = 0x50  # 80
     # REBOOT = 0x20 ?
+
+    X02_02 = 0x02  # Read Discrete Inputs
+    X01_01 = 0x01  # Read Coils
+    X05_05 = 0x05  # Write Single Coil
+    X0F_15 = 0x0F  # Write Multiple Coils
+
+    X03_03 = 0x03  # Read Multiple Holding Registers
+    X06_06 = 0x06  # Write Single Holding Register
+    X04_04 = 0x04  # Read Input Registers
+    X10_16 = 0x10  # Write Multiple Holding Registers
+    X14_20 = 0x14  # (20) Read File Record
+    X15_21 = 0x15  # (21) Write File Record
+    X16_22 = 0x16  # (22) Mask Write Register
+    X17_23 = 0x17  # (23) Read/Write Multiple Registers
+    X18_24 = 0x18  # (24) Read FIFO Queue
+
+    X19_25 = 0x19  # (25) Get Config
+    X20_32 = 0x20  # (32) Reboot
+    X32_50 = 0x32  # (50)
+    X50_80 = 0x50  #
 
 
 class InverterStatus(Enum):

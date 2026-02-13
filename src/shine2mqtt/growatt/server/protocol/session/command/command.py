@@ -1,6 +1,8 @@
 import asyncio
 from dataclasses import dataclass
 
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
+
 
 @dataclass
 class BaseCommand:
@@ -15,4 +17,15 @@ class GetConfigByNameCommand(BaseCommand):
 @dataclass
 class GetConfigByRegistersCommand(BaseCommand):
     register: int
-    future: asyncio.Future
+
+
+@dataclass
+class ReadMultipleHoldingRegistersCommand(BaseCommand):
+    register_start: int
+    num_registers: int
+
+
+@dataclass
+class RawFrameCommand(BaseCommand):
+    header: MBAPHeader
+    payload: bytes

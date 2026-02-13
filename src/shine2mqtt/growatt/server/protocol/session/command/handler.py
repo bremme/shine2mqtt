@@ -3,47 +3,63 @@ from asyncio import Future
 from loguru import logger
 
 from shine2mqtt.growatt.protocol.base.message import BaseMessage
+from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.get_config.get_config import (
     GrowattGetConfigRequestMessage,
 )
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
+from shine2mqtt.growatt.protocol.raw.raw import GrowattRawMessage
 from shine2mqtt.growatt.server.protocol.session.command.command import (
     BaseCommand,
     GetConfigByNameCommand,
     GetConfigByRegistersCommand,
+    RawFrameCommand,
 )
+from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
 
 
 class CommandHandler:
-    def __init__(self, session_state, config_registry):
+    def __init__(self, session_state: ServerProtocolSessionState, config_registry: ConfigRegistry):
         self.session_state = session_state
         self.command_futures: dict[tuple[FunctionCode, int], Future] = {}
         self.config_registry = config_registry
 
     def handle_command(self, command: BaseCommand) -> BaseMessage | None:
-        if isinstance(command, GetConfigByNameCommand):
-            register = self.config_registry.get_register_by_name(command.name)
-            if register is None:
-                command.future.set_exception(ValueError(f"Unknown config name: {command.name}"))
-                return
-            message = self._build_get_config_request_message(
-                register_start=register,
-            )
-            self.store_command_future(message.header, command.future)
-            return message
-
-        elif isinstance(command, GetConfigByRegistersCommand):
-            if self.config_registry.get_register_info(command.register) is None:
-                command.future.set_exception(
-                    ValueError(f"Unknown config register: {command.register}")
+        match command:
+            case GetConfigByNameCommand():
+                register = self.config_registry.get_register_by_name(command.name)
+                if register is None:
+                    command.future.set_exception(ValueError(f"Unknown config name: {command.name}"))
+                    return
+                message = self._build_get_config_request_message(
+                    register_start=register,
                 )
-                return
-            message = self._build_get_config_request_message(
-                register_start=command.register,
-            )
-            self.store_command_future(message.header, command.future)
-            return message
+                self.store_command_future(message.header, command.future)
+                return message
+            case GetConfigByRegistersCommand():
+                if self.config_registry.get_register_info(command.register) is None:
+                    command.future.set_exception(
+                        ValueError(f"Unknown config register: {command.register}")
+                    )
+                    return
+                message = self._build_get_config_request_message(
+                    register_start=command.register,
+                )
+                self.store_command_future(message.header, command.future)
+                return message
+
+            case RawFrameCommand():
+                self.store_command_future(command.header, command.future)
+                return GrowattRawMessage(
+                    header=command.header,
+                    datalogger_serial=self.session_state.datalogger_serial,
+                    payload=command.payload,
+                )
+            case _:
+                logger.warning(f"Unknown command type: {type(command)}")
+                command.future.set_exception(ValueError(f"Unknown command type: {type(command)}"))
+                return None
 
     def resolve_response(self, message: BaseMessage):
         if future := self.retrieve_command_future(message.header):
@@ -64,7 +80,7 @@ class CommandHandler:
             register_end = register_start
 
         function_code = FunctionCode.GET_CONFIG
-        transaction_id = self.session_state.get_transaction_id(function_code)
+        transaction_id = self.session_state.get_next_transaction_id(function_code)
 
         header = MBAPHeader(
             transaction_id=transaction_id,

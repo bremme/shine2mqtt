@@ -4,7 +4,8 @@ from pathlib import Path
 import uvicorn
 from loguru import logger
 
-from shine2mqtt.api.api import RestApi
+from shine2mqtt.api.api import create_app
+from shine2mqtt.app.command_router import CommandRouter
 from shine2mqtt.app.config.config import ApplicationConfig
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.frame import (
@@ -58,6 +59,8 @@ class Application:
             session_registry=session_registry,
         )
 
+        self.command_router = CommandRouter(protocol_commands, session_registry)
+
         self.mqtt_bridge = self._setup_mqtt_bridge(protocol_events, config)
 
         self.rest_server = self._setup_rest_server(config, protocol_commands)
@@ -91,7 +94,7 @@ class Application:
         if not config.api.enabled:
             return None
 
-        api_app = RestApi(protocol_commands=protocol_commands).app
+        api_app = create_app(protocol_commands=protocol_commands)
 
         uvicorn_config = uvicorn.Config(
             app=api_app,
@@ -115,6 +118,7 @@ class Application:
 
             if self.config.api.enabled and self.rest_server is not None:
                 tasks.append(asyncio.create_task(self.rest_server.serve()))
+                tasks.append(asyncio.create_task(self.command_router.run()))
 
             await asyncio.gather(*tasks)
 

@@ -58,6 +58,7 @@ class MessageHandler:
             self.session_state.announce(message)
             # get software version first to enable device discovery
             # TODO this should be configurable
+            # FIXME perhaps gettign the config should be indepdent of the announce message
             response_messages.append(
                 self._build_get_config_request_message(
                     register_start=DATALOGGER_SW_VERSION_REGISTER,
@@ -66,8 +67,10 @@ class MessageHandler:
             )
             response_messages.append(
                 self._build_get_config_request_message(
-                    register_start=self._GET_CONFIG_REGISTER_START,
-                    register_end=self._GET_CONFIG_REGISTER_END,
+                    # register_start=self._GET_CONFIG_REGISTER_START,
+                    # register_end=self._GET_CONFIG_REGISTER_END,
+                    register_start=0,
+                    register_end=5,
                 )
             )
 
