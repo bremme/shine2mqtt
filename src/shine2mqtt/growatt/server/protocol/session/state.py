@@ -20,6 +20,7 @@ class ServerProtocolSessionState:
             FunctionCode.BUFFERED_DATA: 0,
             FunctionCode.SET_CONFIG: 0,
             FunctionCode.GET_CONFIG: 0,
+            FunctionCode.READ_REGISTERS: 0,
         }
     )
 

@@ -13,6 +13,7 @@ from shine2mqtt.growatt.protocol.get_config.decoder import (
     GetConfigResponseDecoder,
 )
 from shine2mqtt.growatt.protocol.ping.decoder import PingRequestDecoder
+from shine2mqtt.growatt.protocol.read_register.decoder import ReadRegistersPayloadDecoder
 from shine2mqtt.growatt.protocol.set_config.decoder import SetConfigRequestDecoder
 
 
@@ -48,13 +49,17 @@ class DecoderRegistry:
 
         registry = cls()
 
-        # Client → Server messages
+        # Datalogger to Server pushed messages
         registry.register_decoder(FunctionCode.ANNOUNCE, AnnounceRequestDecoder())
         registry.register_decoder(FunctionCode.DATA, DataRequestDecoder())
         registry.register_decoder(FunctionCode.BUFFERED_DATA, BufferDataRequestDecoder())
         registry.register_decoder(FunctionCode.PING, PingRequestDecoder())
+
+        # Datalogger responses to server requests
         registry.register_decoder(FunctionCode.GET_CONFIG, GetConfigResponseDecoder())
         registry.register_decoder(FunctionCode.SET_CONFIG, AckMessageResponseDecoder())
+
+        registry.register_decoder(FunctionCode.READ_REGISTERS, ReadRegistersPayloadDecoder())
 
         return registry
 
@@ -74,13 +79,13 @@ class DecoderRegistry:
 
         registry = cls()
 
-        # Server → Client messages (ACKs)
+        # Server → Datalogger messages (ACKs)
         ack_decoder = AckMessageResponseDecoder()
         registry.register_decoder(FunctionCode.ANNOUNCE, ack_decoder)
         registry.register_decoder(FunctionCode.DATA, ack_decoder)
         registry.register_decoder(FunctionCode.BUFFERED_DATA, ack_decoder)
 
-        # Server → Client messages (requests/responses)
+        # Server → Datalogger messages (requests/responses)
         # PING is echoed back with same structure
         registry.register_decoder(FunctionCode.PING, PingRequestDecoder())
         registry.register_decoder(FunctionCode.GET_CONFIG, GetConfigRequestDecoder())

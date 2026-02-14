@@ -10,11 +10,15 @@ from shine2mqtt.growatt.protocol.get_config.get_config import (
 )
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 from shine2mqtt.growatt.protocol.raw.raw import GrowattRawMessage
+from shine2mqtt.growatt.protocol.read_register.read_register import (
+    GrowattReadRegistersRequestMessage,
+)
 from shine2mqtt.growatt.server.protocol.session.command.command import (
     BaseCommand,
     GetConfigByNameCommand,
     GetConfigByRegistersCommand,
     RawFrameCommand,
+    ReadRegistersCommand,
 )
 from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
 
@@ -56,6 +60,23 @@ class CommandHandler:
                     datalogger_serial=self.session_state.datalogger_serial,
                     payload=command.payload,
                 )
+            case ReadRegistersCommand():
+                header = MBAPHeader(
+                    transaction_id=self.session_state.get_next_transaction_id(
+                        FunctionCode.READ_REGISTERS
+                    ),
+                    protocol_id=self.session_state.protocol_id,
+                    length=0,
+                    unit_id=self.session_state.unit_id,
+                    function_code=FunctionCode.READ_REGISTERS,
+                )
+                self.store_command_future(header, command.future)
+                return GrowattReadRegistersRequestMessage(
+                    header=header,
+                    datalogger_serial=self.session_state.datalogger_serial,
+                    register_start=command.register_start,
+                    register_end=command.register_end,
+                )
             case _:
                 logger.warning(f"Unknown command type: {type(command)}")
                 command.future.set_exception(ValueError(f"Unknown command type: {type(command)}"))
@@ -63,6 +84,11 @@ class CommandHandler:
 
     def resolve_response(self, message: BaseMessage):
         if future := self.retrieve_command_future(message.header):
+            if future.done():
+                logger.warning(
+                    f"Command future already done (likely cancelled/timeout) for transaction ID {message.header.transaction_id}"
+                )
+                return
             future.set_result(message)
             logger.debug(
                 f"Resolved command future for transaction ID {message.header.transaction_id}"
