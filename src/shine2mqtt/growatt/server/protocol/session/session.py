@@ -62,7 +62,11 @@ class ServerProtocolSession:
         self.message_handler = message_handler
 
     def handle_incoming_frame(self, frame: bytes) -> None:
-        message: BaseMessage = self.decoder.decode(frame)
+        try:
+            message: BaseMessage = self.decoder.decode(frame)
+        except Exception as e:
+            logger.error(f"Failed to decode incoming frame: {e}")
+            return
 
         self.command_handler.resolve_response(message)
         self._publish_protocol_event(message)
