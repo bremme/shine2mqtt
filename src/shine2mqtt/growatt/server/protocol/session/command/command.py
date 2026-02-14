@@ -20,9 +20,9 @@ class GetConfigByRegistersCommand(BaseCommand):
 
 
 @dataclass
-class ReadMultipleHoldingRegistersCommand(BaseCommand):
+class ReadRegistersCommand(BaseCommand):
     register_start: int
-    num_registers: int
+    register_end: int
 
 
 @dataclass
