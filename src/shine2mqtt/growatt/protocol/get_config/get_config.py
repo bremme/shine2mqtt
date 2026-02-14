@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 from shine2mqtt.growatt.protocol.base.message import DataloggerMessage
 
+# Datalogger messages ######################################################################
 
-# Client messages ######################################################################
-# requests
+
 # responses
 @dataclass
 class GrowattGetConfigResponseMessage(DataloggerMessage):
@@ -17,7 +17,8 @@ class GrowattGetConfigResponseMessage(DataloggerMessage):
 
 
 # Server messages ######################################################################
-# responses
+
+
 # request
 @dataclass
 class GrowattGetConfigRequestMessage(DataloggerMessage):

@@ -5,7 +5,7 @@ from shine2mqtt.growatt.protocol.base.message import DataloggerMessage
 from shine2mqtt.growatt.protocol.constants import InverterStatus
 
 
-# Client messages ######################################################################
+# Datalogger messages ######################################################################
 # requests
 @dataclass
 class GrowattDataMessage(DataloggerMessage):

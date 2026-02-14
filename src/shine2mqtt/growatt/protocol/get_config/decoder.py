@@ -35,6 +35,7 @@ class GetConfigResponseDecoder(MessageDecoder[GrowattGetConfigResponseMessage]):
 
     def decode(self, header: MBAPHeader, payload: bytes) -> GrowattGetConfigResponseMessage:
         datalogger_serial = self.decode_str(payload, 0, 10)
+        # padding
         register = self.decode_u16(payload, 30)
         length = self.decode_u16(payload, 32)
 

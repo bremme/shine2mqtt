@@ -18,7 +18,7 @@ class SafetyFunction:
     frequency_derating_recovery: bool
 
 
-# Client messages ######################################################################
+# Datalogger messages ######################################################################
 # requests
 @dataclass
 class GrowattAnnounceMessage(DataloggerMessage):
