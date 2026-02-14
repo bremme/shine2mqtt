@@ -41,7 +41,7 @@ class MessageHandler:
             case GrowattGetConfigResponseMessage():
                 response_messages = self._handle_get_config_response(message)
             case _:
-                logger.error(f"No handler for message type: {type(message)}")
+                logger.warning(f"No handler for message type: {type(message)}")
                 response_messages: list[BaseMessage] = []
 
         return response_messages
