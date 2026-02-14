@@ -23,6 +23,11 @@ class FunctionCode(Enum):
     BUFFERED_DATA = 0x50  # 80
     # REBOOT = 0x20 ?
 
+    READ_REGISTERS = 0x05  # 5 (custom code, not standard Modbus)
+    WRITE_SINGLE_HOLDING_REGISTER = 0x06
+    WRITE_MULTIPLE_HOLDING_REGISTERS = 0x10
+
+    # default Modbus function codes
     X02_02 = 0x02  # Read Discrete Inputs
     X01_01 = 0x01  # Read Coils
     X05_05 = 0x05  # Write Single Coil
@@ -41,7 +46,7 @@ class FunctionCode(Enum):
     X19_25 = 0x19  # (25) Get Config
     X20_32 = 0x20  # (32) Reboot
     X32_50 = 0x32  # (50)
-    X50_80 = 0x50  #
+    X50_80 = 0x50  # (80)
 
 
 class InverterStatus(Enum):
