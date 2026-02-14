@@ -88,5 +88,6 @@ class GrowattServer:
             logger.error(f"Error in TCP session from {addr}")
         finally:
             logger.info(f"TCP session closed from {addr}")
+            self._session_registry.remove(protocol_session)
             self.session = None
             self.session_task = None

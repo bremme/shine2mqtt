@@ -8,5 +8,8 @@ class ProtocolSessionRegistry:
     def add(self, session: ServerProtocolSession):
         self._sessions.append(session)
 
-    def get_session(self) -> ServerProtocolSession:
-        return self._sessions[0]
+    def remove(self, session: ServerProtocolSession):
+        self._sessions.remove(session)
+
+    def get_session(self) -> ServerProtocolSession | None:
+        return self._sessions[-1] if self._sessions else None
