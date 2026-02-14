@@ -65,7 +65,7 @@ class ServerProtocolSession:
         try:
             message: BaseMessage = self.decoder.decode(frame)
         except Exception as e:
-            logger.error(f"Failed to decode incoming frame: {e}")
+            logger.error(f"Failed to decode incoming frame {frame}: {e}")
             return
 
         self.command_handler.resolve_response(message)
