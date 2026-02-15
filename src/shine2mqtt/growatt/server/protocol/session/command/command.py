@@ -1,4 +1,3 @@
-import asyncio
 from dataclasses import dataclass
 
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
@@ -6,7 +5,7 @@ from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 @dataclass
 class BaseCommand:
-    future: asyncio.Future
+    datalogger_serial: str
 
 
 @dataclass

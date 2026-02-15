@@ -5,7 +5,6 @@ import uvicorn
 from loguru import logger
 
 from shine2mqtt.api.api import create_app
-from shine2mqtt.app.command_router import CommandRouter
 from shine2mqtt.app.config.config import ApplicationConfig
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.frame import (
@@ -59,11 +58,11 @@ class Application:
             session_registry=session_registry,
         )
 
-        self.command_router = CommandRouter(protocol_commands, session_registry)
+        # self.command_router = SessionCommandExecutor(protocol_commands, session_registry)
 
         self.mqtt_bridge = self._setup_mqtt_bridge(protocol_events, config)
 
-        self.rest_server = self._setup_rest_server(config, protocol_commands)
+        self.rest_server = self._setup_rest_server(config, protocol_commands, session_registry)
 
     def _setup_mqtt_bridge(
         self, protocol_events: ProtocolEvents, config: ApplicationConfig
@@ -90,11 +89,12 @@ class Application:
         self,
         config: ApplicationConfig,
         protocol_commands: ProtocolCommands,
+        session_registry: ProtocolSessionRegistry,
     ):
         if not config.api.enabled:
             return None
 
-        api_app = create_app(protocol_commands=protocol_commands)
+        api_app = create_app(protocol_commands=protocol_commands, session_registry=session_registry)
 
         uvicorn_config = uvicorn.Config(
             app=api_app,
@@ -118,7 +118,7 @@ class Application:
 
             if self.config.api.enabled and self.rest_server is not None:
                 tasks.append(asyncio.create_task(self.rest_server.serve()))
-                tasks.append(asyncio.create_task(self.command_router.run()))
+                # tasks.append(asyncio.create_task(self.command_router.run()))
 
             await asyncio.gather(*tasks)
 

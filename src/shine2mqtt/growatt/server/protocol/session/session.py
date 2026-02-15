@@ -1,13 +1,16 @@
+from collections.abc import Callable
+
 from loguru import logger
 
 from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
+from shine2mqtt.growatt.protocol.constants import FunctionCode
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.growatt.server.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames, ProtocolEvents
 from shine2mqtt.growatt.server.protocol.session.command.command import BaseCommand
-from shine2mqtt.growatt.server.protocol.session.command.handler import CommandHandler
+from shine2mqtt.growatt.server.protocol.session.command.message_builder import CommandMessageBuilder
 from shine2mqtt.growatt.server.protocol.session.message.handler import MessageHandler
 from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
 
@@ -29,7 +32,7 @@ class ServerProtocolSessionFactory:
         session_state = ServerProtocolSessionState()
         outgoing_frames = OutgoingFrames()
 
-        command_handler = CommandHandler(session_state, self.config_registry)
+        command_handler = CommandMessageBuilder(session_state, self.config_registry)
         message_handler = MessageHandler(session_state)
 
         return ServerProtocolSession(
@@ -42,6 +45,9 @@ class ServerProtocolSessionFactory:
         )
 
 
+type TransactionKey = tuple[FunctionCode, int]
+
+
 class ServerProtocolSession:
     def __init__(
         self,
@@ -50,7 +56,7 @@ class ServerProtocolSession:
         outgoing_frames: OutgoingFrames,
         protocol_events: ProtocolEvents,
         message_handler: MessageHandler,
-        command_handler: CommandHandler,
+        command_handler: CommandMessageBuilder,
     ):
         self.decoder = decoder
         self.encoder = encoder
@@ -58,8 +64,16 @@ class ServerProtocolSession:
         self.protocol_events = protocol_events
         self.outgoing_frames = outgoing_frames
 
-        self.command_handler = command_handler
+        self.command_message_builder = command_handler
         self.message_handler = message_handler
+
+        self.command_callbacks: dict[
+            TransactionKey, Callable[[TransactionKey, BaseMessage], None]
+        ] = {}
+
+    @property
+    def state(self) -> ServerProtocolSessionState:
+        return self.message_handler.session_state
 
     def handle_incoming_frame(self, frame: bytes) -> None:
         try:
@@ -68,7 +82,9 @@ class ServerProtocolSession:
             logger.error(f"Failed to decode incoming frame {frame}: {e}")
             return
 
-        self.command_handler.resolve_response(message)
+        # self.command_message_builder.resolve_response(message)
+
+        self._call_command_callback(message)
         self._publish_protocol_event(message)
 
         transaction_id = message.header.transaction_id
@@ -98,11 +114,37 @@ class ServerProtocolSession:
             )
             self.protocol_events.put_nowait(event)
 
-    def handle_command(self, command: BaseCommand) -> None:
-        if message := self.command_handler.handle_command(command):
-            transaction_id = message.header.transaction_id
-            logger.info(
-                f"→ Enqueue {message.header.function_code.name} ({message.header.function_code.value:#02x}) message for command {command.__class__.__name__}, {transaction_id=}"
-            )
-            frame = self.encoder.encode(message)
-            self.outgoing_frames.put_nowait(frame)
+    def _call_command_callback(self, message: BaseMessage):
+        key: TransactionKey = (message.header.function_code, message.header.transaction_id)
+        if callback := self._get_command_callback(key):
+            callback(key, message)
+
+    def send_command(
+        self, command: BaseCommand, callback: Callable[[TransactionKey, BaseMessage], None]
+    ) -> TransactionKey:
+        message = self.command_message_builder.build_message(command)
+        transaction_id = message.header.transaction_id
+        logger.info(
+            f"→ Enqueue {message.header.function_code.name} ({message.header.function_code.value:#02x}) message for command {command.__class__.__name__}, {transaction_id=}"
+        )
+        key = (message.header.function_code, transaction_id)
+        self._register_command_callback(key, callback)
+        frame = self.encoder.encode(message)
+        self.outgoing_frames.put_nowait(frame)
+        return key
+
+    def _register_command_callback(
+        self,
+        key: TransactionKey,
+        callback: Callable[[TransactionKey, BaseMessage], None],
+    ):
+        self.command_callbacks[key] = callback
+
+    def _unregister_command_callback(self, key: TransactionKey):
+        if not self.command_callbacks.pop(key, None):
+            logger.warning(f"Unregistering command callback for key {key} that was not found")
+
+    def _get_command_callback(
+        self, key: TransactionKey
+    ) -> Callable[[TransactionKey, BaseMessage], None] | None:
+        return self.command_callbacks.get(key, None)
