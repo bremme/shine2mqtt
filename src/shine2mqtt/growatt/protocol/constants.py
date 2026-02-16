@@ -6,13 +6,6 @@ NACK = b"\x03"
 ENCRYPTION_KEY = b"Growatt"
 DECRYPTION_KEY = ENCRYPTION_KEY
 
-# Modbus function codes
-# https://en.wikipedia.org/wiki/Modbus#Public_function_codes
-READ_INPUT_REGISTERS = 4
-READ_MULTIPLE_HOLDING_REGISTERS = 3
-WRITE_SINGLE_HOLDING_REGISTER = 6
-WRITE_MULTIPLE_HOLDING_REGISTERS = 16
-
 
 class FunctionCode(Enum):
     ANNOUNCE = 0x03  # 3 (READ_MULTIPLE_HOLDING_REGISTERS)
@@ -28,6 +21,7 @@ class FunctionCode(Enum):
     WRITE_MULTIPLE_HOLDING_REGISTERS = 0x10
 
     # default Modbus function codes
+    # https://en.wikipedia.org/wiki/Modbus#Public_function_codes
     X02_02 = 0x02  # Read Discrete Inputs
     X01_01 = 0x01  # Read Coils
     X05_05 = 0x05  # Write Single Coil
@@ -55,6 +49,7 @@ class InverterStatus(Enum):
     FAULT = 3
 
 
+# register constants
 UPDATE_INTERVAL_REGISTER = 4
 DATALOGGER_IP_ADDRESS_REGISTER = 14
 DATALOGGER_MAC_ADDRESS_REGISTER = 16
@@ -91,7 +86,7 @@ CONFIG_REGISTERS = {
         "description": "Local IP",
         "fmt": "s",
     },  # 0x0E
-    15: {"name": "port", "description": "Local Port", "fmt": "s"},  # 0x0F
+    15: {"name": "port", "description": "Local Port", "fmt": "s"},
     DATALOGGER_MAC_ADDRESS_REGISTER: {
         "name": "mac_address",
         "description": "Mac Address",
@@ -102,24 +97,24 @@ CONFIG_REGISTERS = {
         "description": "Server IP",
         "fmt": "s",
     },  # 0x11
-    18: {"name": "server_port", "description": "Server Port", "fmt": "s"},  # 0x12
-    19: {"name": "server", "description": "Server", "fmt": "s"},  # 0x13
-    20: {"name": "device_type", "description": "Device Type", "fmt": "s"},  # 0x14
+    18: {"name": "server_port", "description": "Server Port", "fmt": "s"},
+    19: {"name": "server", "description": "Server", "fmt": "s"},
+    20: {"name": "device_type", "description": "Device Type", "fmt": "s"},
     DATALOGGER_SW_VERSION_REGISTER: {
         "name": "datalogger_sw_version",
-        "description": "Datalogger software Version",  # 0x15
+        "description": "Datalogger software Version",
         "fmt": "s",
     },
     22: {
         "name": "datalogger_hw_version",
-        "description": "Datalogger Hardware Version",  # 0x16
+        "description": "Datalogger Hardware Version",
         "fmt": "s",
     },
-    25: {"name": "netmask", "description": "Netmask", "fmt": "s"},  # 0x19
-    26: {"name": "gateway_ip_address", "description": "Gateway IP", "fmt": "s"},  # 0x1A
+    25: {"name": "netmask", "description": "Netmask", "fmt": "s"},
+    26: {"name": "gateway_ip_address", "description": "Gateway IP", "fmt": "s"},
     # 27-30 are unknown
-    31: {"name": "date", "description": "Date", "fmt": "s"},  # 0x1F
-    32: {"name": "reboot", "description": "Reboot", "fmt": "s"},  # ?,  # ??? # 0x20
+    31: {"name": "date", "description": "Date", "fmt": "s"},
+    32: {"name": "reboot", "description": "Reboot", "fmt": "s"},
     DATALOGGER_WIFI_SSID_REGISTER: {
         "name": "wifi_ssid",
         "description": "WiFi SSID",
