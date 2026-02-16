@@ -1,12 +1,18 @@
-from collections.abc import Callable
-
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.base.message import BaseMessage
+from shine2mqtt.growatt.protocol.announce.announce import GrowattAnnounceMessage
+from shine2mqtt.growatt.protocol.base.message import BaseMessage, DataloggerMessage
 from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.constants import FunctionCode
+from shine2mqtt.growatt.protocol.data.data import GrowattBufferedDataMessage, GrowattDataMessage
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
+from shine2mqtt.growatt.protocol.get_config.get_config import GrowattGetConfigResponseMessage
+from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
+from shine2mqtt.growatt.protocol.read_register.read_register import (
+    GrowattReadRegisterResponseMessage,
+)
+from shine2mqtt.growatt.protocol.set_config.set_config import GrowattSetConfigResponseMessage
 from shine2mqtt.growatt.server.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames, ProtocolEvents
 from shine2mqtt.growatt.server.protocol.session.command.command import BaseCommand
@@ -67,9 +73,7 @@ class ServerProtocolSession:
         self.command_message_builder = command_handler
         self.message_handler = message_handler
 
-        self.command_callbacks: dict[
-            TransactionKey, Callable[[TransactionKey, BaseMessage], None]
-        ] = {}
+        self.pending_commands: dict[TransactionKey, BaseCommand] = {}
 
     @property
     def state(self) -> ServerProtocolSessionState:
@@ -82,9 +86,6 @@ class ServerProtocolSession:
             logger.error(f"Failed to decode incoming frame {frame}: {e}")
             return
 
-        # self.command_message_builder.resolve_response(message)
-
-        self._call_command_callback(message)
         self._publish_protocol_event(message)
 
         transaction_id = message.header.transaction_id
@@ -92,7 +93,29 @@ class ServerProtocolSession:
             f"✓ Receive {message.header.function_code.name} ({message.header.function_code.value:#02x}) message, {transaction_id=}"
         )
 
-        response_messages = self.message_handler.handle_message(message)
+        response_messages: list[BaseMessage] = []
+
+        match message:
+            # periodic datalogger messages
+            case GrowattAnnounceMessage():
+                response_messages = self.message_handler.build_announce_response(message)
+            case GrowattDataMessage():
+                response_messages = self.message_handler.build_data_response(message)
+            case GrowattBufferedDataMessage():
+                response_messages = self.message_handler.build_buffered_data_response(message)
+            case GrowattPingMessage():
+                response_messages = self.message_handler.build_ping_response(message)
+            # datalogger response messages
+            case GrowattGetConfigResponseMessage():
+                self._complete_command(message)
+            case GrowattSetConfigResponseMessage():
+                self._complete_command(message)
+            case GrowattReadRegisterResponseMessage():
+                self._complete_command(message)
+            case _:
+                logger.warning(
+                    f"Received message with unhandled type {type(message)}, content: {message}"
+                )
 
         for response_message in response_messages:
             transaction_id = response_message.header.transaction_id
@@ -104,9 +127,20 @@ class ServerProtocolSession:
             outgoing_frame: bytes = self.encoder.encode(response_message)
             self.outgoing_frames.put_nowait(outgoing_frame)
 
-    def _publish_protocol_event(self, message: BaseMessage):
-        from shine2mqtt.growatt.protocol.base.message import DataloggerMessage
+    def send_command(self, command: BaseCommand) -> TransactionKey:
+        """Send a command and register it for response handling."""
+        message = self.command_message_builder.build_message(command)
+        transaction_id = message.header.transaction_id
+        logger.info(
+            f"→ Enqueue {message.header.function_code.name} ({message.header.function_code.value:#02x}) message for command {command.__class__.__name__}, {transaction_id=}"
+        )
+        key = (message.header.function_code, transaction_id)
+        self.pending_commands[key] = command
+        frame = self.encoder.encode(message)
+        self.outgoing_frames.put_nowait(frame)
+        return key
 
+    def _publish_protocol_event(self, message: BaseMessage):
         if isinstance(message, DataloggerMessage):
             event = ProtocolEvent(
                 datalogger_serial=message.datalogger_serial,
@@ -114,37 +148,10 @@ class ServerProtocolSession:
             )
             self.protocol_events.put_nowait(event)
 
-    def _call_command_callback(self, message: BaseMessage):
+    def _complete_command(self, message: BaseMessage) -> None:
+        """Complete a pending command with the received response message."""
         key: TransactionKey = (message.header.function_code, message.header.transaction_id)
-        if callback := self._get_command_callback(key):
-            callback(key, message)
-
-    def send_command(
-        self, command: BaseCommand, callback: Callable[[TransactionKey, BaseMessage], None]
-    ) -> TransactionKey:
-        message = self.command_message_builder.build_message(command)
-        transaction_id = message.header.transaction_id
-        logger.info(
-            f"→ Enqueue {message.header.function_code.name} ({message.header.function_code.value:#02x}) message for command {command.__class__.__name__}, {transaction_id=}"
-        )
-        key = (message.header.function_code, transaction_id)
-        self._register_command_callback(key, callback)
-        frame = self.encoder.encode(message)
-        self.outgoing_frames.put_nowait(frame)
-        return key
-
-    def _register_command_callback(
-        self,
-        key: TransactionKey,
-        callback: Callable[[TransactionKey, BaseMessage], None],
-    ):
-        self.command_callbacks[key] = callback
-
-    def _unregister_command_callback(self, key: TransactionKey):
-        if not self.command_callbacks.pop(key, None):
-            logger.warning(f"Unregistering command callback for key {key} that was not found")
-
-    def _get_command_callback(
-        self, key: TransactionKey
-    ) -> Callable[[TransactionKey, BaseMessage], None] | None:
-        return self.command_callbacks.get(key, None)
+        if command := self.pending_commands.pop(key, None):
+            command.complete_with_response(message)
+        else:
+            logger.warning(f"Received response for unknown command with key {key}")

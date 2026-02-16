@@ -10,7 +10,6 @@ from shine2mqtt.growatt.protocol.data.data import (
 )
 from shine2mqtt.growatt.protocol.get_config.get_config import (
     GrowattGetConfigRequestMessage,
-    GrowattGetConfigResponseMessage,
 )
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
@@ -24,32 +23,9 @@ class MessageHandler:
     def __init__(self, session_state: ServerProtocolSessionState):
         self.session_state = session_state
 
-    def handle_message(self, message: BaseMessage) -> list[BaseMessage]:
-        logger.debug(f"Message content: {message}")
+    def build_announce_response(self, message: GrowattAnnounceMessage) -> list[BaseMessage]:
+        self._handle_message_default_actions(message)
 
-        self.session_state.set_incoming_transaction_id(message.header)
-
-        match message:
-            case GrowattPingMessage():
-                response_messages = self._handle_ping_request(message)
-            case GrowattAnnounceMessage():
-                response_messages = self._handle_announce_request(message)
-            case GrowattDataMessage() | GrowattBufferedDataMessage():
-                response_messages = self._handle_data_request(message)
-            case GrowattAckMessage():
-                response_messages = self._handle_set_config_response()
-            case GrowattGetConfigResponseMessage():
-                response_messages = self._handle_get_config_response(message)
-            case _:
-                logger.warning(f"No handler for message type: {type(message)}")
-                response_messages: list[BaseMessage] = []
-
-        return response_messages
-
-    def _handle_ping_request(self, message: GrowattPingMessage) -> list[BaseMessage]:
-        return [message]
-
-    def _handle_announce_request(self, message: GrowattAnnounceMessage) -> list[BaseMessage]:
         response_messages = []
 
         response_messages.append(GrowattAckMessage(header=message.header, ack=True))
@@ -76,6 +52,24 @@ class MessageHandler:
 
         return response_messages
 
+    def build_data_response(self, message: GrowattDataMessage) -> list[BaseMessage]:
+        self._handle_message_default_actions(message)
+        return [GrowattAckMessage(header=message.header, ack=True)]
+
+    def build_buffered_data_response(
+        self, message: GrowattBufferedDataMessage
+    ) -> list[BaseMessage]:
+        return self.build_data_response(message)
+
+    def build_ping_response(self, message: GrowattPingMessage) -> list[BaseMessage]:
+        self._handle_message_default_actions(message)
+        return [message]
+
+    def _handle_message_default_actions(self, message: BaseMessage) -> None:
+        logger.debug(f"Message content: {message}")
+
+        self.session_state.set_incoming_transaction_id(message.header)
+
     def _build_get_config_request_message(self, register_start, register_end=None):
         if register_end is None:
             register_end = register_start
@@ -94,23 +88,3 @@ class MessageHandler:
         return GrowattGetConfigRequestMessage(
             header, self.session_state.datalogger_serial, register_start, register_end
         )
-
-    def _handle_data_request(self, message: GrowattDataMessage) -> list[BaseMessage]:
-        return [GrowattAckMessage(header=message.header, ack=True)]
-
-    def _handle_buffered_data_request(
-        self, message: GrowattBufferedDataMessage
-    ) -> list[BaseMessage]:
-        return [GrowattAckMessage(header=message.header, ack=True)]
-
-    def _handle_set_config_response(self) -> list[BaseMessage]:
-        # this just ack the set config command
-        return []
-
-    def _handle_get_config_response(
-        self, message: GrowattGetConfigResponseMessage
-    ) -> list[BaseMessage]:
-        logger.info(
-            f"Received config register={message.register} name='{message.name}', value='{message.value}'"
-        )
-        return []

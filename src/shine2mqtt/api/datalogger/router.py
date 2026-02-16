@@ -2,19 +2,38 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from shine2mqtt.api.datalogger.mappers import get_config_response_to_datalogger_setting
-from shine2mqtt.api.datalogger.models import Datalogger, DataloggerSetting
-from shine2mqtt.api.dependencies import get_command_executor, get_session_registry
+from shine2mqtt.api.datalogger.mappers import (
+    get_config_response_to_datalogger_register_setting,
+    get_config_response_to_datalogger_setting,
+)
+from shine2mqtt.api.datalogger.models import (
+    Datalogger,
+    DataloggerRegisterSetting,
+    DataloggerSetting,
+)
+from shine2mqtt.api.dependencies import (
+    gateway_timeout_504,
+    get_command_executor,
+    get_session_registry,
+    internal_server_error_500,
+    not_found_404,
+    not_implemented_501,
+)
 from shine2mqtt.app.command_executor import SessionCommandExecutor
-from shine2mqtt.growatt.protocol.get_config.get_config import GrowattGetConfigResponseMessage
-from shine2mqtt.growatt.server.protocol.session.command.command import GetConfigByNameCommand
+from shine2mqtt.growatt.protocol.config import RegisterNotFoundError
+from shine2mqtt.growatt.server.protocol.session.command.command import (
+    GetConfigByNameCommand,
+    GetConfigByRegistersCommand,
+    SetConfigByNameCommand,
+)
 from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
 
 router = APIRouter(tags=["datalogger"])
 
 
+# Datalogger endpoints #############################################################################
 @router.get(path="/dataloggers")
-async def get_all_datalogger(
+async def get_all_dataloggers(
     session_registry: Annotated[ProtocolSessionRegistry, Depends(get_session_registry)],
 ) -> list[Datalogger]:
     sessions = session_registry.get_all_sessions()
@@ -26,7 +45,6 @@ async def get_all_datalogger(
             unit_id=session.state.unit_id,
         )
         for session in sessions
-        if session.state.datalogger_serial is not None and session.state.is_announced()
     ]
 
 
@@ -37,8 +55,8 @@ async def get_single_datalogger(
 ) -> Datalogger:
     session = session_registry.get_session(serial)
 
-    if session is None or not session.state.is_announced():
-        raise HTTPException(status_code=404, detail=f"Datalogger with serial {serial} not found")
+    if session is None:
+        not_found_404(f"Datalogger with serial '{serial}' not found")
 
     return Datalogger(
         serial=session.state.datalogger_serial,
@@ -47,9 +65,13 @@ async def get_single_datalogger(
     )
 
 
+# Datalogger settings endpoints ####################################################################
 @router.get("/dataloggers/{serial}/settings")
-async def get_all_datalogger_settings(serial: str) -> list[str]:
-    return ["wifi_ssid", "mqtt_broker"]
+async def get_all_datalogger_settings(
+    serial: str,
+    executer: Annotated[SessionCommandExecutor, Depends(get_command_executor)],
+):
+    not_implemented_501()
 
 
 @router.get("/dataloggers/{serial}/settings/{name}")
@@ -63,32 +85,67 @@ async def get_single_datalogger_setting(
     try:
         message = await executer.execute(command, timeout=10)
     except TimeoutError:
-        raise HTTPException(status_code=504, detail="Server timeout") from None
+        gateway_timeout_504()
+    except RegisterNotFoundError:
+        not_found_404(f"Setting with name '{name}' not found")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        internal_server_error_500(e)
 
-    if message is None:
-        raise HTTPException(status_code=404, detail=f"Config with name {name} not found") from None
-
-    assert isinstance(message, GrowattGetConfigResponseMessage)
     return get_config_response_to_datalogger_setting(message)
 
 
 @router.put("/dataloggers/{serial}/settings/{name}")
-async def update_single_datalogger_setting(serial: str, name: str, value: str) -> dict[str, str]:
-    return {"name": name, "value": value}
+async def update_single_datalogger_setting(
+    serial: str,
+    name: str,
+    value: str,
+    executer: Annotated[SessionCommandExecutor, Depends(get_command_executor)],
+) -> DataloggerSetting:
+    command = SetConfigByNameCommand(datalogger_serial=serial, name=name, value=value)
+
+    try:
+        message = await executer.execute(command, timeout=10)
+    except TimeoutError:
+        gateway_timeout_504()
+    except RegisterNotFoundError:
+        not_found_404(f"Setting with name '{name}' not found")
+    except Exception as e:
+        internal_server_error_500(e)
+
+    if not message.ack:
+        raise HTTPException(
+            status_code=400, detail=f"Failed to update setting '{name}' with value '{value}'"
+        )
+
+    return DataloggerSetting(name=name, value=value)
 
 
+# Register endpoints ###############################################################################
 @router.get("/dataloggers/{serial}/registers/{register}")
-async def get_single_register(serial: str, register: int) -> dict[str, str | int]:
-    return {"register": register, "value": "example"}
+async def get_single_register(
+    serial: str,
+    register: int,
+    executer: Annotated[SessionCommandExecutor, Depends(get_command_executor)],
+) -> DataloggerRegisterSetting:
+    command = GetConfigByRegistersCommand(datalogger_serial=serial, register=register)
+
+    try:
+        message = await executer.execute(command, timeout=10)
+    except TimeoutError:
+        gateway_timeout_504()
+    except KeyError:
+        not_found_404(f"Register with number '{register}' not found")
+    except Exception as e:
+        internal_server_error_500(e)
+
+    return get_config_response_to_datalogger_register_setting(message)
 
 
 @router.get("/dataloggers/{serial}/registers")
-async def get_all_registers(serial: str) -> list[dict[str, str | int]]:
-    return [{"register": 0, "value": "example"}]
+async def get_all_registers(serial: str):
+    not_implemented_501()
 
 
 @router.put("/dataloggers/{serial}/registers/{register}")
-async def update_single_register(serial: str, register: int, value: str) -> dict[str, str | int]:
-    return {"register": register, "value": value}
+async def update_single_register(serial: str, register: int, value: str):
+    not_implemented_501()

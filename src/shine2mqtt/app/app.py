@@ -13,7 +13,6 @@ from shine2mqtt.growatt.protocol.frame import (
 from shine2mqtt.growatt.protocol.frame.capturer import CaptureHandler
 from shine2mqtt.growatt.server import GrowattServer
 from shine2mqtt.growatt.server.protocol.queues import (
-    ProtocolCommands,
     ProtocolEvents,
 )
 from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
@@ -29,7 +28,6 @@ class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
 
-        protocol_commands = ProtocolCommands(maxsize=100)
         protocol_events = ProtocolEvents(maxsize=100)
 
         encoder = FrameFactory.encoder()
@@ -58,11 +56,9 @@ class Application:
             session_registry=session_registry,
         )
 
-        # self.command_router = SessionCommandExecutor(protocol_commands, session_registry)
-
         self.mqtt_bridge = self._setup_mqtt_bridge(protocol_events, config)
 
-        self.rest_server = self._setup_rest_server(config, protocol_commands, session_registry)
+        self.rest_server = self._setup_rest_server(config, session_registry)
 
     def _setup_mqtt_bridge(
         self, protocol_events: ProtocolEvents, config: ApplicationConfig
@@ -88,13 +84,12 @@ class Application:
     def _setup_rest_server(
         self,
         config: ApplicationConfig,
-        protocol_commands: ProtocolCommands,
         session_registry: ProtocolSessionRegistry,
     ):
         if not config.api.enabled:
             return None
 
-        api_app = create_app(protocol_commands=protocol_commands, session_registry=session_registry)
+        api_app = create_app(session_registry=session_registry)
 
         uvicorn_config = uvicorn.Config(
             app=api_app,
@@ -118,7 +113,6 @@ class Application:
 
             if self.config.api.enabled and self.rest_server is not None:
                 tasks.append(asyncio.create_task(self.rest_server.serve()))
-                # tasks.append(asyncio.create_task(self.command_router.run()))
 
             await asyncio.gather(*tasks)
 

@@ -1,63 +1,92 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+
+from shine2mqtt.api.dependencies import (
+    gateway_timeout_504,
+    get_command_executor,
+    internal_server_error_500,
+    not_implemented_501,
+)
+from shine2mqtt.api.inverter.mappers import read_registers_response_to_inverter_registers
+from shine2mqtt.api.inverter.models import InverterRegister, RawFrameRequest
+from shine2mqtt.app.command_executor import SessionCommandExecutor
+from shine2mqtt.growatt.protocol.raw.raw import GrowattRawMessage
+from shine2mqtt.growatt.server.protocol.session.command.command import (
+    RawFrameCommand,
+    ReadRegistersCommand,
+)
 
 router = APIRouter(prefix="/dataloggers/{serial}/inverter", tags=["inverter"])
 
 
 @router.get("/settings")
-async def get_all_inverter_settings(serial: str) -> list[str]:
-    """List all available inverter setting names."""
-    return ["max_output_power", "startup_voltage", "shutdown_voltage", "grid_frequency"]
+async def get_all_inverter_settings(serial: str):
+    not_implemented_501()
 
 
 @router.get("/settings/{name}")
-async def get_single_inverter_setting(serial: str, name: str) -> dict[str, str]:
-    """Get a specific inverter setting by name."""
-    return {"name": name, "value": "example_value"}
+async def get_single_inverter_setting(serial: str, name: str):
+    not_implemented_501()
 
 
 @router.put("/settings/{name}")
-async def update_single_inverter_setting(serial: str, name: str, value: str) -> dict[str, str]:
-    """Update a specific inverter setting by name."""
-    return {"name": name, "value": value}
+async def update_single_inverter_setting(serial: str, name: str, value: str):
+    not_implemented_501()
 
 
 # Inverter register endpoints
-@router.get("/registers/{register}")
-async def read_single_inverter_register(serial: str, register: int) -> dict[str, int]:
-    """Read a single register from the inverter."""
-    return {"register": register, "value": 12345}
+@router.get("/registers/{address}")
+async def read_single_inverter_register(serial: str, address: int):
+    not_implemented_501()
 
 
 @router.get("/registers")
-async def read_all_inverter_registers(serial: str, start: int, end: int) -> list[dict[str, int]]:
-    """Read multiple registers from the inverter."""
-    return [{"register": reg, "value": 12345 + reg} for reg in range(start, end + 1)]
+async def read_multiple_inverter_registers(
+    serial: str,
+    start: int,
+    end: int,
+    executer: Annotated[SessionCommandExecutor, Depends(get_command_executor)],
+) -> list[InverterRegister]:
+    command = ReadRegistersCommand(datalogger_serial=serial, register_start=start, register_end=end)
+
+    try:
+        message = await executer.execute(command, timeout=30)
+    except TimeoutError:
+        gateway_timeout_504()
+    # TODO invalid register exception
+    except Exception as e:
+        internal_server_error_500(e)
+
+    return read_registers_response_to_inverter_registers(message)
 
 
-@router.put("/registers/{register}")
-async def write_single_inverter_register(serial: str, register: int, value: int) -> dict[str, int]:
-    """Write a single register on the inverter."""
-    return {"register": register, "value": value}
+@router.put("/registers/{address}")
+async def write_single_inverter_register(serial: str, address: int, value: int):
+    not_implemented_501()
 
 
 @router.put("/registers")
-async def write_multiple_inverter_registers(
-    serial: str, registers: list[dict[str, int]]
-) -> list[dict[str, int]]:
-    """Write multiple registers on the inverter.
-
-    Body example:
-    [
-        {"register": 100, "value": 5000},
-        {"register": 101, "value": 3000}
-    ]
-    """
-    return registers
+async def write_multiple_inverter_registers(serial: str, registers: list[dict[str, int]]):
+    not_implemented_501()
 
 
 @router.post("/raw-frames")
 async def send_raw_frame(
-    serial: str, protocol_id: int, function_code: int, payload: str
-) -> dict[str, str]:
-    """Send a raw frame to the inverter."""
-    return {"payload": payload}
+    serial: str,
+    request: RawFrameRequest,
+    executer: Annotated[SessionCommandExecutor, Depends(get_command_executor)],
+) -> GrowattRawMessage:
+    command = RawFrameCommand(
+        datalogger_serial=serial,
+        function_code=request.function_code,
+        protocol_id=request.protocol_id,
+        payload=bytes.fromhex(request.payload),
+    )
+
+    try:
+        message = await executer.execute(command, timeout=30)
+    except TimeoutError:
+        gateway_timeout_504()
+
+    return message

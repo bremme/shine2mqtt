@@ -32,7 +32,7 @@ class CommandMessageBuilder:
             case GetConfigByNameCommand():
                 register = self.config_registry.get_register_by_name(command.name)
                 if register is None:
-                    raise ValueError(f"Unknown config name: {command.name}")
+                    raise KeyError(f"Unknown config name: {command.name}")
                 message = self._build_get_config_request_message(
                     register_start=register,
                 )
@@ -40,7 +40,7 @@ class CommandMessageBuilder:
                 return message
             case GetConfigByRegistersCommand():
                 if self.config_registry.get_register_info(command.register) is None:
-                    raise ValueError(f"Unknown config register: {command.register}")
+                    raise KeyError(f"Unknown config register: {command.register}")
                 message = self._build_get_config_request_message(
                     register_start=command.register,
                 )
@@ -48,9 +48,19 @@ class CommandMessageBuilder:
                 return message
 
             case RawFrameCommand():
+                header = MBAPHeader(
+                    transaction_id=self.session_state.get_next_transaction_id(
+                        FunctionCode(command.function_code)
+                    ),
+                    protocol_id=command.protocol_id,
+                    length=0,
+                    unit_id=self.session_state.unit_id,
+                    function_code=FunctionCode(command.function_code),
+                )
+
                 # self.store_command_future(command.header, command.future)
                 return GrowattRawMessage(
-                    header=command.header,
+                    header=header,
                     datalogger_serial=self.session_state.datalogger_serial,
                     payload=command.payload,
                 )

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class DataloggerSetting(BaseModel):
@@ -6,7 +6,12 @@ class DataloggerSetting(BaseModel):
     value: str
 
 
+class DataloggerRegisterSetting(BaseModel):
+    address: int
+    value: str
+
+
 class Datalogger(BaseModel):
-    serial: str
-    protocol_id: int
-    unit_id: int
+    serial: str = Field(..., description="The serial number of the datalogger")
+    protocol_id: int = Field(..., description="The protocol ID of the datalogger")
+    unit_id: int = Field(..., description="The unit ID of the datalogger")
