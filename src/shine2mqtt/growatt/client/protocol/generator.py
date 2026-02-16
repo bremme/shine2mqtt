@@ -15,8 +15,6 @@ get_config_frames, get_config_headers, get_config_payloads = CapturedFrameLoader
 )
 ping_frames, ping_headers, ping_payloads = CapturedFrameLoader.load("ping_message")
 
-ack_frames, ack_headers, ack_payloads = CapturedFrameLoader.load("ack_message")
-
 
 class FrameGenerator:
     def __init__(self, encoder: FrameEncoder):
