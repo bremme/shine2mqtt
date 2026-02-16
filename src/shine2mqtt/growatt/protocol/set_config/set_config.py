@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.base.message import DataloggerMessage
 
 
@@ -11,3 +12,8 @@ class GrowattSetConfigRequestMessage(DataloggerMessage):
     register: int
     length: int
     value: int | str
+
+
+@dataclass
+class GrowattSetConfigResponseMessage(GrowattAckMessage):
+    pass

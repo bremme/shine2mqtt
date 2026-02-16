@@ -56,7 +56,8 @@ async def get_single_datalogger(
     session = session_registry.get_session(serial)
 
     if session is None:
-        not_found_404(f"Datalogger with serial '{serial}' not found")
+        # added raise to make the type checker understand that session is not None after this point
+        raise not_found_404(f"Datalogger with serial '{serial}' not found")
 
     return Datalogger(
         serial=session.state.datalogger_serial,
