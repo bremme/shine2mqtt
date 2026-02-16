@@ -13,15 +13,7 @@ class ServerProtocolSessionState:
 
     _announced: bool = False
     last_transaction_id: dict[FunctionCode, int] = field(
-        default_factory=lambda: {
-            FunctionCode.PING: 0,
-            FunctionCode.ANNOUNCE: 0,
-            FunctionCode.DATA: 0,
-            FunctionCode.BUFFERED_DATA: 0,
-            FunctionCode.SET_CONFIG: 0,
-            FunctionCode.GET_CONFIG: 0,
-            FunctionCode.READ_REGISTERS: 0,
-        }
+        default_factory=lambda: dict.fromkeys(FunctionCode, 0)
     )
 
     def is_announced(self) -> bool:

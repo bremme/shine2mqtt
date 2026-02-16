@@ -3,7 +3,7 @@ import struct
 from loguru import logger
 
 from shine2mqtt.growatt.protocol.ack.decoder import MessageDecoder
-from shine2mqtt.growatt.protocol.config import ConfigRegistry
+from shine2mqtt.growatt.protocol.config import ConfigRegistry, RegisterNotFoundError
 from shine2mqtt.growatt.protocol.get_config.get_config import (
     GrowattGetConfigRequestMessage,
     GrowattGetConfigResponseMessage,
@@ -47,9 +47,32 @@ class GetConfigResponseDecoder(MessageDecoder[GrowattGetConfigResponseMessage]):
             )
             data = b""
 
-        config = self.config_registry.get_register_info(register)
+        try:
+            config = self.config_registry.get_register_info(register)
 
-        if config is None:
+            if config.fmt == "s":
+                value = self.decode_str(payload, 34, length)
+            elif config.fmt == "B":
+                value = self.decode_u8(payload, 34)
+            elif config.fmt == "H":
+                value = self.decode_u16(payload, 34)
+            elif config.fmt == "I":
+                value = self.decode_u32(payload, 34)
+            else:
+                value = None
+
+            return GrowattGetConfigResponseMessage(
+                header=header,
+                datalogger_serial=datalogger_serial,
+                register=register,
+                length=length,
+                data=data,
+                name=config.name,
+                description=config.description,
+                value=value,
+            )
+        except RegisterNotFoundError:
+            # Unknown register, return minimal response
             return GrowattGetConfigResponseMessage(
                 header=header,
                 datalogger_serial=datalogger_serial,
@@ -57,23 +80,3 @@ class GetConfigResponseDecoder(MessageDecoder[GrowattGetConfigResponseMessage]):
                 length=length,
                 data=data,
             )
-
-        if config.fmt == "s":
-            value = self.decode_str(payload, 34, length)
-        elif config.fmt == "B":
-            value = self.decode_u8(payload, 34)
-        elif config.fmt == "H":
-            value = self.decode_u16(payload, 34)
-        elif config.fmt == "I":
-            value = self.decode_u32(payload, 34)
-
-        return GrowattGetConfigResponseMessage(
-            header=header,
-            datalogger_serial=datalogger_serial,
-            register=register,
-            length=length,
-            data=data,
-            name=config.name,
-            description=config.description,
-            value=value,
-        )

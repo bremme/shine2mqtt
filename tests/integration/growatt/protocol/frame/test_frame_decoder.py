@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytest
 
-from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.announce.announce import GrowattAnnounceMessage, SafetyFunction
 from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.constants import InverterStatus
@@ -13,6 +12,7 @@ from shine2mqtt.growatt.protocol.get_config.get_config import (
     GrowattGetConfigResponseMessage,
 )
 from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
+from shine2mqtt.growatt.protocol.set_config.set_config import GrowattSetConfigResponseMessage
 from tests.utils.loader import CapturedFrameLoader
 
 announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")
@@ -25,7 +25,9 @@ get_config_frames, get_config_headers, get_config_payloads = CapturedFrameLoader
 )
 ping_frames, ping_headers, ping_payloads = CapturedFrameLoader.load("ping_message")
 
-ack_frames, ack_headers, ack_payloads = CapturedFrameLoader.load("ack_message")
+set_config_response_frames, set_config_response_headers, set_config_response_payloads = (
+    CapturedFrameLoader.load("set_config_response")
+)
 
 DECRYPTION_KEY = b"Growatt"
 DATALOGGER_SERIAL = "XGDABCDEFG"
@@ -139,8 +141,8 @@ EXPECTED_MESSAGES = [
         description="Local IP",
         value="192.168.1.100",
     ),
-    GrowattAckMessage(
-        header=ack_headers[0],
+    GrowattSetConfigResponseMessage(
+        header=set_config_response_headers[0],
         ack=True,
     ),
     GrowattPingMessage(
@@ -155,7 +157,7 @@ CASES = [
     (buffered_data_frames[0], EXPECTED_MESSAGES[1]),
     (data_frames[0], EXPECTED_MESSAGES[2]),
     (get_config_frames[14], EXPECTED_MESSAGES[3]),
-    (ack_frames[0], EXPECTED_MESSAGES[4]),
+    (set_config_response_frames[0], EXPECTED_MESSAGES[4]),
     (ping_frames[0], EXPECTED_MESSAGES[5]),
 ]
 

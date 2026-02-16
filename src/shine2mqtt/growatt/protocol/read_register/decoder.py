@@ -5,7 +5,7 @@ from shine2mqtt.growatt.protocol.read_register.read_register import (
 )
 
 
-class ReadRegistersPayloadDecoder(MessageDecoder[GrowattReadRegisterResponseMessage]):
+class ReadRegistersResponseDecoder(MessageDecoder[GrowattReadRegisterResponseMessage]):
     def __init__(self, register_registry=None):
         self.register_registry = register_registry
 

@@ -13,8 +13,11 @@ from shine2mqtt.growatt.protocol.get_config.decoder import (
     GetConfigResponseDecoder,
 )
 from shine2mqtt.growatt.protocol.ping.decoder import PingRequestDecoder
-from shine2mqtt.growatt.protocol.read_register.decoder import ReadRegistersPayloadDecoder
-from shine2mqtt.growatt.protocol.set_config.decoder import SetConfigRequestDecoder
+from shine2mqtt.growatt.protocol.read_register.decoder import ReadRegistersResponseDecoder
+from shine2mqtt.growatt.protocol.set_config.decoder import (
+    SetConfigRequestDecoder,
+    SetConfigResponseDecoder,
+)
 
 
 class DecoderRegistry:
@@ -57,9 +60,9 @@ class DecoderRegistry:
 
         # Datalogger responses to server requests
         registry.register_decoder(FunctionCode.GET_CONFIG, GetConfigResponseDecoder())
-        registry.register_decoder(FunctionCode.SET_CONFIG, AckMessageResponseDecoder())
+        registry.register_decoder(FunctionCode.SET_CONFIG, SetConfigResponseDecoder())
 
-        registry.register_decoder(FunctionCode.READ_REGISTERS, ReadRegistersPayloadDecoder())
+        registry.register_decoder(FunctionCode.READ_REGISTERS, ReadRegistersResponseDecoder())
 
         return registry
 

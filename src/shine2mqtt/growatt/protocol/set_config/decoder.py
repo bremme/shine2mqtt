@@ -1,16 +1,19 @@
 from shine2mqtt.growatt.protocol.ack.decoder import (
-    AckMessageResponseDecoder,
     MessageDecoder,
 )
-from shine2mqtt.growatt.protocol.config import ConfigRegistry
+from shine2mqtt.growatt.protocol.config import ConfigRegistry, RegisterNotFoundError
+from shine2mqtt.growatt.protocol.constants import ACK
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 from shine2mqtt.growatt.protocol.set_config.set_config import (
     GrowattSetConfigRequestMessage,
+    GrowattSetConfigResponseMessage,
 )
 
 
-class SetConfigResponseDecoder(AckMessageResponseDecoder):
-    pass
+class SetConfigResponseDecoder(MessageDecoder[GrowattSetConfigResponseMessage]):
+    def decode(self, header: MBAPHeader, payload: bytes) -> GrowattSetConfigResponseMessage:
+        ack = payload == ACK
+        return GrowattSetConfigResponseMessage(header=header, ack=ack)
 
 
 class SetConfigRequestDecoder(MessageDecoder[GrowattSetConfigRequestMessage]):
@@ -25,17 +28,18 @@ class SetConfigRequestDecoder(MessageDecoder[GrowattSetConfigRequestMessage]):
         length = self.decode_u16(payload, 32)
 
         # Decode value based on register config
-        config = self.config_registry.get_register_info(register)
-        if config is None:
-            # Unknown register, read as bytes
-            value = self.decode_str(payload, 34, length)
-        elif config.fmt == "s":
-            value = self.decode_str(payload, 34, length)
-        elif config.fmt == "B":
-            value = self.decode_u8(payload, 34)
-        elif config.fmt == "H":
-            value = self.decode_u16(payload, 34)
-        else:
+        try:
+            info = self.config_registry.get_register_info(register)
+            if info.fmt == "s":
+                value = self.decode_str(payload, 34, length)
+            elif info.fmt == "B":
+                value = self.decode_u8(payload, 34)
+            elif info.fmt == "H":
+                value = self.decode_u16(payload, 34)
+            else:
+                value = self.decode_str(payload, 34, length)
+        except RegisterNotFoundError:
+            # Unknown register, read as string
             value = self.decode_str(payload, 34, length)
 
         return GrowattSetConfigRequestMessage(

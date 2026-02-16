@@ -4,7 +4,7 @@ from shine2mqtt.growatt.protocol.ack.decoder import AckMessageResponseDecoder
 from shine2mqtt.growatt.protocol.ack.encoder import AckPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
-_, headers, payloads = CapturedFrameLoader.load("ack_message")
+_, headers, payloads = CapturedFrameLoader.load("set_config_response")
 
 
 @pytest.mark.parametrize(

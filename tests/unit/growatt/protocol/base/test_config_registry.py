@@ -1,6 +1,6 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.config import ConfigRegistry, RegisterInfo
+from shine2mqtt.growatt.protocol.config import ConfigRegistry, RegisterInfo, RegisterNotFoundError
 
 
 @pytest.fixture
@@ -27,7 +27,11 @@ def registry(test_registers):
 def test_get_register_by_name(registry):
     assert registry.get_register_by_name("update_interval") == 4
     assert registry.get_register_by_name("datalogger_sw_version") == 21
-    assert registry.get_register_by_name("unknown") is None
+
+
+def test_get_register_by_name_not_found(registry):
+    with pytest.raises(RegisterNotFoundError):
+        registry.get_register_by_name("unknown")
 
 
 def test_get_register_info(registry):
@@ -38,7 +42,10 @@ def test_get_register_info(registry):
     assert info.description == "Update Interval min"
     assert info.fmt == "s"
 
-    assert registry.get_register_info(999) is None
+
+def test_get_register_info_not_found(registry):
+    with pytest.raises(RegisterNotFoundError):
+        registry.get_register_info(999)
 
 
 def test_has_register(registry):
