@@ -5,6 +5,9 @@ from fastapi import Depends, HTTPException, Request
 from shine2mqtt.app.command_executor import SessionCommandExecutor
 from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
 
+INVERTER_COMMAND_TIMEOUT_SECONDS = 30
+DATALOGGER_COMMAND_TIMEOUT_SECONDS = 10
+
 
 def not_implemented_501() -> NoReturn:
     raise HTTPException(status_code=501, detail="Not implemented") from None

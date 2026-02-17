@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from shine2mqtt.api.dependencies import (
+    INVERTER_COMMAND_TIMEOUT_SECONDS,
     gateway_timeout_504,
     get_command_executor,
     internal_server_error_500,
@@ -52,7 +53,7 @@ async def read_multiple_inverter_registers(
     command = ReadRegistersCommand(datalogger_serial=serial, register_start=start, register_end=end)
 
     try:
-        async with asyncio.timeout(30):
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
             message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
@@ -90,7 +91,7 @@ async def send_raw_frame(
     )
 
     try:
-        async with asyncio.timeout(30):
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
             message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()

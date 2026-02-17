@@ -13,6 +13,7 @@ from shine2mqtt.api.datalogger.models import (
     DataloggerSetting,
 )
 from shine2mqtt.api.dependencies import (
+    DATALOGGER_COMMAND_TIMEOUT_SECONDS,
     gateway_timeout_504,
     get_command_executor,
     get_session_registry,
@@ -85,7 +86,7 @@ async def get_single_datalogger_setting(
     command = GetConfigByNameCommand(datalogger_serial=serial, name=name)
 
     try:
-        async with asyncio.timeout(10):
+        async with asyncio.timeout(DATALOGGER_COMMAND_TIMEOUT_SECONDS):
             message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
@@ -107,7 +108,7 @@ async def update_single_datalogger_setting(
     command = SetConfigByNameCommand(datalogger_serial=serial, name=name, value=value)
 
     try:
-        async with asyncio.timeout(10):
+        async with asyncio.timeout(DATALOGGER_COMMAND_TIMEOUT_SECONDS):
             message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
@@ -124,7 +125,7 @@ async def update_single_datalogger_setting(
     return DataloggerSetting(name=name, value=value)
 
 
-# Register endpoints ###############################################################################
+# Datalogger register endpoints ###############################################################################
 @router.get("/dataloggers/{serial}/registers/{register}")
 async def get_single_register(
     serial: str,
@@ -134,7 +135,7 @@ async def get_single_register(
     command = GetConfigByRegistersCommand(datalogger_serial=serial, register=register)
 
     try:
-        async with asyncio.timeout(10):
+        async with asyncio.timeout(DATALOGGER_COMMAND_TIMEOUT_SECONDS):
             message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
