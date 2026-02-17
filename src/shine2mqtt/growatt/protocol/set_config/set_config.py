@@ -10,8 +10,7 @@ from shine2mqtt.growatt.protocol.base.message import DataloggerMessage
 @dataclass
 class GrowattSetConfigRequestMessage(DataloggerMessage):
     register: int
-    length: int
-    value: int | str
+    value: str
 
 
 @dataclass

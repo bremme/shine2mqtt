@@ -18,7 +18,6 @@ EXPECTED_MESSAGES = [
         header=headers[14],
         datalogger_serial=DATALOGGER_SERIAL,
         register=14,
-        length=13,
         data=b"192.168.1.100",
         name="ip_address",
         description="Local IP",

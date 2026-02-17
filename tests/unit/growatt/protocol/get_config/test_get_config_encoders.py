@@ -75,7 +75,6 @@ class TestGetConfigResponsePayloadEncoder:
             header=header,
             datalogger_serial=DATALOGGER_SERIAL,
             register=14,
-            length=13,
             data=b"192.168.1.100",
         )
 
@@ -96,7 +95,6 @@ class TestGetConfigResponsePayloadEncoder:
             header=header,
             datalogger_serial=DATALOGGER_SERIAL,
             register=56,
-            length=6,
             data=b"MySSID",
         )
 

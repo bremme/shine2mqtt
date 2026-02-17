@@ -49,23 +49,12 @@ class GetConfigResponseDecoder(MessageDecoder[GrowattGetConfigResponseMessage]):
 
         try:
             config = self.config_registry.get_register_info(register)
-
-            if config.fmt == "s":
-                value = self.decode_str(payload, 34, length)
-            elif config.fmt == "B":
-                value = self.decode_u8(payload, 34)
-            elif config.fmt == "H":
-                value = self.decode_u16(payload, 34)
-            elif config.fmt == "I":
-                value = self.decode_u32(payload, 34)
-            else:
-                value = None
+            value = self.decode_str(payload, 34, length)
 
             return GrowattGetConfigResponseMessage(
                 header=header,
                 datalogger_serial=datalogger_serial,
                 register=register,
-                length=length,
                 data=data,
                 name=config.name,
                 description=config.description,
@@ -77,6 +66,5 @@ class GetConfigResponseDecoder(MessageDecoder[GrowattGetConfigResponseMessage]):
                 header=header,
                 datalogger_serial=datalogger_serial,
                 register=register,
-                length=length,
                 data=data,
             )

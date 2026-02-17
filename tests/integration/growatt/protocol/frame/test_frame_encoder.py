@@ -48,8 +48,7 @@ MESSAGES = [
         ),
         datalogger_serial="XGD4A49AGC",
         register=5,
-        length=2,
-        value=42,
+        value="42",
     ),
     GrowattAckMessage(
         header=MBAPHeader(
@@ -66,7 +65,7 @@ MESSAGES = [
 FRAMES = [
     b"\x00\x02\x00\x06\x00\x0c\x01\x16\x1f5+C @M\x065,\x15|",
     b"\x00\x02\x00\x06\x00\x10\x01\x19\x1f5+C @M\x065,wat~\xdcb",
-    b"\x00\x02\x00\x06\x00&\x01\x18\x1f5+C @M\x065,wattGrowattGrowattGroravtm\xe5%",
+    b"\x00\x02\x00\x06\x00&\x01\x18\x1f5+C @M\x065,wattGrowattGrowattGrorav@u/3",
     b"\x00\x02\x00\x06\x00\x03\x01\x04G9\x98",
 ]
 

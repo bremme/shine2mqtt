@@ -13,27 +13,6 @@ class TestSetConfigRequestPayloadEncoder:
     def encoder(self):
         return SetConfigRequestPayloadEncoder()
 
-    def test_encode_set_config_request_with_int_value(self, encoder):
-        header = MBAPHeader(
-            transaction_id=2,
-            protocol_id=6,
-            length=16,
-            unit_id=1,
-            function_code=FunctionCode.SET_CONFIG,
-        )
-        message = GrowattSetConfigRequestMessage(
-            header=header,
-            datalogger_serial=DATALOGGER_SERIAL,
-            register=5,
-            length=2,
-            value=42,
-        )
-
-        payload = encoder.encode(message)
-
-        expected = b"XGDABCDEFG" + b"\x00" * 20 + b"\x00\x05\x00\x02\x00\x2a"
-        assert payload == expected
-
     def test_encode_set_config_request_with_string_value(self, encoder):
         header = MBAPHeader(
             transaction_id=3,
@@ -46,7 +25,6 @@ class TestSetConfigRequestPayloadEncoder:
             header=header,
             datalogger_serial=DATALOGGER_SERIAL,
             register=8,
-            length=10,
             value="TestString",
         )
 
