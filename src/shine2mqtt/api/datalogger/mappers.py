@@ -15,5 +15,6 @@ def get_config_response_to_datalogger_register_setting(
 ) -> DataloggerRegisterSetting:
     return DataloggerRegisterSetting(
         address=message.register,
-        value=str(message.value),
+        value=message.value,
+        raw_value=message.data.hex(),
     )

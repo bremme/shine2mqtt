@@ -3,10 +3,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from shine2mqtt.api.constants import INVERTER_COMMAND_TIMEOUT_SECONDS
 from shine2mqtt.api.dependencies import (
-    INVERTER_COMMAND_TIMEOUT_SECONDS,
-    gateway_timeout_504,
     get_command_executor,
+)
+from shine2mqtt.api.http_exceptions import (
+    gateway_timeout_504,
     internal_server_error_500,
     not_implemented_501,
 )

@@ -9,6 +9,7 @@ class DataloggerSetting(BaseModel):
 class DataloggerRegisterSetting(BaseModel):
     address: int
     value: str
+    raw_value: str
 
 
 class Datalogger(BaseModel):

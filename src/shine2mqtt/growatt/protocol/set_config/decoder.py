@@ -11,8 +11,26 @@ from shine2mqtt.growatt.protocol.set_config.set_config import (
 
 class SetConfigResponseDecoder(MessageDecoder[GrowattSetConfigResponseMessage]):
     def decode(self, header: MBAPHeader, payload: bytes) -> GrowattSetConfigResponseMessage:
-        ack = payload == ACK
-        return GrowattSetConfigResponseMessage(header=header, ack=ack)
+        # payload example:
+        # b'XGD4A49AGC
+        # \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+        # \x00\x04\x00'
+
+        # register 4 value '2'
+        # request: b'XGD4A49AGC\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x012'
+        # response:b'XGD4A49AGC\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00'
+
+        # register 4 value '1'
+        # request: b'XGD4A49AGC\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x011'
+
+        datalogger_serial = self.decode_str(payload, 0, 10)
+        # 10-30 is \x00 (padding)
+        register = self.decode_u16(payload, 30)
+        ack = payload[32:33] == ACK
+
+        return GrowattSetConfigResponseMessage(
+            header=header, datalogger_serial=datalogger_serial, register=register, ack=ack
+        )
 
 
 class SetConfigRequestDecoder(MessageDecoder[GrowattSetConfigRequestMessage]):

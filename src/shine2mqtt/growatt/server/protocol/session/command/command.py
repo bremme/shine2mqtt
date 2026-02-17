@@ -42,8 +42,14 @@ class SetConfigByNameCommand(BaseCommand[GrowattSetConfigResponseMessage]):
 
 
 @dataclass
-class GetConfigByRegistersCommand(BaseCommand[GrowattGetConfigResponseMessage]):
+class GetConfigByRegisterCommand(BaseCommand[GrowattGetConfigResponseMessage]):
     register: int
+
+
+@dataclass
+class SetConfigByRegisterCommand(BaseCommand[GrowattSetConfigResponseMessage]):
+    register: int
+    value: str
 
 
 @dataclass

@@ -11,12 +11,16 @@ from shine2mqtt.growatt.protocol.raw.raw import GrowattRawMessage
 from shine2mqtt.growatt.protocol.read_register.read_register import (
     GrowattReadRegistersRequestMessage,
 )
+from shine2mqtt.growatt.protocol.set_config.set_config import (
+    GrowattSetConfigRequestMessage,
+)
 from shine2mqtt.growatt.server.protocol.session.command.command import (
     BaseCommand,
     GetConfigByNameCommand,
-    GetConfigByRegistersCommand,
+    GetConfigByRegisterCommand,
     RawFrameCommand,
     ReadRegistersCommand,
+    SetConfigByRegisterCommand,
 )
 from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
 
@@ -31,21 +35,21 @@ class CommandMessageBuilder:
         match command:
             case GetConfigByNameCommand():
                 register = self.config_registry.get_register_by_name(command.name)
-                if register is None:
-                    raise KeyError(f"Unknown config name: {command.name}")
+
                 message = self._build_get_config_request_message(
                     register_start=register,
                 )
-                # self.store_command_future(message.header, command.future)
+
                 return message
-            case GetConfigByRegistersCommand():
-                if self.config_registry.get_register_info(command.register) is None:
-                    raise KeyError(f"Unknown config register: {command.register}")
-                message = self._build_get_config_request_message(
+            case GetConfigByRegisterCommand():
+                return self._build_get_config_request_message(
                     register_start=command.register,
                 )
-                # self.store_command_future(message.header, command.future)
-                return message
+
+            case SetConfigByRegisterCommand():
+                return self._build_set_config_request_message(
+                    register=command.register, value=command.value
+                )
 
             case RawFrameCommand():
                 header = MBAPHeader(
@@ -58,7 +62,6 @@ class CommandMessageBuilder:
                     function_code=FunctionCode(command.function_code),
                 )
 
-                # self.store_command_future(command.header, command.future)
                 return GrowattRawMessage(
                     header=header,
                     datalogger_serial=self.session_state.datalogger_serial,
@@ -74,7 +77,7 @@ class CommandMessageBuilder:
                     unit_id=self.session_state.unit_id,
                     function_code=FunctionCode.READ_REGISTERS,
                 )
-                # self.store_command_future(header, command.future)
+
                 return GrowattReadRegistersRequestMessage(
                     header=header,
                     datalogger_serial=self.session_state.datalogger_serial,
@@ -103,21 +106,18 @@ class CommandMessageBuilder:
             header, self.session_state.datalogger_serial, register_start, register_end
         )
 
-    # def resolve_response(self, message: BaseMessage):
-    #     if future := self.retrieve_command_future(message.header):
-    #         if future.done():
-    #             logger.warning(
-    #                 f"Command future already done (likely cancelled/timeout) for transaction ID {message.header.transaction_id}"
-    #             )
-    #             return
-    #         future.set_result(message)
-    #         logger.debug(
-    #             f"Resolved command future for transaction ID {message.header.transaction_id}"
-    #         )
+    def _build_set_config_request_message(self, register, value):
+        function_code = FunctionCode.SET_CONFIG
+        transaction_id = self.session_state.get_next_transaction_id(function_code)
 
-    # def store_command_future(self, header: MBAPHeader, future: Future) -> None:
-    #     self.command_futures[(header.function_code, header.transaction_id)] = future
+        header = MBAPHeader(
+            transaction_id=transaction_id,
+            protocol_id=self.session_state.protocol_id,
+            length=0,
+            unit_id=self.session_state.unit_id,
+            function_code=function_code,
+        )
 
-    # def retrieve_command_future(self, header: MBAPHeader) -> Future | None:
-    #     key = (header.function_code, header.transaction_id)
-    #     return self.command_futures.pop(key, None)
+        return GrowattSetConfigRequestMessage(
+            header, self.session_state.datalogger_serial, register, value
+        )

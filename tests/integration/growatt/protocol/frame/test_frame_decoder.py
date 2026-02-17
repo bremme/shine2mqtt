@@ -142,6 +142,8 @@ EXPECTED_MESSAGES = [
     ),
     GrowattSetConfigResponseMessage(
         header=set_config_response_headers[0],
+        datalogger_serial=DATALOGGER_SERIAL,
+        register=4,
         ack=True,
     ),
     GrowattPingMessage(

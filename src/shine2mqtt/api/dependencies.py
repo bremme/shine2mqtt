@@ -1,32 +1,9 @@
-from typing import Annotated, NoReturn
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request
 
 from shine2mqtt.app.command_executor import SessionCommandExecutor
 from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
-
-INVERTER_COMMAND_TIMEOUT_SECONDS = 30
-DATALOGGER_COMMAND_TIMEOUT_SECONDS = 10
-
-
-def not_implemented_501() -> NoReturn:
-    raise HTTPException(status_code=501, detail="Not implemented") from None
-
-
-def gateway_timeout_504() -> NoReturn:
-    raise HTTPException(status_code=504, detail="Server timeout") from None
-
-
-def internal_server_error_500(e: Exception) -> NoReturn:
-    raise HTTPException(status_code=500, detail=str(e)) from e
-
-
-def bad_request_400(detail: str, e: Exception | None = None) -> NoReturn:
-    raise HTTPException(status_code=400, detail=detail) from e
-
-
-def not_found_404(detail: str) -> NoReturn:
-    raise HTTPException(status_code=404, detail=detail) from None
 
 
 def get_session_registry(request: Request) -> ProtocolSessionRegistry:

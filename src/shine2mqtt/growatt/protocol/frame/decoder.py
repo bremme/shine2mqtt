@@ -54,9 +54,6 @@ class FrameDecoder:
         except KeyError as e:
             message = f"Decoder not found for function code {header.function_code.name} ({header.function_code.value:#02x})"
             logger.error(message)
-            # print(header)
-            # print(frame)
-            # print(raw_payload)
             raise DecodingError(message) from e
 
         try:

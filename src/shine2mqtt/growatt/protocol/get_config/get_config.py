@@ -10,9 +10,9 @@ from shine2mqtt.growatt.protocol.base.message import DataloggerMessage
 class GrowattGetConfigResponseMessage(DataloggerMessage):
     register: int
     data: bytes
+    value: str
     name: str | None = None
     description: str = ""
-    value: str | None = None
 
 
 # Server messages ######################################################################
