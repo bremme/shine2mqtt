@@ -1,4 +1,3 @@
-import asyncio
 from asyncio import Future
 from dataclasses import dataclass, field
 
@@ -16,9 +15,9 @@ class BaseCommand[TMessage: BaseMessage]:
     datalogger_serial: str
     _future: Future[TMessage] = field(default_factory=Future, init=False, repr=False)
 
-    async def wait_for_response(self, timeout: float) -> TMessage:  # noqa: S7483
-        """Wait for the command response with timeout."""
-        return await asyncio.wait_for(self._future, timeout)
+    async def wait_for_response(self) -> TMessage:
+        """Wait for the command response."""
+        return await self._future
 
     def complete_with_response(self, message: TMessage) -> None:
         """Complete the command with the received response message."""

@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -84,7 +85,8 @@ async def get_single_datalogger_setting(
     command = GetConfigByNameCommand(datalogger_serial=serial, name=name)
 
     try:
-        message = await executer.execute(command, timeout=10)
+        async with asyncio.timeout(10):
+            message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
     except RegisterNotFoundError:
@@ -105,7 +107,8 @@ async def update_single_datalogger_setting(
     command = SetConfigByNameCommand(datalogger_serial=serial, name=name, value=value)
 
     try:
-        message = await executer.execute(command, timeout=10)
+        async with asyncio.timeout(10):
+            message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
     except RegisterNotFoundError:
@@ -131,7 +134,8 @@ async def get_single_register(
     command = GetConfigByRegistersCommand(datalogger_serial=serial, register=register)
 
     try:
-        message = await executer.execute(command, timeout=10)
+        async with asyncio.timeout(10):
+            message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
     except KeyError:

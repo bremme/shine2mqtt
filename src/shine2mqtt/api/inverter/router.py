@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -51,7 +52,8 @@ async def read_multiple_inverter_registers(
     command = ReadRegistersCommand(datalogger_serial=serial, register_start=start, register_end=end)
 
     try:
-        message = await executer.execute(command, timeout=30)
+        async with asyncio.timeout(30):
+            message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
     # TODO invalid register exception
@@ -71,7 +73,10 @@ async def write_multiple_inverter_registers(serial: str, registers: list[dict[st
     not_implemented_501()
 
 
-@router.post("/raw-frames")
+@router.post(
+    "/raw-frames",
+    responses={504: {"description": "Gateway timeout when the datalogger did not respond in time"}},
+)
 async def send_raw_frame(
     serial: str,
     request: RawFrameRequest,
@@ -85,7 +90,8 @@ async def send_raw_frame(
     )
 
     try:
-        message = await executer.execute(command, timeout=30)
+        async with asyncio.timeout(30):
+            message = await executer.execute(command)
     except TimeoutError:
         gateway_timeout_504()
 

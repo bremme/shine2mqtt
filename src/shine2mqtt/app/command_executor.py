@@ -7,9 +7,7 @@ class SessionCommandExecutor:
     def __init__(self, session: ServerProtocolSession):
         self._session = session
 
-    async def execute[TMessage: BaseMessage](
-        self, command: BaseCommand[TMessage], timeout: float = 10.0
-    ) -> TMessage:  # noqa: S7483
+    async def execute[TMessage: BaseMessage](self, command: BaseCommand[TMessage]) -> TMessage:
         """Execute a command and wait for its response."""
         self._session.send_command(command)
-        return await command.wait_for_response(timeout)
+        return await command.wait_for_response()
