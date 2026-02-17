@@ -15,7 +15,14 @@ from shine2mqtt.growatt.protocol.read_register.read_register import (
 from shine2mqtt.growatt.protocol.set_config.set_config import GrowattSetConfigResponseMessage
 from shine2mqtt.growatt.server.protocol.event import ProtocolEvent
 from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames, ProtocolEvents
-from shine2mqtt.growatt.server.protocol.session.command.command import BaseCommand
+from shine2mqtt.growatt.server.protocol.session.command.command import (
+    BaseCommand,
+    GetConfigByNameCommand,
+    GetConfigByRegisterCommand,
+    RawFrameCommand,
+    ReadRegistersCommand,
+    SetConfigByRegisterCommand,
+)
 from shine2mqtt.growatt.server.protocol.session.command.message_builder import CommandMessageBuilder
 from shine2mqtt.growatt.server.protocol.session.message.handler import MessageHandler
 from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
@@ -86,12 +93,12 @@ class ServerProtocolSession:
             logger.error(f"Failed to decode incoming frame {frame}: {e}")
             return
 
-        self._publish_protocol_event(message)
-
         transaction_id = message.header.transaction_id
         logger.info(
             f"✓ Receive {message.header.function_code.name} ({message.header.function_code.value:#02x}) message, {transaction_id=}"
         )
+
+        self._publish_protocol_event(message)
 
         response_messages: list[BaseMessage] = []
 
@@ -110,6 +117,7 @@ class ServerProtocolSession:
                 self._complete_command(message)
             case GrowattSetConfigResponseMessage():
                 self._complete_command(message)
+            # inverter response messages
             case GrowattReadRegisterResponseMessage():
                 self._complete_command(message)
             case _:
@@ -127,18 +135,38 @@ class ServerProtocolSession:
             outgoing_frame: bytes = self.encoder.encode(response_message)
             self.outgoing_frames.put_nowait(outgoing_frame)
 
-    def send_command(self, command: BaseCommand) -> TransactionKey:
+    def send_command(self, command: BaseCommand):
         """Send a command and register it for response handling."""
-        message = self.command_message_builder.build_message(command)
+        match command:
+            case GetConfigByNameCommand():
+                message = self.command_message_builder.build_get_config_message_by_name(
+                    register_name=command.name,
+                )
+            case GetConfigByRegisterCommand():
+                message = self.command_message_builder.build_get_config_message(
+                    register_start=command.register,
+                )
+            case SetConfigByRegisterCommand():
+                message = self.command_message_builder.build_set_config_message(
+                    register=command.register, value=command.value
+                )
+            case RawFrameCommand():
+                message = self.command_message_builder.build_raw_frame_message(command)
+
+            case ReadRegistersCommand():
+                message = self.command_message_builder.build_read_registers_message(command)
+            case _:
+                raise ValueError(f"Unknown command type: {type(command)}")
+
         transaction_id = message.header.transaction_id
         logger.info(
             f"→ Enqueue {message.header.function_code.name} ({message.header.function_code.value:#02x}) message for command {command.__class__.__name__}, {transaction_id=}"
         )
-        key = (message.header.function_code, transaction_id)
-        self.pending_commands[key] = command
+
+        self._add_pending_command(message, command)
+
         frame = self.encoder.encode(message)
         self.outgoing_frames.put_nowait(frame)
-        return key
 
     def _publish_protocol_event(self, message: BaseMessage):
         if isinstance(message, DataloggerMessage):
@@ -150,8 +178,20 @@ class ServerProtocolSession:
 
     def _complete_command(self, message: BaseMessage) -> None:
         """Complete a pending command with the received response message."""
-        key: TransactionKey = (message.header.function_code, message.header.transaction_id)
-        if command := self.pending_commands.pop(key, None):
+        if command := self._pop_pending_command(message):
             command.complete_with_response(message)
         else:
-            logger.warning(f"Received response for unknown command with key {key}")
+            logger.warning(
+                f"Received response for unknown command with key {self._get_message_key(message)}"
+            )
+
+    def _add_pending_command(self, message: BaseMessage, command: BaseCommand) -> None:
+        key = self._get_message_key(message)
+        self.pending_commands[key] = command
+
+    def _pop_pending_command(self, message: BaseMessage) -> BaseCommand | None:
+        key = self._get_message_key(message)
+        return self.pending_commands.pop(key, None)
+
+    def _get_message_key(self, message: BaseMessage) -> TransactionKey:
+        return (message.header.function_code, message.header.transaction_id)
