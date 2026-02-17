@@ -1,4 +1,3 @@
-from abc import ABC
 from asyncio import Future
 from dataclasses import dataclass, field
 
@@ -12,7 +11,7 @@ from shine2mqtt.growatt.protocol.set_config.set_config import GrowattSetConfigRe
 
 
 @dataclass
-class BaseCommand[TMessage: BaseMessage](ABC):
+class BaseCommand[TMessage: BaseMessage]:
     datalogger_serial: str
     _future: Future[TMessage] = field(default_factory=Future, init=False, repr=False)
 

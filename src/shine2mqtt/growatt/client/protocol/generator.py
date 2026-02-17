@@ -11,7 +11,7 @@ buffered_data_frames, buffered_data_headers, buffered_data_payloads = CapturedFr
 )
 data_frames, data_headers, data_payloads = CapturedFrameLoader.load("data_message")
 get_config_frames, get_config_headers, get_config_payloads = CapturedFrameLoader.load(
-    "get_config_message"
+    "get_config_response"
 )
 ping_frames, ping_headers, ping_payloads = CapturedFrameLoader.load("ping_message")
 

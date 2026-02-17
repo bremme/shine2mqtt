@@ -8,7 +8,7 @@ from shine2mqtt.growatt.protocol.get_config.get_config import (
 from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 from tests.utils.loader import CapturedFrameLoader
 
-frames, headers, payloads = CapturedFrameLoader.load("get_config_message")
+frames, headers, payloads = CapturedFrameLoader.load("get_config_response")
 
 DATALOGGER_SERIAL = "XGDABCDEFG"
 

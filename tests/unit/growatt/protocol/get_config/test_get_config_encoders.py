@@ -76,6 +76,7 @@ class TestGetConfigResponsePayloadEncoder:
             datalogger_serial=DATALOGGER_SERIAL,
             register=14,
             data=b"192.168.1.100",
+            value="192.168.1.100",
         )
 
         payload = encoder.encode(message)
@@ -96,6 +97,7 @@ class TestGetConfigResponsePayloadEncoder:
             datalogger_serial=DATALOGGER_SERIAL,
             register=56,
             data=b"MySSID",
+            value="MySSID",
         )
 
         payload = encoder.encode(message)

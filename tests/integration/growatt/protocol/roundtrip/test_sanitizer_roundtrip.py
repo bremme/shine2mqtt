@@ -17,7 +17,7 @@ from tests.utils.loader import CapturedFrameLoader
 announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")
 data_frames, data_headers, data_payloads = CapturedFrameLoader.load("data_message")
 get_config_frames, get_config_headers, get_config_payloads = CapturedFrameLoader.load(
-    "get_config_message"
+    "get_config_response"
 )
 ping_frames, ping_headers, ping_payloads = CapturedFrameLoader.load("ping_message")
 

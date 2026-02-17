@@ -4,7 +4,7 @@ from shine2mqtt.growatt.protocol.get_config.decoder import GetConfigResponseDeco
 from shine2mqtt.growatt.protocol.get_config.encoder import GetConfigResponsePayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
-_, headers, payloads = CapturedFrameLoader.load("get_config_message")
+_, headers, payloads = CapturedFrameLoader.load("get_config_response")
 
 
 @pytest.mark.parametrize(
