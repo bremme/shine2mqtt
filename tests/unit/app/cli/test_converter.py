@@ -1,6 +1,6 @@
 from argparse import Namespace
 
-from shine2mqtt.app.cli.converter import CliArgDictConverter
+from shine2mqtt.main.cli.converter import CliArgDictConverter
 
 
 class TestCliArgDictConverter:

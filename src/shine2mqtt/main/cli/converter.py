@@ -1,7 +1,7 @@
 from argparse import Namespace
 
 from shine2mqtt import util
-from shine2mqtt.app.config.config import NESTED_DELIMITER
+from shine2mqtt.main.config.config import NESTED_DELIMITER
 
 
 class CliArgDictConverter:

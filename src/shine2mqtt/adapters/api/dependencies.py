@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request
 
-from shine2mqtt.app.command_executor import SessionCommandExecutor
+from shine2mqtt.main.command_executor import SessionCommandExecutor
 from shine2mqtt.protocol.server.protocol.session.registry import ProtocolSessionRegistry
 
 

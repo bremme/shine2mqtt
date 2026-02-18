@@ -14,7 +14,7 @@ from shine2mqtt.adapters.api.http_exceptions import (
 )
 from shine2mqtt.adapters.api.inverter.mappers import read_registers_response_to_inverter_registers
 from shine2mqtt.adapters.api.inverter.models import InverterRegister, RawFrameRequest
-from shine2mqtt.app.command_executor import SessionCommandExecutor
+from shine2mqtt.main.command_executor import SessionCommandExecutor
 from shine2mqtt.protocol.protocol.raw.raw import GrowattRawMessage
 from shine2mqtt.protocol.server.protocol.session.command.command import (
     RawFrameCommand,

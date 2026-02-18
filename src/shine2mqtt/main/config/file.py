@@ -5,7 +5,7 @@ from typing import Any
 import yaml
 
 from shine2mqtt import PROJECT_ROOT
-from shine2mqtt.app.config.config import (
+from shine2mqtt.main.config.config import (
     ENV_PREFIX,
 )
 

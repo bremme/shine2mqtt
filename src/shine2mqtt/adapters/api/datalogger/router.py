@@ -24,7 +24,7 @@ from shine2mqtt.adapters.api.http_exceptions import (
     not_found_404,
     not_implemented_501,
 )
-from shine2mqtt.app.command_executor import SessionCommandExecutor
+from shine2mqtt.main.command_executor import SessionCommandExecutor
 from shine2mqtt.protocol.protocol.config import RegisterNotFoundError
 from shine2mqtt.protocol.protocol.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.protocol.protocol.set_config.set_config import GrowattSetConfigResponseMessage

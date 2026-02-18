@@ -1,7 +1,7 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from shine2mqtt.app.config.file import ConfigFileLoader
+from shine2mqtt.main.config.file import ConfigFileLoader
 
 
 class TestConfigFileLoader:

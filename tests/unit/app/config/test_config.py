@@ -1,6 +1,6 @@
 import logging
 
-from shine2mqtt.app.config.config import ApplicationConfig
+from shine2mqtt.main.config.config import ApplicationConfig
 
 
 class TestApplicationConfig:

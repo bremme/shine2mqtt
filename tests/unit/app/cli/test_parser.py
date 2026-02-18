@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from shine2mqtt.app.cli.parser import CliArgParser
+from shine2mqtt.main.cli.parser import CliArgParser
 
 
 class TestCliArgParser:

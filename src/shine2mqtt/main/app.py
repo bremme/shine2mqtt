@@ -10,7 +10,7 @@ from shine2mqtt.adapters.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_
 from shine2mqtt.adapters.mqtt.bridge import MqttBridge
 from shine2mqtt.adapters.mqtt.client import MqttClient
 from shine2mqtt.adapters.mqtt.processor import MqttDataloggerMessageProcessor
-from shine2mqtt.app.config.config import ApplicationConfig
+from shine2mqtt.main.config.config import ApplicationConfig
 from shine2mqtt.protocol.protocol.config import ConfigRegistry
 from shine2mqtt.protocol.protocol.frame import (
     FrameFactory,
