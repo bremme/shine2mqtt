@@ -80,6 +80,8 @@ class RawPayloadSanitizer:
                 return self._sanitize_announce_or_data_payload(payload)
             case FunctionCode.GET_CONFIG:
                 return self._sanitize_get_config_response_payload(payload)
+            case FunctionCode.SET_CONFIG:
+                return self._sanitize_set_config_response_payload(payload)
             case FunctionCode.PING:
                 return self._sanitize_ping_payload(payload)
             case _:
@@ -112,7 +114,13 @@ class RawPayloadSanitizer:
 
         return bytes(sanitized_payload)
 
+    def _sanitize_set_config_response_payload(self, payload: bytes) -> bytes:
+        return self._replace_datalogger_serial(payload, DUMMY_DATALOGGER_SERIAL)
+
     def _sanitize_ping_payload(self, payload: bytes) -> bytes:
+        return self._replace_datalogger_serial(payload, DUMMY_DATALOGGER_SERIAL)
+
+    def _replace_datalogger_serial(self, payload: bytes, datalogger_serial: str) -> bytes:
         sanitized_payload = bytearray(payload)
-        sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
+        sanitized_payload[0:10] = ByteEncoder.encode_str(datalogger_serial, 10)
         return bytes(sanitized_payload)
