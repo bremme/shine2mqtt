@@ -1,6 +1,6 @@
-from shine2mqtt.growatt.protocol.base.message import BaseMessage
-from shine2mqtt.growatt.server.protocol.session.command.command import BaseCommand
-from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSession
+from shine2mqtt.protocol.protocol.base.message import BaseMessage
+from shine2mqtt.protocol.server.protocol.session.command.command import BaseCommand
+from shine2mqtt.protocol.server.protocol.session.session import ServerProtocolSession
 
 
 class SessionCommandExecutor:

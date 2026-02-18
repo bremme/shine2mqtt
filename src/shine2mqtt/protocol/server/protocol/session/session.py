@@ -23,7 +23,9 @@ from shine2mqtt.protocol.server.protocol.session.command.command import (
     ReadRegistersCommand,
     SetConfigByRegisterCommand,
 )
-from shine2mqtt.protocol.server.protocol.session.command.message_builder import CommandMessageBuilder
+from shine2mqtt.protocol.server.protocol.session.command.message_builder import (
+    CommandMessageBuilder,
+)
 from shine2mqtt.protocol.server.protocol.session.message.handler import MessageHandler
 from shine2mqtt.protocol.server.protocol.session.state import ServerProtocolSessionState
 

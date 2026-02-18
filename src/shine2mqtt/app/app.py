@@ -4,24 +4,24 @@ from pathlib import Path
 import uvicorn
 from loguru import logger
 
-from shine2mqtt.api.api import create_app
+from shine2mqtt.adapters.api.api import create_app
+from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
+from shine2mqtt.adapters.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
+from shine2mqtt.adapters.mqtt.bridge import MqttBridge
+from shine2mqtt.adapters.mqtt.client import MqttClient
+from shine2mqtt.adapters.mqtt.processor import MqttDataloggerMessageProcessor
 from shine2mqtt.app.config.config import ApplicationConfig
-from shine2mqtt.growatt.protocol.config import ConfigRegistry
-from shine2mqtt.growatt.protocol.frame import (
+from shine2mqtt.protocol.protocol.config import ConfigRegistry
+from shine2mqtt.protocol.protocol.frame import (
     FrameFactory,
 )
-from shine2mqtt.growatt.protocol.frame.capturer import CaptureHandler
-from shine2mqtt.growatt.server import GrowattServer
-from shine2mqtt.growatt.server.protocol.queues import (
+from shine2mqtt.protocol.protocol.frame.capturer import CaptureHandler
+from shine2mqtt.protocol.server import GrowattServer
+from shine2mqtt.protocol.server.protocol.queues import (
     ProtocolEvents,
 )
-from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
-from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSessionFactory
-from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
-from shine2mqtt.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
-from shine2mqtt.mqtt.bridge import MqttBridge
-from shine2mqtt.mqtt.client import MqttClient
-from shine2mqtt.mqtt.processor import MqttDataloggerMessageProcessor
+from shine2mqtt.protocol.server.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.protocol.server.protocol.session.session import ServerProtocolSessionFactory
 
 
 class Application:

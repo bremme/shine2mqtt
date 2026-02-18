@@ -5,10 +5,10 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shine2mqtt import util
-from shine2mqtt.api.config import ApiConfig
-from shine2mqtt.growatt.client.config import SimulatedClientConfig
-from shine2mqtt.growatt.server.config import GrowattServerConfig
-from shine2mqtt.mqtt.config import MqttConfig
+from shine2mqtt.adapters.api.config import ApiConfig
+from shine2mqtt.adapters.mqtt.config import MqttConfig
+from shine2mqtt.protocol.client.config import SimulatedClientConfig
+from shine2mqtt.protocol.server.config import GrowattServerConfig
 
 ENV_PREFIX = "SHINE2MQTT_"
 
