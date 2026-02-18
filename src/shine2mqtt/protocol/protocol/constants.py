@@ -8,12 +8,13 @@ DECRYPTION_KEY = ENCRYPTION_KEY
 
 
 class FunctionCode(Enum):
-    ANNOUNCE = 0x03  # 3 (READ_MULTIPLE_HOLDING_REGISTERS)
-    DATA = 0x04  # 4 (READ_INPUT_REGISTERS)
+    ANNOUNCE = 0x03  # 3 (holding registers)
+    DATA = 0x04  # 4 (input registers)
+    BUFFERED_DATA = 0x50  # 80 (input registers)
     PING = 0x16  # 22
+
     SET_CONFIG = 0x18  # 24
     GET_CONFIG = 0x19  # 25
-    BUFFERED_DATA = 0x50  # 80
     # REBOOT = 0x20 ?
 
     READ_REGISTERS = 0x05  # 5 (custom code, not standard Modbus)
