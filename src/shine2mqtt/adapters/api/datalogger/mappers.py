@@ -1,5 +1,5 @@
-from shine2mqtt.api.datalogger.models import DataloggerRegisterSetting, DataloggerSetting
-from shine2mqtt.growatt.protocol.get_config.get_config import GrowattGetConfigResponseMessage
+from shine2mqtt.adapters.api.datalogger.models import DataloggerRegisterSetting, DataloggerSetting
+from shine2mqtt.protocol.protocol.get_config.get_config import GrowattGetConfigResponseMessage
 
 
 def get_config_response_to_datalogger_setting(

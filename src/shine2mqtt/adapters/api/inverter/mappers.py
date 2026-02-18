@@ -1,5 +1,5 @@
-from shine2mqtt.api.inverter.models import InverterRegister
-from shine2mqtt.growatt.protocol.read_register.read_register import (
+from shine2mqtt.adapters.api.inverter.models import InverterRegister
+from shine2mqtt.protocol.protocol.read_register.read_register import (
     GrowattReadRegisterResponseMessage,
 )
 

@@ -3,21 +3,21 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from shine2mqtt.api.constants import DATALOGGER_COMMAND_TIMEOUT_SECONDS
-from shine2mqtt.api.datalogger.mappers import (
+from shine2mqtt.adapters.api.constants import DATALOGGER_COMMAND_TIMEOUT_SECONDS
+from shine2mqtt.adapters.api.datalogger.mappers import (
     get_config_response_to_datalogger_register_setting,
     get_config_response_to_datalogger_setting,
 )
-from shine2mqtt.api.datalogger.models import (
+from shine2mqtt.adapters.api.datalogger.models import (
     Datalogger,
     DataloggerRegisterSetting,
     DataloggerSetting,
 )
-from shine2mqtt.api.dependencies import (
+from shine2mqtt.adapters.api.dependencies import (
     get_command_executor,
     get_session_registry,
 )
-from shine2mqtt.api.http_exceptions import (
+from shine2mqtt.adapters.api.http_exceptions import (
     bad_request_400,
     gateway_timeout_504,
     internal_server_error_500,
@@ -25,16 +25,16 @@ from shine2mqtt.api.http_exceptions import (
     not_implemented_501,
 )
 from shine2mqtt.app.command_executor import SessionCommandExecutor
-from shine2mqtt.growatt.protocol.config import RegisterNotFoundError
-from shine2mqtt.growatt.protocol.get_config.get_config import GrowattGetConfigResponseMessage
-from shine2mqtt.growatt.protocol.set_config.set_config import GrowattSetConfigResponseMessage
-from shine2mqtt.growatt.server.protocol.session.command.command import (
+from shine2mqtt.protocol.protocol.config import RegisterNotFoundError
+from shine2mqtt.protocol.protocol.get_config.get_config import GrowattGetConfigResponseMessage
+from shine2mqtt.protocol.protocol.set_config.set_config import GrowattSetConfigResponseMessage
+from shine2mqtt.protocol.server.protocol.session.command.command import (
     GetConfigByNameCommand,
     GetConfigByRegisterCommand,
     SetConfigByNameCommand,
     SetConfigByRegisterCommand,
 )
-from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.protocol.server.protocol.session.registry import ProtocolSessionRegistry
 
 router = APIRouter(tags=["datalogger"])
 

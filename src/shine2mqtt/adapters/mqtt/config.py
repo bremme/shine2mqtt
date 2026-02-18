@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from shine2mqtt.hass.config import HassDiscoveryConfig
+from shine2mqtt.adapters.hass.config import HassDiscoveryConfig
 
 
 class MqttServerConfig(BaseModel):

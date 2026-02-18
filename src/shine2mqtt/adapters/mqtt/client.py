@@ -3,8 +3,8 @@ from typing import Any
 from aiomqtt import Client, ProtocolVersion, Will
 from loguru import logger
 
-from shine2mqtt.mqtt.config import MqttServerConfig
-from shine2mqtt.mqtt.message import MqttMessage
+from shine2mqtt.adapters.mqtt.config import MqttServerConfig
+from shine2mqtt.adapters.mqtt.message import MqttMessage
 
 
 class MqttClient:

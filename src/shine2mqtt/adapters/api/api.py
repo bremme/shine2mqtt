@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Response
 from fastapi.responses import RedirectResponse
 
-from shine2mqtt.api.datalogger.router import router as datalogger_router
-from shine2mqtt.api.inverter.router import router as inverter_router
-from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.adapters.api.datalogger.router import router as datalogger_router
+from shine2mqtt.adapters.api.inverter.router import router as inverter_router
+from shine2mqtt.protocol.server.protocol.session.registry import ProtocolSessionRegistry
 
 
 def create_app(session_registry: ProtocolSessionRegistry) -> FastAPI:

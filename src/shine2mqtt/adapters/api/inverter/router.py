@@ -3,20 +3,20 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from shine2mqtt.api.constants import INVERTER_COMMAND_TIMEOUT_SECONDS
-from shine2mqtt.api.dependencies import (
+from shine2mqtt.adapters.api.constants import INVERTER_COMMAND_TIMEOUT_SECONDS
+from shine2mqtt.adapters.api.dependencies import (
     get_command_executor,
 )
-from shine2mqtt.api.http_exceptions import (
+from shine2mqtt.adapters.api.http_exceptions import (
     gateway_timeout_504,
     internal_server_error_500,
     not_implemented_501,
 )
-from shine2mqtt.api.inverter.mappers import read_registers_response_to_inverter_registers
-from shine2mqtt.api.inverter.models import InverterRegister, RawFrameRequest
+from shine2mqtt.adapters.api.inverter.mappers import read_registers_response_to_inverter_registers
+from shine2mqtt.adapters.api.inverter.models import InverterRegister, RawFrameRequest
 from shine2mqtt.app.command_executor import SessionCommandExecutor
-from shine2mqtt.growatt.protocol.raw.raw import GrowattRawMessage
-from shine2mqtt.growatt.server.protocol.session.command.command import (
+from shine2mqtt.protocol.protocol.raw.raw import GrowattRawMessage
+from shine2mqtt.protocol.server.protocol.session.command.command import (
     RawFrameCommand,
     ReadRegistersCommand,
 )

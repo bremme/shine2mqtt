@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 
-from shine2mqtt.growatt.protocol.constants import FunctionCode
+from shine2mqtt.protocol.protocol.constants import FunctionCode
 
 
 class InverterRegister(BaseModel):

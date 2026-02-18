@@ -1,7 +1,7 @@
 from typing import Any
 
 from shine2mqtt import HOME_PAGE, __version__
-from shine2mqtt.hass.config import HassDiscoveryConfig
+from shine2mqtt.adapters.hass.config import HassDiscoveryConfig
 
 
 class MqttDiscoveryBuilder:
