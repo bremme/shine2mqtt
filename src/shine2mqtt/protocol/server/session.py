@@ -1,11 +1,10 @@
 import asyncio
 from asyncio import StreamReader, StreamWriter
 
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.frame.decoder import HEADER_LENGTH, FrameDecoder
 from shine2mqtt.protocol.server.protocol.queues import OutgoingFrames
 from shine2mqtt.protocol.server.protocol.session.session import ServerProtocolSession
+from shine2mqtt.util.logger import logger
 
 
 class GrowattTcpSession:

@@ -1,8 +1,7 @@
 import asyncio
 
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.frame.decoder import HEADER_LENGTH, FrameDecoder
+from shine2mqtt.util.logger import logger
 
 
 class TCPTransport:

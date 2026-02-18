@@ -1,5 +1,3 @@
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.protocol.protocol.base.message import BaseMessage, DataloggerMessage
 from shine2mqtt.protocol.protocol.config import ConfigRegistry
@@ -28,6 +26,7 @@ from shine2mqtt.protocol.server.protocol.session.command.message_builder import 
 )
 from shine2mqtt.protocol.server.protocol.session.message.handler import MessageHandler
 from shine2mqtt.protocol.server.protocol.session.state import ServerProtocolSessionState
+from shine2mqtt.util.logger import logger
 
 
 class ServerProtocolSessionFactory:

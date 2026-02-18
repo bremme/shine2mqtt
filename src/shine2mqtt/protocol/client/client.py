@@ -1,8 +1,6 @@
 import asyncio
 from asyncio import CancelledError, IncompleteReadError
 
-from loguru import logger
-
 from shine2mqtt.protocol.client.config import SimulatedClientConfig
 from shine2mqtt.protocol.client.protocol.factory import ClientProtocolSessionFactory
 from shine2mqtt.protocol.client.protocol.generator import FrameGenerator
@@ -13,6 +11,7 @@ from shine2mqtt.protocol.client.protocol.session import (
 from shine2mqtt.protocol.client.transport import TCPTransport
 from shine2mqtt.protocol.protocol.frame.factory import FrameFactory
 from shine2mqtt.util.clock import MonotonicClockService
+from shine2mqtt.util.logger import logger
 
 
 class SimulatedClient:

@@ -2,7 +2,6 @@ import asyncio
 from pathlib import Path
 
 import uvicorn
-from loguru import logger
 
 from shine2mqtt.adapters.api.api import create_app
 from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
@@ -22,6 +21,7 @@ from shine2mqtt.protocol.server.protocol.queues import (
 )
 from shine2mqtt.protocol.server.protocol.session.registry import ProtocolSessionRegistry
 from shine2mqtt.protocol.server.protocol.session.session import ServerProtocolSessionFactory
+from shine2mqtt.util.logger import logger
 
 
 class Application:

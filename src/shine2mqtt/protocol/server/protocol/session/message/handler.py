@@ -1,5 +1,3 @@
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.protocol.protocol.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.protocol.protocol.base.message import BaseMessage
@@ -14,6 +12,7 @@ from shine2mqtt.protocol.protocol.get_config.get_config import (
 from shine2mqtt.protocol.protocol.header.header import MBAPHeader
 from shine2mqtt.protocol.protocol.ping.message import GrowattPingMessage
 from shine2mqtt.protocol.server.protocol.session.state import ServerProtocolSessionState
+from shine2mqtt.util.logger import logger
 
 
 class MessageHandler:

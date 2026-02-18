@@ -1,13 +1,12 @@
 from collections.abc import Callable
 
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.base.decoder import ByteDecoder, MessageDecoder
 from shine2mqtt.protocol.protocol.base.decoder_registry import DecoderRegistry
 from shine2mqtt.protocol.protocol.base.message import BaseMessage, MBAPHeader
 from shine2mqtt.protocol.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.protocol.protocol.frame.validator import FrameValidator
 from shine2mqtt.protocol.protocol.header.decoder import HeaderDecoder
+from shine2mqtt.util.logger import logger
 
 HEADER_LENGTH = 8
 CRC_LENGTH = 2

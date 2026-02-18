@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from loguru import logger
+from shine2mqtt.util.logger import logger
 
 
 def _should_log_record(record):

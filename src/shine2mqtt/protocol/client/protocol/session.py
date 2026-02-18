@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 
-from loguru import logger
-
 from shine2mqtt.protocol.client.protocol.generator import FrameGenerator
 from shine2mqtt.protocol.client.protocol.handler import ClientMessageHandler
 from shine2mqtt.protocol.client.protocol.state import ClientProtocolSessionState
 from shine2mqtt.protocol.protocol.constants import FunctionCode
 from shine2mqtt.protocol.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.util.clock import ClockService, has_interval_elapsed
+from shine2mqtt.util.logger import logger
 
 
 @dataclass

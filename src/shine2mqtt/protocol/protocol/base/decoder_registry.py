@@ -1,5 +1,3 @@
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.ack.decoder import AckMessageResponseDecoder
 from shine2mqtt.protocol.protocol.announce.decoder import AnnounceRequestDecoder
 from shine2mqtt.protocol.protocol.base.decoder import MessageDecoder
@@ -18,6 +16,7 @@ from shine2mqtt.protocol.protocol.set_config.decoder import (
     SetConfigRequestDecoder,
     SetConfigResponseDecoder,
 )
+from shine2mqtt.util.logger import logger
 
 
 class DecoderRegistry:

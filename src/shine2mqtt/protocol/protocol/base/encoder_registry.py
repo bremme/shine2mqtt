@@ -1,5 +1,3 @@
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.ack.encoder import AckPayloadEncoder
 from shine2mqtt.protocol.protocol.announce.encoder import AnnouncePayloadEncoder
 from shine2mqtt.protocol.protocol.base.encoder import PayloadEncoder
@@ -16,6 +14,7 @@ from shine2mqtt.protocol.protocol.ping.encoder import PingPayloadEncoder
 from shine2mqtt.protocol.protocol.raw.encoder import RawRequestPayloadEncoder
 from shine2mqtt.protocol.protocol.read_register.encoder import ReadRegistersPayloadEncoder
 from shine2mqtt.protocol.protocol.set_config.encoder import SetConfigRequestPayloadEncoder
+from shine2mqtt.util.logger import logger
 
 
 class PayloadEncoderRegistry:

@@ -1,12 +1,11 @@
 import asyncio
 from asyncio import Server, StreamReader, StreamWriter
 
-from loguru import logger
-
 from shine2mqtt.protocol.server.config import GrowattServerConfig
 from shine2mqtt.protocol.server.protocol.session.registry import ProtocolSessionRegistry
 from shine2mqtt.protocol.server.protocol.session.session import ServerProtocolSessionFactory
 from shine2mqtt.protocol.server.session import GrowattTcpSession
+from shine2mqtt.util.logger import logger
 
 
 class GrowattServer:

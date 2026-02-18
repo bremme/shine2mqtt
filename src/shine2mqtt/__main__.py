@@ -1,7 +1,5 @@
 import asyncio
 
-from loguru import logger
-
 from shine2mqtt.main.app import Application
 from shine2mqtt.main.cli.converter import CliArgDictConverter
 from shine2mqtt.main.cli.parser import CliArgParser
@@ -10,6 +8,7 @@ from shine2mqtt.main.config.file import ConfigFileLoader
 from shine2mqtt.main.logger import LoggerConfigurator
 from shine2mqtt.protocol.client.client import SimulatedClient
 from shine2mqtt.protocol.client.config import SimulatedClientConfig
+from shine2mqtt.util.logger import logger
 
 
 async def run_simulated_client(config: SimulatedClientConfig) -> None:

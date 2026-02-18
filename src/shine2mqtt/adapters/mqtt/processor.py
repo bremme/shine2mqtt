@@ -2,8 +2,6 @@ import json
 from dataclasses import asdict
 from typing import Any
 
-from loguru import logger
-
 from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
 from shine2mqtt.adapters.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 from shine2mqtt.adapters.mqtt.config import MqttConfig
@@ -15,6 +13,7 @@ from shine2mqtt.protocol.protocol.data.data import (
     GrowattDataMessage,
 )
 from shine2mqtt.protocol.protocol.get_config.get_config import GrowattGetConfigResponseMessage
+from shine2mqtt.util.logger import logger
 
 
 class MqttDataloggerMessageProcessor:

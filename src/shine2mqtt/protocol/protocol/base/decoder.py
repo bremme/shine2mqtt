@@ -2,10 +2,9 @@ import struct
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from loguru import logger
-
 from shine2mqtt.protocol.protocol.base.message import BaseMessage
 from shine2mqtt.protocol.protocol.header.header import MBAPHeader
+from shine2mqtt.util.logger import logger
 
 
 class ByteDecoder:
