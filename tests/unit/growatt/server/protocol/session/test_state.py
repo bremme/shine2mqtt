@@ -2,10 +2,10 @@ from datetime import datetime
 
 import pytest
 
-from shine2mqtt.growatt.protocol.announce.announce import GrowattAnnounceMessage, SafetyFunction
-from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.header.header import MBAPHeader
-from shine2mqtt.growatt.server.protocol.session.state import ServerProtocolSessionState
+from shine2mqtt.protocol.protocol.announce.announce import GrowattAnnounceMessage, SafetyFunction
+from shine2mqtt.protocol.protocol.constants import FunctionCode
+from shine2mqtt.protocol.protocol.header.header import MBAPHeader
+from shine2mqtt.protocol.server.protocol.session.state import ServerProtocolSessionState
 
 # TEMP
 default_function_codes = [

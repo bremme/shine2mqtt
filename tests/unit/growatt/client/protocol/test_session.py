@@ -2,12 +2,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from shine2mqtt.growatt.client.protocol.session import (
+from shine2mqtt.protocol.client.protocol.session import (
     ClientProtocolSession,
     SendIntervals,
     SendMessageAction,
 )
-from shine2mqtt.growatt.protocol.constants import FunctionCode
+from shine2mqtt.protocol.protocol.constants import FunctionCode
 
 
 class TestClientProtocolSession:

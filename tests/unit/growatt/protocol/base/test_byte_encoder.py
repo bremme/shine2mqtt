@@ -1,4 +1,4 @@
-from shine2mqtt.growatt.protocol.base.encoder import ByteEncoder
+from shine2mqtt.protocol.protocol.base.encoder import ByteEncoder
 
 
 class TestByteEncoder:

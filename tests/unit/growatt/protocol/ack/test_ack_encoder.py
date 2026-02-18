@@ -1,10 +1,10 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
-from shine2mqtt.growatt.protocol.ack.encoder import AckPayloadEncoder
+from shine2mqtt.protocol.protocol.ack.ack import GrowattAckMessage
+from shine2mqtt.protocol.protocol.ack.encoder import AckPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
-frames, headers, payloads = CapturedFrameLoader.load("set_config_response")
+frames, headers, payloads = CapturedFrameLoader.load("ack_message")
 
 # First payload is ACK (0x00), second is NACK (0x03)
 INPUT_MESSAGES = [

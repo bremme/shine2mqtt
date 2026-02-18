@@ -1,6 +1,6 @@
 import pytest
 
-from shine2mqtt.hass.config import DeviceConfig, HassDiscoveryConfig
+from shine2mqtt.adapters.hass.config import DeviceConfig, HassDiscoveryConfig
 
 
 class TestDeviceConfig:

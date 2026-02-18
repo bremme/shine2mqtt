@@ -1,6 +1,6 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.config import ConfigRegistry, RegisterInfo, RegisterNotFoundError
+from shine2mqtt.protocol.protocol.config import ConfigRegistry, RegisterInfo, RegisterNotFoundError
 
 
 @pytest.fixture

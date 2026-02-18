@@ -1,15 +1,15 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.constants import FunctionCode
-from shine2mqtt.growatt.protocol.get_config.encoder import (
+from shine2mqtt.protocol.protocol.constants import FunctionCode
+from shine2mqtt.protocol.protocol.get_config.encoder import (
     GetConfigRequestPayloadEncoder,
     GetConfigResponsePayloadEncoder,
 )
-from shine2mqtt.growatt.protocol.get_config.get_config import (
+from shine2mqtt.protocol.protocol.get_config.get_config import (
     GrowattGetConfigRequestMessage,
     GrowattGetConfigResponseMessage,
 )
-from shine2mqtt.growatt.protocol.header.header import MBAPHeader
+from shine2mqtt.protocol.protocol.header.header import MBAPHeader
 
 DATALOGGER_SERIAL = "XGDABCDEFG"
 

@@ -1,8 +1,8 @@
 import pytest
 
-from shine2mqtt.hass.config import DeviceConfig, HassDiscoveryConfig
-from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
-from shine2mqtt.hass.map import INVERTER_SENSOR_MAP
+from shine2mqtt.adapters.hass.config import DeviceConfig, HassDiscoveryConfig
+from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
+from shine2mqtt.adapters.hass.map import INVERTER_SENSOR_MAP
 
 
 @pytest.fixture

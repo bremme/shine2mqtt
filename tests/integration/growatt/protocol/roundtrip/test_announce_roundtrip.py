@@ -1,7 +1,7 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.announce.decoder import AnnounceRequestDecoder
-from shine2mqtt.growatt.protocol.announce.encoder import AnnouncePayloadEncoder
+from shine2mqtt.protocol.protocol.announce.decoder import AnnounceRequestDecoder
+from shine2mqtt.protocol.protocol.announce.encoder import AnnouncePayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
 _, headers, payloads = CapturedFrameLoader.load("announce_message")
