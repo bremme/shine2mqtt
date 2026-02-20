@@ -11,6 +11,7 @@ from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessag
 from shine2mqtt.protocol.messages.data.data import GrowattBufferedDataMessage, GrowattDataMessage
 from shine2mqtt.protocol.messages.message import BaseMessage, DataloggerMessage
 from shine2mqtt.protocol.messages.ping.message import GrowattPingMessage
+from shine2mqtt.protocol.session.mapper import MessageEventMapper
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState
 from shine2mqtt.util.logger import logger
 
@@ -51,6 +52,7 @@ class ProtocolSession(Session):
         self.domain_events = domain_events
         self.decoder = decoder
         self.encoder = encoder
+        self.mapper = MessageEventMapper()
         self.state = state
 
     @property
@@ -75,20 +77,18 @@ class ProtocolSession(Session):
                 logger.error(f"Failed to decode incoming frame {frame}: {e}")
                 return
 
-            transaction_id = message.header.transaction_id
             if isinstance(message, DataloggerMessage):
+                transaction_id = message.header.transaction_id
                 datalogger_serial = message.datalogger_serial
-
                 logger.info(
                     f"✓ Receive {message.header.function_code.name} ({message.header.function_code.value:#02x}) message, {transaction_id=}, {datalogger_serial=}"
                 )
 
-            # publish domain event
-            # await self.event_queue.put_nowait(event)
+            self.publish_domain_event(message)
 
             # respond to periodic datalogger messages
             if self.is_periodic_message(message):
-                await self.handle_periodic_message(message)
+                await self.respond_to_periodic_message(message)
             elif self.is_response_message(message):
                 await self.handle_response_message(message)
 
@@ -112,7 +112,18 @@ class ProtocolSession(Session):
     def is_response_message(self, message: BaseMessage) -> bool:
         return not self.is_periodic_message(message)
 
-    async def handle_periodic_message(self, message: BaseMessage) -> None:
+    def publish_domain_event(self, message: BaseMessage) -> None:
+        match message:
+            case GrowattAnnounceMessage():
+                event = self.mapper.map_announce_message_to_announce_event(message)
+            case GrowattDataMessage() | GrowattBufferedDataMessage():
+                event = self.mapper.map_data_message_to_inverter_state_updated_event(message)
+            case _:
+                return
+
+        self.domain_events.put_nowait(event)
+
+    async def respond_to_periodic_message(self, message: BaseMessage) -> None:
         self.state.set_incoming_transaction_id(message.header)
 
         match message:
