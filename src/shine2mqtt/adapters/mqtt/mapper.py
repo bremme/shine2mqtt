@@ -6,17 +6,16 @@ from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
 from shine2mqtt.adapters.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 from shine2mqtt.adapters.mqtt.config import MqttConfig
 from shine2mqtt.adapters.mqtt.message import MqttMessage
-from shine2mqtt.protocol.protocol.announce.announce import GrowattAnnounceMessage
-from shine2mqtt.protocol.protocol.base.message import BaseMessage
-from shine2mqtt.protocol.protocol.data.data import (
-    GrowattBufferedDataMessage,
-    GrowattDataMessage,
+from shine2mqtt.domain.events.events import (
+    DataloggerAnnouncedEvent,
+    DomainEvent,
+    InverterStateUpdatedEvent,
 )
-from shine2mqtt.protocol.protocol.get_config.get_config import GrowattGetConfigResponseMessage
+from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.util.logger import logger
 
 
-class MqttDataloggerMessageProcessor:
+class MqttEventMapper:
     def __init__(self, discovery: MqttDiscoveryBuilder, config: MqttConfig):
         self._discovery = discovery
 
@@ -30,16 +29,16 @@ class MqttDataloggerMessageProcessor:
 
         self._datalogger_config = {}
 
-    def process(self, message: BaseMessage) -> list[MqttMessage]:
-        match message:
-            case GrowattDataMessage() | GrowattBufferedDataMessage():
-                return self._process_data_message(message)
-            case GrowattAnnounceMessage():
-                return self._process_announce_message(message)
-            case GrowattGetConfigResponseMessage():
-                return self._process_get_config_response(message)
+    def process(self, event: DomainEvent) -> list[MqttMessage]:
+        match event:
+            case DataloggerAnnouncedEvent():
+                return self._map_datalogger_announce(event)
+            case InverterStateUpdatedEvent():
+                return self._map_inverter_update(event)
+            # case GrowattGetConfigResponseMessage():
+            #     return self._map_get_config_response(event)
             case _:
-                logger.debug(f"No handler for this message type {type(message)}")
+                logger.debug(f"No handler for this message type {type(event)}")
                 return []
 
     # TODO not sure if this belongs here?
@@ -52,20 +51,18 @@ class MqttDataloggerMessageProcessor:
             retain=True,
         )
 
-    def _process_data_message(
-        self, message: GrowattDataMessage | GrowattBufferedDataMessage
-    ) -> list[MqttMessage]:
-        return self._build_mqtt_messages(message)
+    def _map_inverter_update(self, event: InverterStateUpdatedEvent) -> list[MqttMessage]:
+        return self._build_mqtt_messages(event)
 
-    def _process_announce_message(self, message: GrowattAnnounceMessage) -> list[MqttMessage]:
+    def _map_datalogger_announce(self, event: DataloggerAnnouncedEvent) -> list[MqttMessage]:
         mqtt_messages = []
         if self._hass_discovery and not self._inverter_announced:
             logger.info("Appending inverter discovery message")
-            mqtt_messages.append(self._build_inverter_discovery_messages(message))
+            mqtt_messages.append(self._build_inverter_discovery_messages(event))
             self._inverter_announced = True
 
         # use retain diagnostic sensors don't change over time
-        mqtt_messages.extend(self._build_mqtt_messages(message, qos=1, retain=True))
+        mqtt_messages.extend(self._build_mqtt_messages(event, qos=1, retain=True))
 
         return mqtt_messages
 
@@ -120,13 +117,13 @@ class MqttDataloggerMessageProcessor:
 
     def _build_mqtt_messages(
         self,
-        message: (GrowattAnnounceMessage | GrowattDataMessage | GrowattBufferedDataMessage),
+        event: DomainEvent,
         qos: int = 0,
         retain: bool = False,
     ) -> list[MqttMessage]:
         mqtt_messages = []
 
-        for attribute_name, value in asdict(message).items():
+        for attribute_name, value in asdict(event).items():
             if attribute_name == "header":
                 continue
 
@@ -155,14 +152,10 @@ class MqttDataloggerMessageProcessor:
 
         return message
 
-    def _build_discovery_messages(self, message: GrowattAnnounceMessage) -> list[MqttMessage]:
-        inverter_message = self._build_inverter_discovery_messages(message)
-        return [inverter_message]
-
-    def _build_inverter_discovery_messages(self, message: GrowattAnnounceMessage) -> MqttMessage:
+    def _build_inverter_discovery_messages(self, event: DataloggerAnnouncedEvent) -> MqttMessage:
         discovery_message = self._discovery.build_inverter_discovery_message(
-            inverter_fw_version=message.inverter_fw_version,
-            inverter_serial=message.inverter_serial,
+            inverter_fw_version=event.inverter.fw_version,
+            inverter_serial=event.inverter.serial,
         )
 
         payload = json.dumps(discovery_message)

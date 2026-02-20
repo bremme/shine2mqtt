@@ -5,8 +5,8 @@ import aiomqtt
 from aiomqtt import Client
 
 from shine2mqtt.adapters.mqtt.client import MqttClient
-from shine2mqtt.adapters.mqtt.processor import MqttDataloggerMessageProcessor
-from shine2mqtt.protocol.server.protocol.queues import ProtocolEvents
+from shine2mqtt.adapters.mqtt.mapper import MqttEventMapper
+from shine2mqtt.domain.events.events import DomainEvent
 from shine2mqtt.util.logger import logger
 
 
@@ -15,12 +15,12 @@ class MqttBridge:
 
     def __init__(
         self,
-        protocol_events: ProtocolEvents,
-        event_processor: MqttDataloggerMessageProcessor,
+        domain_events: asyncio.Queue[DomainEvent],
+        event_processor: MqttEventMapper,
         client: MqttClient,
     ):
-        self._protocol_events = protocol_events
         self._client = client
+        self._domain_events = domain_events
         self._event_processor = event_processor
 
     async def run(self):
@@ -50,19 +50,18 @@ class MqttBridge:
 
     async def _handle_shutdown(self, client: Client) -> None:
         logger.info("MQTT bridge shutting down, flushing Event → MQTT queue")
-        await self._flush_protocol_events(client)
+        await self._flush_domain_events(client)
         await self._publish_availability_status(client, online=False)
 
     async def _publisher(self, client: Client) -> None:
         while True:
-            event = await self._protocol_events.get()
-            message = event.message
+            event: DomainEvent = await self._domain_events.get()
 
-            logger.debug(
-                f"Processing incoming {message.header.function_code.name} ({message.header.function_code.value:#02x}) message."
+            logger.info(
+                f"Processing incoming {type(event).__name__} from '{event.datalogger_serial}' datalogger"
             )
 
-            for mqtt_message in self._event_processor.process(message):
+            for mqtt_message in self._event_processor.process(event):
                 logger.info(
                     f"Publishing MQTT message '{mqtt_message.topic}': {mqtt_message.payload}"
                 )
@@ -72,12 +71,11 @@ class MqttBridge:
         async for msg in client.messages:
             logger.debug(f"Received MQTT message '{msg.topic}': {msg.payload}")
 
-    async def _flush_protocol_events(self, client: Client) -> None:
-        while not self._protocol_events.empty():
-            event = self._protocol_events.get_nowait()
-            message = event.message
+    async def _flush_domain_events(self, client: Client) -> None:
+        while not self._domain_events.empty():
+            event = self._domain_events.get_nowait()
             try:
-                for mqtt_message in self._event_processor.process(message):
+                for mqtt_message in self._event_processor.process(event):
                     await client.publish(**asdict(mqtt_message), timeout=0.5)
             except Exception as e:
                 logger.warning(f"Failed to publish message during flush: {e}")

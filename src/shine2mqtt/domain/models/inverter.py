@@ -1,10 +1,14 @@
 from dataclasses import dataclass
-from datetime import datetime
 from enum import Enum
 
 
+@dataclass(frozen=True)
 class Inverter:
-    pass
+    serial: str
+    fw_version: str
+    control_fw_version: str
+    # device_type: str
+    settings: InverterSettings
 
 
 class InverterStatus(Enum):
@@ -78,11 +82,10 @@ class InverterSettings:
     power_factor: float
     rated_power_ac: float
     rated_voltage_dc: float
-    inverter_fw_version: str
-    inverter_control_fw_version: str
-    lcd_language: str
-    device_type: str
-    timestamp: datetime
+    # inverter_fw_version: str
+    # inverter_control_fw_version: str
+    # lcd_language: str
+    # timestamp: datetime
 
     voltage_ac_low_limit: float
     voltage_ac_high_limit: float

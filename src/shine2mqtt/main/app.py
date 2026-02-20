@@ -1,6 +1,11 @@
 import asyncio
 
-from shine2mqtt.domain.events.base import DomainEvent
+from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
+from shine2mqtt.adapters.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
+from shine2mqtt.adapters.mqtt.bridge import MqttBridge
+from shine2mqtt.adapters.mqtt.client import MqttClient
+from shine2mqtt.adapters.mqtt.mapper import MqttEventMapper
+from shine2mqtt.domain.events.events import DomainEvent
 from shine2mqtt.infrastructure.server.server import TCPServer
 from shine2mqtt.main.config.config import ApplicationConfig
 from shine2mqtt.protocol.frame.factory import FrameFactory
@@ -12,7 +17,7 @@ class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
 
-        domain_events = asyncio.Queue[DomainEvent]()
+        domain_events = asyncio.Queue[DomainEvent](maxsize=100)
 
         encoder = FrameFactory.encoder()
         decoder = FrameFactory.server_decoder()
@@ -25,7 +30,7 @@ class Application:
         tcp_server = TCPServer(
             session_registry=session_registry,
             session_factory=session_factory,
-            config=self.config.server,
+            config=config.server,
         )
 
         # Application handlers
@@ -35,7 +40,7 @@ class Application:
         # Adapters
         # mqtt_publisher = MqttEventPublisher(event_queue, config)
         # mqtt_subscriber = MqttCommandSubscriber(write_handler)
-        # mqtt_bridge = MqttBridge2(mqtt_publisher, mqtt_subscriber, config)
+        self._mqtt_bridge = self._setup_mqtt_bridge(domain_events, config)
 
         # api_app = create_api_app(read_handler, write_handler, session_registry)
 
@@ -43,13 +48,32 @@ class Application:
         # self._mqtt_bridge = mqtt_bridge
         # self._api_app = api_app
 
+    def _setup_mqtt_bridge(
+        self, domain_events: asyncio.Queue[DomainEvent], config: ApplicationConfig
+    ) -> MqttBridge:
+        discovery_builder = MqttDiscoveryBuilder(
+            config=config.mqtt.discovery,
+            datalogger_sensor_map=DATALOGGER_SENSOR_MAP,
+            inverter_sensor_map=INVERTER_SENSOR_MAP,
+        )
+
+        mqtt_event_processor = MqttEventMapper(discovery=discovery_builder, config=config.mqtt)
+        will_message = mqtt_event_processor.build_availability_message(online=False)
+        mqtt_client = MqttClient(config.mqtt.server, will_message=will_message)
+
+        return MqttBridge(
+            domain_events=domain_events,
+            client=mqtt_client,
+            event_processor=mqtt_event_processor,
+        )
+
     async def run(self):
         # try:
         # await self._tcp_server.start()
 
         tasks = [
             asyncio.create_task(self._tcp_server.serve()),
-            # asyncio.create_task(self._mqtt_bridge.run()),
+            asyncio.create_task(self._mqtt_bridge.run()),
         ]
 
         # if self.config.api.enabled and self.rest_server is not None:

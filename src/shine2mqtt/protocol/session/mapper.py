@@ -1,17 +1,24 @@
-from shine2mqtt.domain.events.base import DataloggerAnnouncedEvent, InverterStateUpdatedEvent
+from datetime import datetime
+
+from shine2mqtt.domain.events.events import DataloggerAnnouncedEvent, InverterStateUpdatedEvent
+from shine2mqtt.domain.models.datalogger import DataLogger
 from shine2mqtt.domain.models.inverter import (
+    Inverter,
     InverterSettings,
     InverterState,
     InverterStatus,
     SafetyFunction,
 )
 from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage
+from shine2mqtt.protocol.messages.data.data import GrowattBufferedDataMessage, GrowattDataMessage
+from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
+from shine2mqtt.protocol.session.state import ServerProtocolSessionState
+
+# class MessageDomainMapper:
 
 
 class MessageEventMapper:
-    def map_announce_message_to_announce_event(
-        self, message: GrowattAnnounceMessage
-    ) -> DataloggerAnnouncedEvent:
+    def map_announce_message_to_inverter(self, message: GrowattAnnounceMessage) -> Inverter:
         inverter_settings = InverterSettings(
             remote_on_off=message.remote_on_off,
             safety_function=SafetyFunction(**vars(message.safety_function)),
@@ -21,11 +28,6 @@ class MessageEventMapper:
             power_factor=message.power_factor,
             rated_power_ac=message.rated_power_ac,
             rated_voltage_dc=message.rated_voltage_dc,
-            inverter_fw_version=message.inverter_fw_version,
-            inverter_control_fw_version=message.inverter_control_fw_version,
-            lcd_language=message.lcd_language,
-            device_type=message.device_type,
-            timestamp=message.timestamp,
             voltage_ac_low_limit=message.voltage_ac_low_limit,
             voltage_ac_high_limit=message.voltage_ac_high_limit,
             frequency_ac_low_limit=message.frequency_ac_low_limit,
@@ -33,17 +35,35 @@ class MessageEventMapper:
             power_factor_control_mode=message.power_factor_control_mode,
         )
 
+        return Inverter(
+            serial=message.inverter_serial,
+            fw_version=message.inverter_fw_version,
+            control_fw_version=message.inverter_control_fw_version,
+            settings=inverter_settings,
+        )
+
+    def map_config_sw_version_to_datalogger(
+        self, message: GrowattGetConfigResponseMessage
+    ) -> DataLogger:
+        return DataLogger(
+            serial=message.datalogger_serial,
+            sw_version=message.value,
+        )
+
+    def map_state_to_announce_event(
+        self, state: ServerProtocolSessionState
+    ) -> DataloggerAnnouncedEvent:
         return DataloggerAnnouncedEvent(
-            datalogger_serial=message.datalogger_serial,
-            inverter_serial=message.inverter_serial,
-            inverter_settings=inverter_settings,
-            timestamp=message.timestamp,
+            datalogger_serial=state.datalogger.serial,
+            timestamp=datetime.now(),
+            datalogger=state.datalogger,
+            inverter=state.inverter,
         )
 
     def map_data_message_to_inverter_state_updated_event(
-        self, message
+        self, message: GrowattDataMessage | GrowattBufferedDataMessage
     ) -> InverterStateUpdatedEvent:
-        status = InverterStatus(message.inverter_status)
+        status = InverterStatus(message.inverter_status.value)
 
         state = InverterState(
             inverter_status=status,

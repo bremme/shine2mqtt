@@ -43,7 +43,9 @@ class TCPServer:
 
         transport = TCPSession(reader, writer)
 
-        session = self.session_factory.create(transport=transport)
+        state = await self.session_factory.create_initializer(transport=transport).initialize()
+
+        session = self.session_factory.create(state=state, transport=transport)
 
         self.session_registry.add(session)
 

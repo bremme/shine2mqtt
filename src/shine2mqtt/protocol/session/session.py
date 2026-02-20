@@ -1,8 +1,7 @@
 import asyncio
 
-from shine2mqtt.domain.events.base import DomainEvent
+from shine2mqtt.domain.events.events import DomainEvent
 from shine2mqtt.domain.interfaces.session import Session
-from shine2mqtt.domain.models.datalogger import DataLogger
 from shine2mqtt.infrastructure.server.session import TCPSession
 from shine2mqtt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.protocol.frame.encoder import FrameEncoder
@@ -11,6 +10,7 @@ from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessag
 from shine2mqtt.protocol.messages.data.data import GrowattBufferedDataMessage, GrowattDataMessage
 from shine2mqtt.protocol.messages.message import BaseMessage, DataloggerMessage
 from shine2mqtt.protocol.messages.ping.message import GrowattPingMessage
+from shine2mqtt.protocol.session.initializer import ProtocolSessionInitializer
 from shine2mqtt.protocol.session.mapper import MessageEventMapper
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState
 from shine2mqtt.util.logger import logger
@@ -27,12 +27,19 @@ class ProtocolSessionFactory:
         self.decoder = decoder
         self.domain_events = domain_events
 
-    def create(self, transport: TCPSession) -> ProtocolSession:
-        session_state = ServerProtocolSessionState()
+    def create_initializer(self, transport: TCPSession) -> ProtocolSessionInitializer:
+        mapper = MessageEventMapper()
+        return ProtocolSessionInitializer(
+            encoder=self.encoder,
+            decoder=self.decoder,
+            mapper=mapper,
+            transport=transport,
+        )
 
+    def create(self, state: ServerProtocolSessionState, transport: TCPSession) -> ProtocolSession:
         return ProtocolSession(
             transport=transport,
-            state=session_state,
+            state=state,
             decoder=self.decoder,
             encoder=self.encoder,
             domain_events=self.domain_events,
@@ -57,25 +64,21 @@ class ProtocolSession(Session):
 
     @property
     def datalogger(self):
-        if self.state.is_announced() is False:
-            return None
-        return DataLogger(
-            serial=self.state.datalogger_serial,
-        )
+        return self.state.datalogger
 
     @property
-    def datalogger_serial(self) -> str:
-        return self.state.datalogger_serial
+    def inverter(self):
+        return self.state.inverter
 
     async def run(self):
-        while True:
-            frame = await self.transport.read_frame()
+        event = self.mapper.map_state_to_announce_event(self.state)
+        self.domain_events.put_nowait(event)
 
-            try:
-                message: BaseMessage = self.decoder.decode(frame)
-            except Exception as e:
-                logger.error(f"Failed to decode incoming frame {frame}: {e}")
-                return
+        while True:
+            message = await self._read_message()
+
+            if message is None:
+                continue
 
             if isinstance(message, DataloggerMessage):
                 transaction_id = message.header.transaction_id
@@ -98,6 +101,14 @@ class ProtocolSession(Session):
         logger.info("Closing protocol session")
         await self.transport.close()
 
+    async def _read_message(self) -> BaseMessage | None:
+        frame = await self.transport.read_frame()
+
+        try:
+            return self.decoder.decode(frame)
+        except Exception as e:
+            logger.error(f"Failed to decode incoming frame {frame}: {e}")
+
     def is_periodic_message(self, message: BaseMessage) -> bool:
         return isinstance(
             message,
@@ -114,8 +125,6 @@ class ProtocolSession(Session):
 
     def publish_domain_event(self, message: BaseMessage) -> None:
         match message:
-            case GrowattAnnounceMessage():
-                event = self.mapper.map_announce_message_to_announce_event(message)
             case GrowattDataMessage() | GrowattBufferedDataMessage():
                 event = self.mapper.map_data_message_to_inverter_state_updated_event(message)
             case _:
@@ -127,9 +136,6 @@ class ProtocolSession(Session):
         self.state.set_incoming_transaction_id(message.header)
 
         match message:
-            case GrowattAnnounceMessage():
-                self.state.announce(message)
-                response = GrowattAckMessage(header=message.header, ack=True)
             case GrowattDataMessage() | GrowattBufferedDataMessage():
                 response = GrowattAckMessage(header=message.header, ack=True)
             case GrowattPingMessage():

@@ -9,7 +9,7 @@ class ProtocolSessionRegistry(SessionRegistry):
 
     def get(self, datalogger_serial: str) -> Session | None:
         for session in self._sessions:
-            if session.datalogger_serial == datalogger_serial:
+            if session.datalogger and session.datalogger.serial == datalogger_serial:
                 return session
         return None
 
