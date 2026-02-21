@@ -22,9 +22,10 @@ class ClientProtocolSessionFactory:
         self.clock = clock
         self.generator = generator
         self.message_handler = message_handler
+        self._datalogger_serial = generate_random_uppercase_string(10)
 
     def create(self) -> ClientProtocolSession:
-        datalogger_serial = generate_random_uppercase_string(10)
+        datalogger_serial = self._datalogger_serial
         session_state = ClientProtocolSessionState(
             protocol_id=1, unit_id=1, datalogger_serial=datalogger_serial
         )
