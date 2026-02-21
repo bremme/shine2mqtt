@@ -4,8 +4,8 @@ from typing import Any
 
 from shine2mqtt.infrastructure.server.config import GrowattServerConfig
 from shine2mqtt.infrastructure.server.session import TCPSession
+from shine2mqtt.protocol.session.factory import ProtocolSessionFactory
 from shine2mqtt.protocol.session.registry import ProtocolSessionRegistry
-from shine2mqtt.protocol.session.session import ProtocolSessionFactory
 from shine2mqtt.util.logger import logger
 
 
@@ -43,9 +43,7 @@ class TCPServer:
 
         transport = TCPSession(reader, writer)
 
-        state = await self.session_factory.create_initializer(transport=transport).initialize()
-
-        session = self.session_factory.create(state=state, transport=transport)
+        session = await self.session_factory.create_initializer(transport=transport).initialize()
 
         self.session_registry.add(session)
 

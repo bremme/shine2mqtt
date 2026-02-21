@@ -21,14 +21,5 @@ class TransactionIdTracker:
 
 @dataclass
 class ServerProtocolSessionState:
-    protocol_id: int
-    unit_id: int
     datalogger: DataLogger
     inverter: Inverter
-    transaction_id_tracker: TransactionIdTracker
-
-    def get_next_transaction_id(self, function_code: FunctionCode) -> int:
-        return self.transaction_id_tracker.get_next_transaction_id(function_code)
-
-    def set_incoming_transaction_id(self, header: MBAPHeader) -> None:
-        self.transaction_id_tracker.set_incoming_transaction_id(header)

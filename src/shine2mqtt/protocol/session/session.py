@@ -5,13 +5,13 @@ from shine2mqtt.domain.interfaces.session import Session
 from shine2mqtt.infrastructure.server.session import TCPSession
 from shine2mqtt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.protocol.frame.encoder import FrameEncoder
-from shine2mqtt.protocol.messages.ack.ack import GrowattAckMessage
 from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.protocol.messages.data.data import GrowattBufferedDataMessage, GrowattDataMessage
 from shine2mqtt.protocol.messages.message import BaseMessage
 from shine2mqtt.protocol.messages.ping.message import GrowattPingMessage
 from shine2mqtt.protocol.session.base import BaseProtocolSession
 from shine2mqtt.protocol.session.mapper import MessageEventMapper
+from shine2mqtt.protocol.session.message_factory import MessageFactory
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState
 from shine2mqtt.util.logger import logger
 
@@ -21,6 +21,7 @@ class ProtocolSession(BaseProtocolSession, Session):
         self,
         transport: TCPSession,
         state: ServerProtocolSessionState,
+        factory: MessageFactory,
         encoder: FrameEncoder,
         decoder: FrameDecoder,
         domain_events: asyncio.Queue[DomainEvent],
@@ -29,6 +30,7 @@ class ProtocolSession(BaseProtocolSession, Session):
         self.domain_events = domain_events
         self.mapper = MessageEventMapper()
         self.state = state
+        self._factory = factory
 
     @property
     def datalogger(self):
@@ -86,11 +88,11 @@ class ProtocolSession(BaseProtocolSession, Session):
         self.domain_events.put_nowait(event)
 
     async def respond_to_periodic_message(self, message: BaseMessage) -> None:
-        self.state.set_incoming_transaction_id(message.header)
+        self._factory.update_transaction_id(message.header)
 
         match message:
             case GrowattDataMessage() | GrowattBufferedDataMessage():
-                response = GrowattAckMessage(header=message.header, ack=True)
+                response = self._factory.ack(message.header)
             case GrowattPingMessage():
                 response = message
             case _:

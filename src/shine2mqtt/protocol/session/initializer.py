@@ -1,51 +1,75 @@
-from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
+from __future__ import annotations
+
+import asyncio
+from typing import TYPE_CHECKING
+
+from shine2mqtt.domain.events.events import DomainEvent
+from shine2mqtt.infrastructure.server.session import TCPSession
+from shine2mqtt.protocol.frame.decoder import FrameDecoder
+from shine2mqtt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.protocol.messages.ack.ack import GrowattAckMessage
 from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage
-from shine2mqtt.protocol.messages.get_config.get_config import (
-    GrowattGetConfigRequestMessage,
-    GrowattGetConfigResponseMessage,
-)
+from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.protocol.session.base import BaseProtocolSession
+from shine2mqtt.protocol.session.mapper import MessageEventMapper
+from shine2mqtt.protocol.session.message_factory import MessageFactory
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState, TransactionIdTracker
 from shine2mqtt.protocol.settings.constants import DATALOGGER_SW_VERSION_REGISTER
 from shine2mqtt.util.logger import logger
 
+if TYPE_CHECKING:
+    from shine2mqtt.protocol.session.session import ProtocolSession
+
 
 class ProtocolSessionInitializer(BaseProtocolSession):
-    def __init__(self, encoder, decoder, mapper, transport):
+    def __init__(
+        self,
+        encoder: FrameEncoder,
+        decoder: FrameDecoder,
+        mapper: MessageEventMapper,
+        transport: TCPSession,
+        domain_events: asyncio.Queue[DomainEvent],
+    ):
         super().__init__(transport=transport, encoder=encoder, decoder=decoder)
         self.mapper = mapper
+        self.domain_events = domain_events
         self.transaction_id_tracker = TransactionIdTracker()
 
-    async def initialize(self) -> ServerProtocolSessionState:
+    async def initialize(self) -> ProtocolSession:
+        from shine2mqtt.protocol.session.session import ProtocolSession
+
         logger.info("Initializing protocol session, waiting for announce message...")
         announce = await self._wait_for_announce()
-        config = await self._request_datalogger_config(
+
+        factory = MessageFactory(
             protocol_id=announce.header.protocol_id,
             unit_id=announce.header.unit_id,
-            datalogger_serial=announce.datalogger_serial,
+            tracker=self.transaction_id_tracker,
         )
 
-        inverter = self.mapper.map_announce_message_to_inverter(announce)
-        datalogger = self.mapper.map_config_sw_version_to_datalogger(config)
+        config = await self._request_datalogger_config(factory, announce.datalogger_serial)
 
-        return ServerProtocolSessionState(
+        inverter = self.mapper.map_announce_message_to_inverter(announce)
+        datalogger = self.mapper.map_config_sw_version_to_datalogger(
+            config,
             protocol_id=announce.header.protocol_id,
             unit_id=announce.header.unit_id,
-            datalogger=datalogger,
-            inverter=inverter,
-            transaction_id_tracker=self.transaction_id_tracker,
+        )
+
+        state = ServerProtocolSessionState(datalogger=datalogger, inverter=inverter)
+        return ProtocolSession(
+            transport=self.transport,
+            state=state,
+            factory=factory,
+            encoder=self.encoder,
+            decoder=self.decoder,
+            domain_events=self.domain_events,
         )
 
     async def _wait_for_announce(self) -> GrowattAnnounceMessage:
         while True:
             match message := await self._read_message():
                 case GrowattAnnounceMessage():
-                    transaction_id = message.header.transaction_id
-                    datalogger_serial = message.datalogger_serial
-                    logger.info(
-                        f"✓ ANNOUNCE (0x03) message, received and acknowledged {transaction_id=}, {datalogger_serial=}"
-                    )
                     response = GrowattAckMessage(header=message.header, ack=True)
                     await self._write_message(response)
                     return message
@@ -55,26 +79,12 @@ class ProtocolSessionInitializer(BaseProtocolSession):
                     )
 
     async def _request_datalogger_config(
-        self, protocol_id, unit_id, datalogger_serial
+        self, factory: MessageFactory, datalogger_serial: str
     ) -> GrowattGetConfigResponseMessage:
-        function_code = FunctionCode.GET_CONFIG
-        transaction_id = self.transaction_id_tracker.get_next_transaction_id(function_code)
-
-        header = MBAPHeader(
-            transaction_id=transaction_id,
-            protocol_id=protocol_id,
-            length=0,
-            unit_id=unit_id,
-            function_code=function_code,
-        )
-        message = GrowattGetConfigRequestMessage(
-            header=header,
+        message = factory.get_config_request(
             datalogger_serial=datalogger_serial,
-            register_start=DATALOGGER_SW_VERSION_REGISTER,
-            register_end=DATALOGGER_SW_VERSION_REGISTER,
+            register=DATALOGGER_SW_VERSION_REGISTER,
         )
-
-        logger.info(f"→ Sending GET_CONFIG request for datalogger SW version, {transaction_id=}")
 
         await self._write_message(message)
 

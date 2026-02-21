@@ -62,9 +62,7 @@ class MqttBridge:
             )
 
             for mqtt_message in self._event_processor.process(event):
-                logger.info(
-                    f"Publishing MQTT message '{mqtt_message.topic}': {mqtt_message.payload}"
-                )
+                logger.info(f"→ Publishing MQTT message to '{mqtt_message.topic}'")
                 await client.publish(**asdict(mqtt_message))
 
     async def _subscriber(self, client: Client) -> None:

@@ -9,8 +9,8 @@ from shine2mqtt.domain.events.events import DomainEvent
 from shine2mqtt.infrastructure.server.server import TCPServer
 from shine2mqtt.main.config.config import ApplicationConfig
 from shine2mqtt.protocol.frame.factory import FrameFactory
+from shine2mqtt.protocol.session.factory import ProtocolSessionFactory
 from shine2mqtt.protocol.session.registry import ProtocolSessionRegistry
-from shine2mqtt.protocol.session.session import ProtocolSessionFactory
 
 
 class Application:
