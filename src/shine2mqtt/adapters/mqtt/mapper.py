@@ -11,6 +11,8 @@ from shine2mqtt.domain.events.events import (
     DomainEvent,
     InverterStateUpdatedEvent,
 )
+from shine2mqtt.domain.models.datalogger import DataLogger
+from shine2mqtt.domain.models.inverter import Inverter
 from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.util.logger import logger
 
@@ -57,9 +59,11 @@ class MqttEventMapper:
     def _map_datalogger_announce(self, event: DataloggerAnnouncedEvent) -> list[MqttMessage]:
         mqtt_messages = []
         if self._hass_discovery and not self._inverter_announced:
-            logger.info("Appending inverter discovery message")
-            mqtt_messages.append(self._build_inverter_discovery_messages(event))
+            logger.info("Appending inverter and datalogger discovery message")
+            datalogger_discovery = self._build_datalogger_discovery_messages(event.datalogger)
+            inverter_discovery = self._build_inverter_discovery_messages(event.inverter)
             self._inverter_announced = True
+            mqtt_messages.extend([inverter_discovery, datalogger_discovery])
 
         # use retain diagnostic sensors don't change over time
         mqtt_messages.extend(self._build_mqtt_messages(event, qos=1, retain=True))
@@ -152,22 +156,20 @@ class MqttEventMapper:
 
         return message
 
-    def _build_inverter_discovery_messages(self, event: DataloggerAnnouncedEvent) -> MqttMessage:
+    def _build_inverter_discovery_messages(self, inverter: Inverter) -> MqttMessage:
         discovery_message = self._discovery.build_inverter_discovery_message(
-            inverter_fw_version=event.inverter.fw_version,
-            inverter_serial=event.inverter.serial,
+            inverter_fw_version=inverter.fw_version,
+            inverter_serial=inverter.serial,
         )
 
         payload = json.dumps(discovery_message)
         topic = self._discovery.build_inverter_discovery_topic()
         return MqttMessage(topic=topic, payload=payload, qos=1, retain=True)
 
-    def _build_datalogger_discovery_messages(
-        self, datalogger_sw_version: str, datalogger_serial: str
-    ) -> MqttMessage:
+    def _build_datalogger_discovery_messages(self, datalogger: DataLogger) -> MqttMessage:
         discovery_message = self._discovery.build_datalogger_discovery_message(
-            datalogger_sw_version=datalogger_sw_version,
-            datalogger_serial=datalogger_serial,
+            datalogger_sw_version=datalogger.sw_version,
+            datalogger_serial=datalogger.serial,
         )
         payload = json.dumps(discovery_message)
         topic = self._discovery.build_datalogger_discovery_topic()
