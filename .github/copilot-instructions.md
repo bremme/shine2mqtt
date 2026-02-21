@@ -53,6 +53,17 @@ Use these instructions when writing code for the project
 * Local reasoning is important
 * Always use type hints
 
+### Refactoring
+
+When refactoring
+
+* Don't remove commended code unless explicitly asked
+* Don't changing naming unless explicitly asked
+
+## Project architecture
+
+Read the project architecture documentation (ARCHITECTURE.md) before suggesting any architectural changes.
+
 ### Unit testing instructions
 
 - Use `pytest` for unit tests
