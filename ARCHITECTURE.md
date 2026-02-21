@@ -72,15 +72,15 @@ graph TD
 
 ## Package Responsibilities
 
-| Package | Responsibility | May import from | Must NOT import from |
-|---|---|---|---|
-| `domain/` | Core business entities: models, domain events, commands, abstract interfaces. Zero external dependencies. | stdlib only | everything else |
-| `protocol/` | Growatt binary protocol: frame encoding/decoding, per-connection state machine, message → domain event mapping. Implements `domain.interfaces.Session`. | `domain/`, `infrastructure/`, `util/` | `adapters/`, `app/`, `main/` |
-| `infrastructure/` | Raw asyncio I/O: `TCPServer` accepts connections, `TCPSession` wraps `StreamReader`/`StreamWriter`. No protocol or domain logic. | `domain/`, `util/` | `protocol/`, `adapters/`, `app/`, `main/` |
-| `adapters/` | I/O ports to the outside world. Split by direction: **outbound** — `mqtt/publisher` consumes domain events from the queue and publishes MQTT messages; `hass/` builds Home Assistant MQTT discovery payloads. **Inbound** — `mqtt/subscriber` receives MQTT commands (stub); `api/` exposes a FastAPI REST interface for reading and writing inverter/datalogger settings. | `domain/`, `util/` | `infrastructure/`, `protocol/` (except `api/` which currently references `protocol/` session types directly — intended to be cleaned up via application handlers) |
-| `app/` | Application-layer command handlers (`ReadRegisterHandler`, `WriteRegisterHandler`). Orchestrates domain commands against the `SessionRegistry` interface. | `domain/`, `util/` | `infrastructure/`, `protocol/`, `adapters/`, `main/` |
-| `main/` | **Composition root only.** Wires all concrete implementations, loads `ApplicationConfig`, defines the CLI. Nothing else imports from here. | everything | — |
-| `util/` | Shared cross-cutting utilities (logger, clock). No domain knowledge. | stdlib, third-party | `domain/`, `adapters/`, `app/`, `protocol/`, `infrastructure/`, `main/` |
+| Package           | Responsibility                                                                                                                                                                                                              | May import from                       | Must NOT import from                                                                                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `domain/`         | Core business entities: models, domain events, commands, abstract interfaces. Zero external dependencies.                                                                                                                    | stdlib only                           | everything else                                                                                                                                                    |
+| `protocol/`       | Growatt binary protocol: frame encoding/decoding, per-connection state machine, message → domain event mapping. Implements `domain.interfaces.Session`.                                                                      | `domain/`, `infrastructure/`, `util/` | `adapters/`, `app/`, `main/`                                                                                                                                       |
+| `infrastructure/` | Raw asyncio I/O: `TCPServer` accepts connections, `TCPSession` wraps `StreamReader`/`StreamWriter`. No protocol or domain logic.                                                                                             | `domain/`, `util/`                    | `protocol/`, `adapters/`, `app/`, `main/`                                                                                                                          |
+| `adapters/`       | I/O ports split by direction. **Outbound**: `mqtt/publisher` maps domain events to MQTT; `hass/` builds HA discovery payloads. **Inbound**: `mqtt/subscriber` handles MQTT commands; `api/` exposes a FastAPI REST interface. | `domain/`, `util/`                    | `infrastructure/`, `protocol/` (except `api/` which currently references `protocol/` session types directly — intended to be cleaned up via application handlers)  |
+| `app/`            | Application-layer command handlers (`ReadRegisterHandler`, `WriteRegisterHandler`). Orchestrates domain commands against the `SessionRegistry` interface.                                                                    | `domain/`, `util/`                    | `infrastructure/`, `protocol/`, `adapters/`, `main/`                                                                                                               |
+| `main/`           | **Composition root only.** Wires all concrete implementations, loads `ApplicationConfig`, defines the CLI. Nothing else imports from here.                                                                                   | everything                            | —                                                                                                                                                                  |
+| `util/`           | Shared cross-cutting utilities (logger, clock). No domain knowledge.                                                                                                                                                         | stdlib, third-party                   | `domain/`, `adapters/`, `app/`, `protocol/`, `infrastructure/`, `main/`                                                                                            |
 
 ---
 
@@ -88,27 +88,27 @@ graph TD
 
 ### Domain Models (`domain/models/`)
 
-| Model | Purpose |
-|---|---|
-| `DataLogger` | Represents a connected Shine WiFi-X datalogger (serial, SW version, IP/MAC, protocol ID) |
-| `Inverter` | Static inverter identity and settings (serial, FW version, `InverterSettings`) |
-| `InverterState` | Live inverter readings: DC/AC power, voltages, currents, energy totals, temperature |
+| Model           | Purpose                                                                                   |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `DataLogger`    | Represents a connected Shine WiFi-X datalogger (serial, SW version, IP/MAC, protocol ID) |
+| `Inverter`      | Static inverter identity and settings (serial, FW version, `InverterSettings`)            |
+| `InverterState` | Live inverter readings: DC/AC power, voltages, currents, energy totals, temperature       |
 
 ### Domain Events (`domain/events/events.py`)
 
 Events are **immutable dataclasses** placed on `asyncio.Queue[DomainEvent]` by the protocol layer and consumed by adapters.
 
-| Event | Emitted when |
-|---|---|
-| `DataloggerAnnouncedEvent` | A datalogger connects and completes the announce handshake |
-| `InverterStateUpdatedEvent` | A data frame arrives with fresh inverter readings |
+| Event                       | Emitted when                                               |
+| --------------------------- | ---------------------------------------------------------- |
+| `DataloggerAnnouncedEvent`  | A datalogger connects and completes the announce handshake |
+| `InverterStateUpdatedEvent` | A data frame arrives with fresh inverter readings          |
 
 ### Domain Interfaces (`domain/interfaces/`)
 
-| Interface | Implemented by |
-|---|---|
-| `Session` | `protocol.session.ProtocolSession` |
-| `SessionRegistry` | `protocol.session.ProtocolSessionRegistry` |
+| Interface         | Implemented by                               |
+| ----------------- | -------------------------------------------- |
+| `Session`         | `protocol.session.ProtocolSession`           |
+| `SessionRegistry` | `protocol.session.ProtocolSessionRegistry`   |
 
 ### Domain Commands (`domain/commands/commands.py`)
 
@@ -197,11 +197,11 @@ Configuration is loaded via `ApplicationConfig` (`main/config/config.py`), which
 
 ## Where to Add New Things
 
-| Goal | Where to change |
-|---|---|
-| New output destination (e.g. InfluxDB, WebSocket) | Add a new adapter under `adapters/`. Consume from `asyncio.Queue[DomainEvent]`. Wire in `main/app.py`. |
-| New domain concept (e.g. battery, grid meter) | Add models to `domain/models/`, new events to `domain/events/events.py`. Extend the protocol mapper to emit the new event. |
-| Support a new Growatt protocol message type | Add message dataclass under `protocol/messages/`, add decoder/encoder, handle in `protocol/session/session.py` and `protocol/session/mapper.py`. |
-| New inverter/datalogger setting accessible via API | Add a domain command to `domain/commands/commands.py`, implement in the relevant `app/handlers/` handler, expose via `adapters/api/`. |
-| New Home Assistant entity | Extend the sensor map in `adapters/hass/map.py` and update `HassDiscoveryPayloadBuilder`. |
-| New CLI option or config key | Add to `ApplicationConfig` (or a nested config class) in `main/config/config.py`. |
+| Goal                                               | Where to change                                                                                                                                  |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| New output destination (e.g. InfluxDB, WebSocket)  | Add a new adapter under `adapters/`. Consume from `asyncio.Queue[DomainEvent]`. Wire in `main/app.py`.                                           |
+| New domain concept (e.g. battery, grid meter)      | Add models to `domain/models/`, new events to `domain/events/events.py`. Extend the protocol mapper to emit the new event.                       |
+| Support a new Growatt protocol message type        | Add message dataclass under `protocol/messages/`, add decoder/encoder, handle in `protocol/session/session.py` and `protocol/session/mapper.py`. |
+| New inverter/datalogger setting accessible via API | Add a domain command to `domain/commands/commands.py`, implement in the relevant `app/handlers/` handler, expose via `adapters/api/`.            |
+| New Home Assistant entity                          | Extend the sensor map in `adapters/hass/map.py` and update `HassDiscoveryPayloadBuilder`.                                                        |
+| New CLI option or config key                       | Add to `ApplicationConfig` (or a nested config class) in `main/config/config.py`.                                                                |
