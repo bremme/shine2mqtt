@@ -85,6 +85,26 @@ class FrameGenerator:
 
         return self.encoder.encode_frame(header, raw_payload)
 
+    def generate_set_config_response_frame(
+        self, transaction_id: int, register: int, datalogger_serial: str, ack: bool
+    ) -> bytes:
+        payload = bytearray(35)
+
+        header = MBAPHeader(
+            transaction_id=transaction_id,
+            protocol_id=0,
+            unit_id=0,
+            function_code=FunctionCode.SET_CONFIG,
+            length=len(payload),
+        )
+
+        payload[0:10] = ByteEncoder.encode_str(datalogger_serial, 10)
+        # 10-30 is \x00 (padding)
+        payload[30:32] = ByteEncoder.encode_u16(register)
+        payload[32:33] = ACK if ack else NACK
+
+        return self.encoder.encode_frame(header, bytes(payload))
+
     def generate_ack_frame(self, header: MBAPHeader, ack: bool) -> bytes:
         payload = ACK if ack else NACK
         return self.encoder.encode_frame(header, payload)

@@ -7,3 +7,5 @@ class DataLogger:
     sw_version: str
     protocol_id: int
     unit_id: int
+    ip_address: str
+    mac_address: str

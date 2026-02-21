@@ -1,4 +1,3 @@
-from shine2mqtt.protocol.frame.raw.encoder import RawRequestPayloadEncoder
 from shine2mqtt.protocol.messages.ack.encoder import AckPayloadEncoder
 from shine2mqtt.protocol.messages.announce.encoder import AnnouncePayloadEncoder
 from shine2mqtt.protocol.messages.data.encoder import (
@@ -12,6 +11,7 @@ from shine2mqtt.protocol.messages.get_config.encoder import (
 )
 from shine2mqtt.protocol.messages.message import BaseMessage
 from shine2mqtt.protocol.messages.ping.encoder import PingPayloadEncoder
+from shine2mqtt.protocol.messages.raw.encoder import RawRequestPayloadEncoder
 from shine2mqtt.protocol.messages.read_register.encoder import ReadRegistersPayloadEncoder
 from shine2mqtt.protocol.messages.set_config.encoder import SetConfigRequestPayloadEncoder
 from shine2mqtt.util.logger import logger

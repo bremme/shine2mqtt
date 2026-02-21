@@ -4,7 +4,7 @@ from shine2mqtt import HOME_PAGE, __version__
 from shine2mqtt.adapters.hass.config import HassDiscoveryConfig
 
 
-class MqttDiscoveryBuilder:
+class HassDiscoveryPayloadBuilder:
     DISCOVERY_ORIGIN = {
         "name": "shine2mqtt",
         "sw_version": __version__,

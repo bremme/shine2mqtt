@@ -2,175 +2,68 @@ import json
 from dataclasses import asdict
 from typing import Any
 
-from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
-from shine2mqtt.adapters.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
+from shine2mqtt.adapters.hass.map import (
+    DATALOGGER_SENSOR_MAP,
+    INVERTER_SENSOR_MAP,
+)
 from shine2mqtt.adapters.mqtt.config import MqttConfig
 from shine2mqtt.adapters.mqtt.message import MqttMessage
-from shine2mqtt.domain.events.events import (
-    DataloggerAnnouncedEvent,
-    DomainEvent,
-    InverterStateUpdatedEvent,
-)
-from shine2mqtt.domain.models.datalogger import DataLogger
+from shine2mqtt.domain.events.events import DataloggerAnnouncedEvent, InverterStateUpdatedEvent
 from shine2mqtt.domain.models.inverter import Inverter
-from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.util.logger import logger
 
 
 class MqttEventMapper:
-    def __init__(self, discovery: MqttDiscoveryBuilder, config: MqttConfig):
-        self._discovery = discovery
-
+    def __init__(self, config: MqttConfig):
         self._base_topic = config.base_topic
-        self._hass_discovery = config.discovery.enabled
-
         self._availability_topic = config.availability_topic
 
-        self._inverter_announced = False
-        self._datalogger_announced = False
-
-        self._datalogger_config = {}
-
-    def process(self, event: DomainEvent) -> list[MqttMessage]:
-        match event:
-            case DataloggerAnnouncedEvent():
-                return self._map_datalogger_announce(event)
-            case InverterStateUpdatedEvent():
-                return self._map_inverter_update(event)
-            # case GrowattGetConfigResponseMessage():
-            #     return self._map_get_config_response(event)
-            case _:
-                logger.debug(f"No handler for this message type {type(event)}")
-                return []
-
-    # TODO not sure if this belongs here?
-    def build_availability_message(self, online: bool) -> MqttMessage:
-        payload = "online" if online else "offline"
+    def map_availability(self, online: bool) -> MqttMessage:
         return MqttMessage(
             topic=self._availability_topic,
-            payload=payload,
+            payload="online" if online else "offline",
             qos=1,
             retain=True,
         )
 
-    def _map_inverter_update(self, event: InverterStateUpdatedEvent) -> list[MqttMessage]:
-        return self._build_mqtt_messages(event)
+    def map_inverter_state(self, event: InverterStateUpdatedEvent) -> list[MqttMessage]:
+        return self._build_mqtt_messages(asdict(event.state), INVERTER_SENSOR_MAP, "inverter")
 
-    def _map_datalogger_announce(self, event: DataloggerAnnouncedEvent) -> list[MqttMessage]:
-        mqtt_messages = []
-        if self._hass_discovery and not self._inverter_announced:
-            logger.info("Appending inverter and datalogger discovery message")
-            datalogger_discovery = self._build_datalogger_discovery_messages(event.datalogger)
-            inverter_discovery = self._build_inverter_discovery_messages(event.inverter)
-            self._inverter_announced = True
-            mqtt_messages.extend([inverter_discovery, datalogger_discovery])
+    def map_datalogger_announced(self, event: DataloggerAnnouncedEvent) -> list[MqttMessage]:
+        inverter_fields = self._flatten_inverter_announce_fields(event.inverter)
+        datalogger_fields = asdict(event.datalogger)
+        return [
+            *self._build_mqtt_messages(
+                datalogger_fields, DATALOGGER_SENSOR_MAP, "datalogger", qos=1, retain=True
+            ),
+            *self._build_mqtt_messages(
+                inverter_fields, INVERTER_SENSOR_MAP, "inverter", qos=1, retain=True
+            ),
+        ]
 
-        # use retain diagnostic sensors don't change over time
-        mqtt_messages.extend(self._build_mqtt_messages(event, qos=1, retain=True))
-
-        return mqtt_messages
-
-    def _process_get_config_response(
-        self, message: GrowattGetConfigResponseMessage
-    ) -> list[MqttMessage]:
-        logger.debug(f"Processing get config response message: {message}")
-        mqtt_messages = []
-
-        if (
-            self._hass_discovery
-            and message.name == "datalogger_sw_version"
-            and not self._datalogger_announced
-        ):
-            logger.info("Appending datalogger discovery message")
-            discovery_message = self._discovery.build_datalogger_discovery_message(
-                datalogger_sw_version=str(message.value),
-                datalogger_serial=message.datalogger_serial,
-            )
-
-            payload = json.dumps(discovery_message)
-            topic = self._discovery.build_datalogger_discovery_topic()
-
-            self._datalogger_announced = True
-
-            return [MqttMessage(topic=topic, payload=payload, qos=1, retain=True)]
-
-        if message.name is not None:
-            self._datalogger_config[message.name] = message.value
-
-        if self._datalogger_announced is False:
-            return []
-
-        for name, value in self._datalogger_config.items():
-            if name not in DATALOGGER_SENSOR_MAP:
-                logger.debug(
-                    f"No sensor mapping found for datalogger config '{name}', skipping MQTT publish"
-                )
-                continue
-
-            sensor_config = DATALOGGER_SENSOR_MAP[name]
-            entity_id = sensor_config["entity_id"]
-
-            topic = self._build_sensor_message_topic(entity_id, "datalogger")
-            payload = json.dumps(self._build_sensor_message_payload(value, sensor_config))
-
-            mqtt_messages.append(MqttMessage(topic=topic, payload=payload, retain=True))
-
-        self._datalogger_config.clear()
-
-        return mqtt_messages
+    def _flatten_inverter_announce_fields(self, inverter: Inverter) -> dict:
+        return {
+            "inverter_serial": inverter.serial,
+            "inverter_fw_version": inverter.fw_version,
+            "inverter_control_fw_version": inverter.control_fw_version,
+            **asdict(inverter.settings),
+        }
 
     def _build_mqtt_messages(
         self,
-        event: DomainEvent,
+        fields: dict[str, Any],
+        sensor_map: dict[str, dict[str, str]],
+        device: str,
         qos: int = 0,
         retain: bool = False,
     ) -> list[MqttMessage]:
-        mqtt_messages = []
-
-        for attribute_name, value in asdict(event).items():
-            if attribute_name == "header":
+        messages = []
+        for field, value in fields.items():
+            if field not in sensor_map:
+                logger.warning(f"No sensor mapping for '{field}', skipping MQTT publish")
                 continue
-
-            if attribute_name not in INVERTER_SENSOR_MAP:
-                logger.debug(f"No sensor mapping for '{attribute_name}', skipping MQTT publish")
-                continue
-
-            sensor_config = INVERTER_SENSOR_MAP[attribute_name]
-            entity_id = sensor_config["entity_id"]
-
-            topic = self._build_sensor_message_topic(entity_id, "inverter")
-            payload = json.dumps(self._build_sensor_message_payload(value, sensor_config))
-
-            mqtt_messages.append(MqttMessage(topic=topic, payload=payload, qos=qos, retain=retain))
-
-        return mqtt_messages
-
-    def _build_sensor_message_topic(self, entity_id: str, base_sub_topic: str) -> str:
-        return f"{self._base_topic}/{base_sub_topic}/sensor/{entity_id}"
-
-    def _build_sensor_message_payload(self, value, sensor_config) -> dict[str, Any]:
-        message = {"value": value}
-
-        if "unit_of_measurement" in sensor_config:
-            message["unit_of_measurement"] = sensor_config["unit_of_measurement"]
-
-        return message
-
-    def _build_inverter_discovery_messages(self, inverter: Inverter) -> MqttMessage:
-        discovery_message = self._discovery.build_inverter_discovery_message(
-            inverter_fw_version=inverter.fw_version,
-            inverter_serial=inverter.serial,
-        )
-
-        payload = json.dumps(discovery_message)
-        topic = self._discovery.build_inverter_discovery_topic()
-        return MqttMessage(topic=topic, payload=payload, qos=1, retain=True)
-
-    def _build_datalogger_discovery_messages(self, datalogger: DataLogger) -> MqttMessage:
-        discovery_message = self._discovery.build_datalogger_discovery_message(
-            datalogger_sw_version=datalogger.sw_version,
-            datalogger_serial=datalogger.serial,
-        )
-        payload = json.dumps(discovery_message)
-        topic = self._discovery.build_datalogger_discovery_topic()
-        return MqttMessage(topic=topic, payload=payload, qos=1, retain=True)
+            sensor = sensor_map[field]
+            topic = f"{self._base_topic}/{device}/sensor/{sensor['entity_id']}"
+            payload = json.dumps({"value": value})
+            messages.append(MqttMessage(topic=topic, payload=payload, qos=qos, retain=retain))
+        return messages

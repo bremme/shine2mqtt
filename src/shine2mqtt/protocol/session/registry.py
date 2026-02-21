@@ -5,16 +5,16 @@ from shine2mqtt.protocol.session.session import ProtocolSession
 
 class ProtocolSessionRegistry(SessionRegistry):
     def __init__(self):
-        self._sessions: list[ProtocolSession] = []
+        self._sessions: dict[str, ProtocolSession] = {}
 
     def get(self, datalogger_serial: str) -> Session | None:
-        for session in self._sessions:
-            if session.datalogger and session.datalogger.serial == datalogger_serial:
-                return session
-        return None
+        return self._sessions.get(datalogger_serial, None)
+
+    def get_all(self) -> list[Session]:
+        return list(self._sessions.values())
 
     def add(self, session: ProtocolSession) -> None:
-        self._sessions.append(session)
+        self._sessions[session.datalogger.serial] = session
 
     def remove(self, session: ProtocolSession) -> None:
-        self._sessions.remove(session)
+        self._sessions.pop(session.datalogger.serial, None)

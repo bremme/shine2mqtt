@@ -3,10 +3,18 @@ from fastapi.responses import RedirectResponse
 
 from shine2mqtt.adapters.api.datalogger.router import router as datalogger_router
 from shine2mqtt.adapters.api.inverter.router import router as inverter_router
-from shine2mqtt.protocol.server.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.app.handlers.read_register import ReadRegisterHandler
+from shine2mqtt.app.handlers.send_raw_frame import SendRawFrameHandler
+from shine2mqtt.app.handlers.write_register import WriteRegisterHandler
+from shine2mqtt.protocol.session.registry import ProtocolSessionRegistry
 
 
-def create_app(session_registry: ProtocolSessionRegistry) -> FastAPI:
+def create_app(
+    session_registry: ProtocolSessionRegistry,
+    read_handler: ReadRegisterHandler,
+    write_handler: WriteRegisterHandler,
+    send_raw_frame_handler: SendRawFrameHandler,
+) -> FastAPI:
     app = FastAPI()
 
     @app.get("/", include_in_schema=False)
@@ -26,5 +34,8 @@ def create_app(session_registry: ProtocolSessionRegistry) -> FastAPI:
         )
 
     app.state.session_registry = session_registry
+    app.state.read_handler = read_handler
+    app.state.write_handler = write_handler
+    app.state.send_raw_frame_handler = send_raw_frame_handler
 
     return app

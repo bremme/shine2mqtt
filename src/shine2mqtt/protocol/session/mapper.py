@@ -11,7 +11,6 @@ from shine2mqtt.domain.models.inverter import (
 )
 from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.protocol.messages.data.data import GrowattBufferedDataMessage, GrowattDataMessage
-from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState
 
 
@@ -51,15 +50,20 @@ class MessageEventMapper:
             settings=settings,
         )
 
-    def map_config_sw_version_to_datalogger(
+    def map_config_to_datalogger(
         self,
-        message: GrowattGetConfigResponseMessage,
+        datalogger_serial: str,
         protocol_id: int,
         unit_id: int,
+        ip_address: str,
+        mac_address: str,
+        sw_version: str,
     ) -> DataLogger:
         return DataLogger(
-            serial=message.datalogger_serial,
-            sw_version=message.value,
+            serial=datalogger_serial,
+            sw_version=sw_version,
+            ip_address=ip_address,
+            mac_address=mac_address,
             protocol_id=protocol_id,
             unit_id=unit_id,
         )

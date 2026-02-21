@@ -50,7 +50,7 @@ class ClientMessageHandler:
                 return self._build_get_config_response_frame(message)
             case GrowattSetConfigRequestMessage():
                 logger.info(f"✓ Received SET_CONFIG request ({hex_value}), {transaction_id=}")
-                return self._build_ack_frame(message)
+                return self._build_set_config_response_frame(message)
             case _:
                 logger.warning(f"Unhandled message type: {type(message)}")
 
@@ -61,6 +61,16 @@ class ClientMessageHandler:
             transaction_id=request_message.header.transaction_id,
             register=request_message.register_start,
             datalogger_serial=request_message.datalogger_serial,
+        )
+
+    def _build_set_config_response_frame(
+        self, request_message: GrowattSetConfigRequestMessage
+    ) -> bytes:
+        return self.generator.generate_set_config_response_frame(
+            transaction_id=request_message.header.transaction_id,
+            register=request_message.register,
+            datalogger_serial=request_message.datalogger_serial,
+            ack=True,
         )
 
     def _build_ack_frame(self, request_message: GrowattSetConfigRequestMessage) -> bytes:

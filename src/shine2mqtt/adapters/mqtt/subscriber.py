@@ -1,9 +1,9 @@
-from shine2mqtt.app.handlers.write_register import WriteRegisterHandler
+import aiomqtt
+
+from shine2mqtt.util.logger import logger
 
 
-class MqttCommandSubscriber:
-    def __init__(self, write_handler: WriteRegisterHandler):
-        self.write_handler = write_handler
-
-    async def on_message(self, topic: str, payload: str) -> None:
-        pass
+class MqttSubscriber:
+    async def run(self, client: aiomqtt.Client) -> None:
+        async for message in client.messages:
+            logger.debug(f"Received MQTT message '{message.topic}': {message.payload}")

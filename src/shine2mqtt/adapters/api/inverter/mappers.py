@@ -1,18 +1,9 @@
-from shine2mqtt.adapters.api.inverter.models import InverterRegister
-from shine2mqtt.protocol.protocol.read_register.read_register import (
-    GrowattReadRegisterResponseMessage,
-)
+from shine2mqtt.adapters.api.inverter.models import InverterRegister, RawFrameResponse
 
 
-def read_registers_response_to_inverter_registers(
-    message: GrowattReadRegisterResponseMessage,
-) -> list[InverterRegister]:
-    inverter_registers = []
-    for register, value in message.data_u16.items():
-        inverter_registers.append(
-            InverterRegister(
-                address=register,
-                value=value,
-            )
-        )
-    return inverter_registers
+def inverter_registers_to_api_model(data: dict[int, int]) -> list[InverterRegister]:
+    return [InverterRegister(address=register, value=value) for register, value in data.items()]
+
+
+def raw_bytes_to_api_model(payload: bytes) -> RawFrameResponse:
+    return RawFrameResponse(payload=payload.hex())

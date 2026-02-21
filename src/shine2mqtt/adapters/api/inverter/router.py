@@ -4,22 +4,25 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from shine2mqtt.adapters.api.constants import INVERTER_COMMAND_TIMEOUT_SECONDS
-from shine2mqtt.adapters.api.dependencies import (
-    get_command_executor,
-)
+from shine2mqtt.adapters.api.dependencies import get_read_handler, get_send_raw_frame_handler
 from shine2mqtt.adapters.api.http_exceptions import (
     gateway_timeout_504,
     internal_server_error_500,
+    not_found_404,
     not_implemented_501,
 )
-from shine2mqtt.adapters.api.inverter.mappers import read_registers_response_to_inverter_registers
-from shine2mqtt.adapters.api.inverter.models import InverterRegister, RawFrameRequest
-from shine2mqtt.main.command_executor import SessionCommandExecutor
-from shine2mqtt.protocol.protocol.raw.raw import GrowattRawMessage
-from shine2mqtt.protocol.server.protocol.session.command.command import (
-    RawFrameCommand,
-    ReadRegistersCommand,
+from shine2mqtt.adapters.api.inverter.mappers import (
+    inverter_registers_to_api_model,
+    raw_bytes_to_api_model,
 )
+from shine2mqtt.adapters.api.inverter.models import (
+    InverterRegister,
+    RawFrameRequest,
+    RawFrameResponse,
+)
+from shine2mqtt.app.exceptions import DataloggerNotConnectedError
+from shine2mqtt.app.handlers.read_register import ReadRegisterHandler
+from shine2mqtt.app.handlers.send_raw_frame import SendRawFrameHandler
 
 router = APIRouter(prefix="/dataloggers/{serial}/inverter", tags=["inverter"])
 
@@ -41,8 +44,15 @@ async def update_single_inverter_setting(serial: str, name: str, value: str):
 
 # Inverter register endpoints
 @router.get("/registers/{address}")
-async def read_single_inverter_register(serial: str, address: int):
-    not_implemented_501()
+async def read_single_inverter_register(
+    serial: str,
+    address: int,
+    read_handler: Annotated[ReadRegisterHandler, Depends(get_read_handler)],
+) -> InverterRegister:
+    registers = await read_multiple_inverter_registers(serial, address, address, read_handler)
+    if not registers:
+        not_found_404(f"Register {address} not found")
+    return registers[0]
 
 
 @router.get("/registers")
@@ -50,20 +60,19 @@ async def read_multiple_inverter_registers(
     serial: str,
     start: int,
     end: int,
-    executer: Annotated[SessionCommandExecutor, Depends(get_command_executor)],
+    read_handler: Annotated[ReadRegisterHandler, Depends(get_read_handler)],
 ) -> list[InverterRegister]:
-    command = ReadRegistersCommand(datalogger_serial=serial, register_start=start, register_end=end)
-
     try:
         async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
-            message = await executer.execute(command)
+            data = await read_handler.read_inverter_registers(serial, start, end)
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
     except TimeoutError:
         gateway_timeout_504()
-    # TODO invalid register exception
     except Exception as e:
         internal_server_error_500(e)
 
-    return read_registers_response_to_inverter_registers(message)
+    return inverter_registers_to_api_model(data)
 
 
 @router.put("/registers/{address}")
@@ -83,19 +92,20 @@ async def write_multiple_inverter_registers(serial: str, registers: list[dict[st
 async def send_raw_frame(
     serial: str,
     request: RawFrameRequest,
-    executer: Annotated[SessionCommandExecutor, Depends(get_command_executor)],
-) -> GrowattRawMessage:
-    command = RawFrameCommand(
-        datalogger_serial=serial,
-        function_code=request.function_code,
-        protocol_id=request.protocol_id,
-        payload=bytes.fromhex(request.payload),
-    )
-
+    handler: Annotated[SendRawFrameHandler, Depends(get_send_raw_frame_handler)],
+) -> RawFrameResponse:
     try:
         async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
-            message = await executer.execute(command)
+            payload = await handler.send_raw_frame(
+                serial,
+                request.function_code,
+                bytes.fromhex(request.payload),
+            )
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
     except TimeoutError:
         gateway_timeout_504()
+    except Exception as e:
+        internal_server_error_500(e)
 
-    return message
+    return raw_bytes_to_api_model(payload)

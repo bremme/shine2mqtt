@@ -15,7 +15,7 @@ ENERGY_ICON = "mdi:meter-electric-outline"
 HASS_CONTROLS_MAP = {}
 
 
-DATA_MESSAGE_SENSORS = {
+INVERTER_STATE_SENSORS: dict[str, dict[str, str]] = {
     "power_dc": {
         "entity_id": "power_dc",
         "name": "Power DC",
@@ -173,7 +173,7 @@ DATA_MESSAGE_SENSORS = {
     },
 }
 
-ANNOUNCE_MESSAGE_SENSORS = {
+INVERTER_ATTRIBUTE_SENSORS: dict[str, dict[str, str]] = {
     # "datalogger_serial": {
     #     "entity_id": "datalogger_serial",
     #     "entity_category": "diagnostic",
@@ -186,6 +186,21 @@ ANNOUNCE_MESSAGE_SENSORS = {
         "name": "Inverter serial",
         "icon": "mdi:identifier",
     },
+    "inverter_fw_version": {
+        "entity_id": "inverter_fw_version",
+        "entity_category": "diagnostic",
+        "name": "Inverter firmware version",
+        "icon": VERSION_ICON,
+    },
+    "inverter_control_fw_version": {
+        "entity_id": "inverter_control_fw_version",
+        "entity_category": "diagnostic",
+        "name": "Inverter control firmware version",
+        "icon": VERSION_ICON,
+    },
+}
+
+INVERTER_SETTINGS_SENSORS: dict[str, dict[str, str]] = {
     "active_power_ac_max": {
         "entity_id": "active_power_ac_max",
         "entity_category": "diagnostic",
@@ -223,21 +238,6 @@ ANNOUNCE_MESSAGE_SENSORS = {
         "unit_of_measurement": "V",
         "icon": VOLTAGE_DC_ICON,
     },
-    "inverter_fw_version": {
-        "entity_id": "inverter_fw_version",
-        "entity_category": "diagnostic",
-        "name": "Inverter firmware version",
-        "icon": VERSION_ICON,
-    },
-    "inverter_control_fw_version": {
-        "entity_id": "inverter_control_fw_version",
-        "entity_category": "diagnostic",
-        "name": "Inverter control firmware version",
-        "icon": VERSION_ICON,
-    },
-    # lcd_language
-    # device_type
-    # timestamp
     "voltage_ac_low_limit": {
         "entity_id": "voltage_ac_low_limit",
         "entity_category": "diagnostic",
@@ -278,12 +278,13 @@ ANNOUNCE_MESSAGE_SENSORS = {
     },
 }
 
-INVERTER_SENSOR_MAP = {
-    **DATA_MESSAGE_SENSORS,
-    **ANNOUNCE_MESSAGE_SENSORS,
+INVERTER_SENSOR_MAP: dict[str, dict[str, str]] = {
+    **INVERTER_ATTRIBUTE_SENSORS,
+    **INVERTER_SETTINGS_SENSORS,
+    **INVERTER_STATE_SENSORS,
 }
 
-DATALOGGER_SENSOR_MAP = {
+DATALOGGER_SENSOR_MAP: dict[str, dict[str, str]] = {
     "update_interval": {
         "entity_id": "update_interval",
         "entity_category": "diagnostic",
@@ -292,7 +293,7 @@ DATALOGGER_SENSOR_MAP = {
         "unit_of_measurement": "min",
         "icon": "mdi:timer-sand",
     },
-    "datalogger_serial": {
+    "serial": {
         "entity_id": "datalogger_serial",
         "entity_category": "diagnostic",
         "name": "Datalogger serial",
@@ -322,7 +323,7 @@ DATALOGGER_SENSOR_MAP = {
         "name": "Server Port",
         "icon": NETWORK_ICON,
     },
-    "datalogger_sw_version": {
+    "sw_version": {
         "entity_id": "datalogger_sw_version",
         "entity_category": "diagnostic",
         "name": "Datalogger Software Version",

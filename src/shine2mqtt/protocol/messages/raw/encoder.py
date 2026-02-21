@@ -1,5 +1,5 @@
-from shine2mqtt.protocol.frame.raw.raw import GrowattRawMessage
 from shine2mqtt.protocol.messages.encoder.encoder import PayloadEncoder
+from shine2mqtt.protocol.messages.raw.raw import GrowattRawMessage
 
 
 class RawRequestPayloadEncoder(PayloadEncoder[GrowattRawMessage]):

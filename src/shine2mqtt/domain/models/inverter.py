@@ -18,6 +18,28 @@ class InverterStatus(Enum):
 
 
 @dataclass(frozen=True)
+class InverterSettings:
+    remote_on_off: bool
+    safety_function: SafetyFunction
+    power_factor_memory: bool
+    active_power_ac_max: int
+    reactive_power_ac_max: int
+    power_factor: float
+    rated_power_ac: float
+    rated_voltage_dc: float
+    # inverter_fw_version: str
+    # inverter_control_fw_version: str
+    # lcd_language: str
+    # timestamp: datetime
+
+    voltage_ac_low_limit: float
+    voltage_ac_high_limit: float
+    frequency_ac_low_limit: float
+    frequency_ac_high_limit: float
+    power_factor_control_mode: str
+
+
+@dataclass(frozen=True)
 class InverterState:
     inverter_status: InverterStatus
     # DC
@@ -70,25 +92,3 @@ class SafetyFunction:
     high_voltage_fault_ride_through: bool
     rate_of_change_of_frequency_protection: bool
     frequency_derating_recovery: bool
-
-
-@dataclass(frozen=True)
-class InverterSettings:
-    remote_on_off: bool
-    safety_function: SafetyFunction
-    power_factor_memory: bool
-    active_power_ac_max: int
-    reactive_power_ac_max: int
-    power_factor: float
-    rated_power_ac: float
-    rated_voltage_dc: float
-    # inverter_fw_version: str
-    # inverter_control_fw_version: str
-    # lcd_language: str
-    # timestamp: datetime
-
-    voltage_ac_low_limit: float
-    voltage_ac_high_limit: float
-    frequency_ac_low_limit: float
-    frequency_ac_high_limit: float
-    power_factor_control_mode: str

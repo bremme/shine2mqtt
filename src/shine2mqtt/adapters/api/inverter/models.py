@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 
-from shine2mqtt.protocol.protocol.constants import FunctionCode
+from shine2mqtt.protocol.frame.header.header import FunctionCode
 
 
 class InverterRegister(BaseModel):
@@ -8,9 +8,12 @@ class InverterRegister(BaseModel):
     value: int
 
 
+class RawFrameResponse(BaseModel):
+    payload: str
+
+
 class RawFrameRequest(BaseModel):
     function_code: int = Field(..., description="Function code")
-    protocol_id: int = Field(6, description="Protocol ID")
     payload: str = Field(
         ..., description="Hex string payload (spaces allowed)", examples=["00 01 00 02", "0a0b0c0d"]
     )

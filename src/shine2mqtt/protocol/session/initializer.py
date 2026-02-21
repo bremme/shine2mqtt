@@ -14,7 +14,11 @@ from shine2mqtt.protocol.session.base import BaseProtocolSession
 from shine2mqtt.protocol.session.mapper import MessageEventMapper
 from shine2mqtt.protocol.session.message_factory import MessageFactory
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState, TransactionIdTracker
-from shine2mqtt.protocol.settings.constants import DATALOGGER_SW_VERSION_REGISTER
+from shine2mqtt.protocol.settings.constants import (
+    DATALOGGER_IP_ADDRESS_REGISTER,
+    DATALOGGER_MAC_ADDRESS_REGISTER,
+    DATALOGGER_SW_VERSION_REGISTER,
+)
 from shine2mqtt.util.logger import logger
 
 if TYPE_CHECKING:
@@ -47,11 +51,22 @@ class ProtocolSessionInitializer(BaseProtocolSession):
             tracker=self.transaction_id_tracker,
         )
 
-        config = await self._request_datalogger_config(factory, announce.datalogger_serial)
+        sw_version = await self._request_datalogger_config(
+            factory, announce.datalogger_serial, register=DATALOGGER_SW_VERSION_REGISTER
+        )
+        ip_address = await self._request_datalogger_config(
+            factory, announce.datalogger_serial, register=DATALOGGER_IP_ADDRESS_REGISTER
+        )
+        max_address = await self._request_datalogger_config(
+            factory, announce.datalogger_serial, register=DATALOGGER_MAC_ADDRESS_REGISTER
+        )
 
         inverter = self.mapper.map_announce_message_to_inverter(announce)
-        datalogger = self.mapper.map_config_sw_version_to_datalogger(
-            config,
+        datalogger = self.mapper.map_config_to_datalogger(
+            datalogger_serial=announce.datalogger_serial,
+            ip_address=ip_address,
+            mac_address=max_address,
+            sw_version=sw_version,
             protocol_id=announce.header.protocol_id,
             unit_id=announce.header.unit_id,
         )
@@ -79,22 +94,19 @@ class ProtocolSessionInitializer(BaseProtocolSession):
                     )
 
     async def _request_datalogger_config(
-        self, factory: MessageFactory, datalogger_serial: str
-    ) -> GrowattGetConfigResponseMessage:
+        self, factory: MessageFactory, datalogger_serial: str, register: int
+    ) -> str:
         message = factory.get_config_request(
             datalogger_serial=datalogger_serial,
-            register=DATALOGGER_SW_VERSION_REGISTER,
+            register=register,
         )
 
         await self._write_message(message)
 
         while True:
             match message := await self._read_message():
-                case GrowattGetConfigResponseMessage() if (
-                    message.register == DATALOGGER_SW_VERSION_REGISTER
-                ):
-                    logger.info("Received datalogger SW version config response")
-                    return message
+                case GrowattGetConfigResponseMessage() if message.register == register:
+                    return message.value
                 case _:
                     logger.warning(
                         f"Received unexpected message while waiting for config response: {message}"

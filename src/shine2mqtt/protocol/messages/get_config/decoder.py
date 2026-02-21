@@ -4,7 +4,7 @@ from shine2mqtt.protocol.messages.get_config.get_config import (
     GrowattGetConfigRequestMessage,
     GrowattGetConfigResponseMessage,
 )
-from shine2mqtt.protocol.settings.registry import SettingsRegistry
+from shine2mqtt.protocol.settings.registry import RegisterNotFoundError, SettingsRegistry
 
 
 class GetConfigRequestDecoder(MessageDecoder[GrowattGetConfigRequestMessage]):
