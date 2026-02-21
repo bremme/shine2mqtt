@@ -8,14 +8,15 @@ from shine2mqtt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.protocol.messages.ack.ack import GrowattAckMessage
 from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.protocol.messages.data.data import GrowattBufferedDataMessage, GrowattDataMessage
-from shine2mqtt.protocol.messages.message import BaseMessage, DataloggerMessage
+from shine2mqtt.protocol.messages.message import BaseMessage
 from shine2mqtt.protocol.messages.ping.message import GrowattPingMessage
+from shine2mqtt.protocol.session.base import BaseProtocolSession
 from shine2mqtt.protocol.session.mapper import MessageEventMapper
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState
 from shine2mqtt.util.logger import logger
 
 
-class ProtocolSession(Session):
+class ProtocolSession(BaseProtocolSession, Session):
     def __init__(
         self,
         transport: TCPSession,
@@ -24,10 +25,8 @@ class ProtocolSession(Session):
         decoder: FrameDecoder,
         domain_events: asyncio.Queue[DomainEvent],
     ):
-        self.transport = transport
+        super().__init__(transport=transport, encoder=encoder, decoder=decoder)
         self.domain_events = domain_events
-        self.decoder = decoder
-        self.encoder = encoder
         self.mapper = MessageEventMapper()
         self.state = state
 
@@ -49,13 +48,6 @@ class ProtocolSession(Session):
             if message is None:
                 continue
 
-            if isinstance(message, DataloggerMessage):
-                transaction_id = message.header.transaction_id
-                datalogger_serial = message.datalogger_serial
-                logger.info(
-                    f"✓ Receive {message.header.function_code.name} ({message.header.function_code.value:#02x}) message, {transaction_id=}, {datalogger_serial=}"
-                )
-
             self.publish_domain_event(message)
 
             # respond to periodic datalogger messages
@@ -69,14 +61,6 @@ class ProtocolSession(Session):
     async def close(self):
         logger.info("Closing protocol session")
         await self.transport.close()
-
-    async def _read_message(self) -> BaseMessage | None:
-        frame = await self.transport.read_frame()
-
-        try:
-            return self.decoder.decode(frame)
-        except Exception as e:
-            logger.error(f"Failed to decode incoming frame {frame}: {e}")
 
     def is_periodic_message(self, message: BaseMessage) -> bool:
         return isinstance(
@@ -113,14 +97,7 @@ class ProtocolSession(Session):
                 logger.warning(f"Received unknown periodic message type: {type(message)}")
                 return
 
-        transaction_id = response.header.transaction_id
-        logger.info(
-            f"→ Enqueue {response.header.function_code.name} ({response.header.function_code.value:#02x}) response, {transaction_id=}"
-        )
-
-        response_frame = self.encoder.encode(response)
-
-        await self.transport.write_frame(response_frame)
+        await self._write_message(response)
 
     async def handle_response_message(self, message: BaseMessage) -> None:
         logger.debug(f"Received response message: {message}")

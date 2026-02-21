@@ -5,18 +5,16 @@ from shine2mqtt.protocol.messages.get_config.get_config import (
     GrowattGetConfigRequestMessage,
     GrowattGetConfigResponseMessage,
 )
-from shine2mqtt.protocol.messages.message import BaseMessage
+from shine2mqtt.protocol.session.base import BaseProtocolSession
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState, TransactionIdTracker
 from shine2mqtt.protocol.settings.constants import DATALOGGER_SW_VERSION_REGISTER
 from shine2mqtt.util.logger import logger
 
 
-class ProtocolSessionInitializer:
+class ProtocolSessionInitializer(BaseProtocolSession):
     def __init__(self, encoder, decoder, mapper, transport):
-        self.encoder = encoder
-        self.decoder = decoder
+        super().__init__(transport=transport, encoder=encoder, decoder=decoder)
         self.mapper = mapper
-        self.transport = transport
         self.transaction_id_tracker = TransactionIdTracker()
 
     async def initialize(self) -> ServerProtocolSessionState:
@@ -43,10 +41,13 @@ class ProtocolSessionInitializer:
         while True:
             match message := await self._read_message():
                 case GrowattAnnounceMessage():
+                    transaction_id = message.header.transaction_id
+                    datalogger_serial = message.datalogger_serial
+                    logger.info(
+                        f"✓ ANNOUNCE (0x03) message, received and acknowledged {transaction_id=}, {datalogger_serial=}"
+                    )
                     response = GrowattAckMessage(header=message.header, ack=True)
-                    response_frame = self.encoder.encode(response)
-                    await self.transport.write_frame(response_frame)
-                    logger.info("Announce message received and acknowledged")
+                    await self._write_message(response)
                     return message
                 case _:
                     logger.warning(
@@ -73,11 +74,9 @@ class ProtocolSessionInitializer:
             register_end=DATALOGGER_SW_VERSION_REGISTER,
         )
 
-        frame = self.encoder.encode(message)
-
         logger.info(f"→ Sending GET_CONFIG request for datalogger SW version, {transaction_id=}")
 
-        await self.transport.write_frame(frame)
+        await self._write_message(message)
 
         while True:
             match message := await self._read_message():
@@ -90,11 +89,3 @@ class ProtocolSessionInitializer:
                     logger.warning(
                         f"Received unexpected message while waiting for config response: {message}"
                     )
-
-    async def _read_message(self) -> BaseMessage | None:
-        frame = await self.transport.read_frame()
-
-        try:
-            return self.decoder.decode(frame)
-        except Exception as e:
-            logger.error(f"Failed to decode incoming frame {frame}: {e}")

@@ -1,55 +1,15 @@
 from datetime import datetime
 
 from shine2mqtt.domain.events.events import DataloggerAnnouncedEvent, InverterStateUpdatedEvent
-from shine2mqtt.domain.models.datalogger import DataLogger
 from shine2mqtt.domain.models.inverter import (
-    Inverter,
-    InverterSettings,
     InverterState,
     InverterStatus,
-    SafetyFunction,
 )
-from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.protocol.messages.data.data import GrowattBufferedDataMessage, GrowattDataMessage
-from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState
-
-# class MessageDomainMapper:
 
 
 class MessageEventMapper:
-    def map_announce_message_to_inverter(self, message: GrowattAnnounceMessage) -> Inverter:
-        inverter_settings = InverterSettings(
-            remote_on_off=message.remote_on_off,
-            safety_function=SafetyFunction(**vars(message.safety_function)),
-            power_factor_memory=message.power_factor_memory,
-            active_power_ac_max=message.active_power_ac_max,
-            reactive_power_ac_max=message.reactive_power_ac_max,
-            power_factor=message.power_factor,
-            rated_power_ac=message.rated_power_ac,
-            rated_voltage_dc=message.rated_voltage_dc,
-            voltage_ac_low_limit=message.voltage_ac_low_limit,
-            voltage_ac_high_limit=message.voltage_ac_high_limit,
-            frequency_ac_low_limit=message.frequency_ac_low_limit,
-            frequency_ac_high_limit=message.frequency_ac_high_limit,
-            power_factor_control_mode=message.power_factor_control_mode,
-        )
-
-        return Inverter(
-            serial=message.inverter_serial,
-            fw_version=message.inverter_fw_version,
-            control_fw_version=message.inverter_control_fw_version,
-            settings=inverter_settings,
-        )
-
-    def map_config_sw_version_to_datalogger(
-        self, message: GrowattGetConfigResponseMessage
-    ) -> DataLogger:
-        return DataLogger(
-            serial=message.datalogger_serial,
-            sw_version=message.value,
-        )
-
     def map_state_to_announce_event(
         self, state: ServerProtocolSessionState
     ) -> DataloggerAnnouncedEvent:
