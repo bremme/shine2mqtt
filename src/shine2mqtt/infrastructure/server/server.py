@@ -1,19 +1,23 @@
 import asyncio
 from asyncio import StreamReader, StreamWriter
-from typing import Any
+from typing import Any, Protocol
 
+from shine2mqtt.domain.interfaces.registry import SessionRegistry
+from shine2mqtt.domain.interfaces.session import Session
 from shine2mqtt.infrastructure.server.config import GrowattServerConfig
 from shine2mqtt.infrastructure.server.session import TCPSession
-from shine2mqtt.protocol.session.factory import ProtocolSessionFactory
-from shine2mqtt.protocol.session.registry import ProtocolSessionRegistry
 from shine2mqtt.util.logger import logger
+
+
+class SessionFactory(Protocol):
+    async def create(self, transport: TCPSession) -> Session: ...
 
 
 class TCPServer:
     def __init__(
         self,
-        session_registry: ProtocolSessionRegistry,
-        session_factory: ProtocolSessionFactory,
+        session_registry: SessionRegistry,
+        session_factory: SessionFactory,
         config: GrowattServerConfig,
     ):
         self.session_registry = session_registry
@@ -43,7 +47,7 @@ class TCPServer:
 
         transport = TCPSession(reader, writer)
 
-        session = await self.session_factory.create_initializer(transport=transport).initialize()
+        session = await self.session_factory.create(transport=transport)
 
         self.session_registry.add(session)
 

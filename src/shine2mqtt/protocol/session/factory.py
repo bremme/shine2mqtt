@@ -6,6 +6,7 @@ from shine2mqtt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.protocol.session.initializer import ProtocolSessionInitializer
 from shine2mqtt.protocol.session.mapper import MessageEventMapper
+from shine2mqtt.protocol.session.session import ProtocolSession
 
 
 class ProtocolSessionFactory:
@@ -19,12 +20,13 @@ class ProtocolSessionFactory:
         self.decoder = decoder
         self.domain_events = domain_events
 
-    def create_initializer(self, transport: TCPSession) -> ProtocolSessionInitializer:
+    async def create(self, transport: TCPSession) -> ProtocolSession:
         mapper = MessageEventMapper()
-        return ProtocolSessionInitializer(
+        initializer = ProtocolSessionInitializer(
             encoder=self.encoder,
             decoder=self.decoder,
             mapper=mapper,
             transport=transport,
             domain_events=self.domain_events,
         )
+        return await initializer._initialize()

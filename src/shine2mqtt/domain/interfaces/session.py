@@ -11,6 +11,14 @@ class Session(ABC):
         pass
 
     @abstractmethod
+    async def run(self) -> None:
+        pass
+
+    @abstractmethod
+    async def close(self) -> None:
+        pass
+
+    @abstractmethod
     async def get_config(self, register: int) -> ConfigResult:
         pass
 

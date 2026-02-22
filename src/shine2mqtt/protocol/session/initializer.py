@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 import asyncio
-from typing import TYPE_CHECKING
 
 from shine2mqtt.domain.events.events import DomainEvent
 from shine2mqtt.infrastructure.server.session import TCPSession
@@ -14,6 +11,7 @@ from shine2mqtt.protocol.messages.ping.message import GrowattPingMessage
 from shine2mqtt.protocol.session.base import BaseProtocolSession
 from shine2mqtt.protocol.session.mapper import MessageEventMapper
 from shine2mqtt.protocol.session.message_factory import MessageFactory
+from shine2mqtt.protocol.session.session import ProtocolSession
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState, TransactionIdTracker
 from shine2mqtt.protocol.settings.constants import (
     DATALOGGER_IP_ADDRESS_REGISTER,
@@ -21,9 +19,6 @@ from shine2mqtt.protocol.settings.constants import (
     DATALOGGER_SW_VERSION_REGISTER,
 )
 from shine2mqtt.util.logger import logger
-
-if TYPE_CHECKING:
-    from shine2mqtt.protocol.session.session import ProtocolSession
 
 
 class ProtocolSessionInitializer(BaseProtocolSession):
@@ -40,9 +35,7 @@ class ProtocolSessionInitializer(BaseProtocolSession):
         self.domain_events = domain_events
         self.transaction_id_tracker = TransactionIdTracker()
 
-    async def initialize(self) -> ProtocolSession:
-        from shine2mqtt.protocol.session.session import ProtocolSession
-
+    async def _initialize(self) -> ProtocolSession:
         logger.info("Initializing protocol session, waiting for announce message...")
         announce = await self._wait_for_announce()
 
@@ -58,7 +51,7 @@ class ProtocolSessionInitializer(BaseProtocolSession):
         ip_address = await self._request_datalogger_config(
             factory, announce.datalogger_serial, register=DATALOGGER_IP_ADDRESS_REGISTER
         )
-        max_address = await self._request_datalogger_config(
+        mac_address = await self._request_datalogger_config(
             factory, announce.datalogger_serial, register=DATALOGGER_MAC_ADDRESS_REGISTER
         )
 
@@ -66,7 +59,7 @@ class ProtocolSessionInitializer(BaseProtocolSession):
         datalogger = self.mapper.map_config_to_datalogger(
             datalogger_serial=announce.datalogger_serial,
             ip_address=ip_address,
-            mac_address=max_address,
+            mac_address=mac_address,
             sw_version=sw_version,
             protocol_id=announce.header.protocol_id,
             unit_id=announce.header.unit_id,

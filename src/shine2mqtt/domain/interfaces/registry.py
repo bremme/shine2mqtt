@@ -9,3 +9,9 @@ class SessionRegistry(ABC):
 
     @abstractmethod
     def get_all(self) -> list[Session]: ...
+
+    @abstractmethod
+    def add(self, session: Session) -> None: ...
+
+    @abstractmethod
+    def remove(self, session: Session) -> None: ...

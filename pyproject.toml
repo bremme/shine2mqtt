@@ -127,8 +127,6 @@ ignore_imports = [
     "shine2mqtt.infrastructure.client.client -> shine2mqtt.protocol.simulator.session",
     "shine2mqtt.infrastructure.client.transport -> shine2mqtt.protocol.frame.constants",
     "shine2mqtt.infrastructure.client.transport -> shine2mqtt.protocol.frame.decoder",
-    "shine2mqtt.infrastructure.server.server -> shine2mqtt.protocol.session.factory",
-    "shine2mqtt.infrastructure.server.server -> shine2mqtt.protocol.session.registry"
 ]
 
 [[tool.importlinter.contracts]]
