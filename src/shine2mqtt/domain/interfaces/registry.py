@@ -1,8 +1,11 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from shine2mqtt.domain.interfaces.session import Session
 
 
-class SessionRegistry(Protocol):
+class SessionRegistry(ABC):
+    @abstractmethod
     def get(self, datalogger_serial: str) -> Session | None: ...
+
+    @abstractmethod
     def get_all(self) -> list[Session]: ...
