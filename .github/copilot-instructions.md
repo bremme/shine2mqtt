@@ -53,6 +53,15 @@ Use these instructions when writing code for the project
 * Follow PEP8
 * Use ruff for code formatting
 
+### Project stack
+
+- Python 3.14
+- Package manager: `uv`
+- Linting/formatting: `ruff`
+- Type checker: `ty`
+- Unit testing: `pytest`
+- Key libraries: `pydantic`, `asyncio`, `aiomqtt`
+
 ### Refactoring
 
 When refactoring
@@ -62,7 +71,23 @@ When refactoring
 
 ## Project architecture
 
+Shine2MQTT acts as a local replacement for Growatt's cloud servers. Growatt Shine WiFi-X dataloggers connect over TCP using a proprietary binary protocol. The application decodes those streams and publishes data to an MQTT broker in a Home Assistant-compatible format. An optional REST API allows reading/writing inverter settings.
 
+See `ARCHITECTURE.md` for a full overview.
+
+### Architecture: Clean Architecture
+
+All dependencies point inward toward `domain/`. No inner layer may import from an outer layer.
+
+| Package           | Responsibility                                                                 |
+|-------------------|--------------------------------------------------------------------------------|
+| `domain/`         | Core models, events, commands, abstract interfaces. No external dependencies.  |
+| `protocol/`       | Growatt binary protocol, frame codec, per-connection state machine             |
+| `infrastructure/` | Raw asyncio TCP server/session. No protocol or domain logic.                   |
+| `adapters/`       | MQTT publisher, Home Assistant discovery, FastAPI REST interface                |
+| `app/`            | Application-layer command handlers                                             |
+| `main/`           | Composition root: wires everything together, CLI, config loading               |
+| `util/`           | Shared utilities (clocks, conversions, logging helpers)                        |
 
 ### Unit testing instructions
 
