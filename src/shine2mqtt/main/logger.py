@@ -21,7 +21,7 @@ class _InterceptHandler(logging.Handler):
                 function=record.funcName,
                 line=record.lineno,
             )
-        ).log(level, record.getMessage())
+        ).opt(exception=record.exc_info).log(level, record.getMessage())
 
 
 class LoggerConfigurator:
