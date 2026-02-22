@@ -84,7 +84,7 @@ All dependencies point inward toward `domain/`. No inner layer may import from a
 | `domain/`         | Core models, events, commands, abstract interfaces. No external dependencies.  |
 | `protocol/`       | Growatt binary protocol, frame codec, per-connection state machine             |
 | `infrastructure/` | Raw asyncio TCP server/session. No protocol or domain logic.                   |
-| `adapters/`       | MQTT publisher, Home Assistant discovery, FastAPI REST interface                |
+| `adapters/`       | MQTT publisher, Home Assistant discovery, FastAPI REST interface               |
 | `app/`            | Application-layer command handlers                                             |
 | `main/`           | Composition root: wires everything together, CLI, config loading               |
 | `util/`           | Shared utilities (clocks, conversions, logging helpers)                        |

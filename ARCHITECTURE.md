@@ -11,6 +11,7 @@ C4Context
     Person(user, "User", "Monitors solar production via Home Assistant")
 
     System_Boundary(home, "Local network") {
+        
         System(s2m, "shine2mqtt", "Decodes Growatt protocol, publishes to MQTT, exposes REST API")
         SystemDb(broker, "MQTT Broker", "e.g. Mosquitto")
         System(ha, "Home Assistant", "Automation platform")
@@ -20,52 +21,14 @@ C4Context
         System_Ext(api_client, "REST client", "Read/write inverter settings (optional)")
     }
 
+    Rel(ha, user, "UI")
+    Rel(broker, ha, "MQTT")
+    Rel(s2m, broker, "MQTT publish")
     Rel(dl1, s2m, "TCP – Growatt binary protocol")
     Rel(dl2, s2m, "TCP – Growatt binary protocol")
-    Rel(s2m, broker, "MQTT publish")
-    Rel(broker, ha, "MQTT")
-    Rel(ha, user, "UI")
     Rel(api_client, s2m, "HTTP REST")
-```
 
----
-
-## Architecture Pattern
-
-The project applies **Hexagonal Architecture** (Ports & Adapters). The core rule is:
-
-> **All dependencies point inward toward `domain/`.** No inner layer may import from an outer layer.
-
-```mermaid
-graph TD
-    main["main/\nComposition root"]
-    adapters["adapters/\nOutput ports\n(MQTT, HASS, REST API)"]
-    app["app/\nApplication layer\n(command handlers)"]
-    protocol["protocol/\nGrowatt protocol\n(implements Session)"]
-    infra["infrastructure/\nI/O primitives\n(TCP server/session)"]
-    domain["domain/\nModels · Events · Interfaces"]
-    util["util/\nShared utilities"]
-
-    main --> adapters
-    main --> app
-    main --> protocol
-    main --> infra
-    main --> domain
-
-    adapters --> domain
-    app --> domain
-    protocol --> domain
-    protocol --> infra
-    infra --> domain
-
-    adapters -.->|"no import"| protocol
-    adapters -.->|"no import"| infra
-
-    util --> domain
-    adapters --> util
-    app --> util
-    protocol --> util
-    infra --> util
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
 
 ---
@@ -110,9 +73,9 @@ Events are **immutable dataclasses** placed on `asyncio.Queue[DomainEvent]` by t
 | `Session`         | `protocol.session.ProtocolSession`           |
 | `SessionRegistry` | `protocol.session.ProtocolSessionRegistry`   |
 
-### Domain Commands (`domain/commands/commands.py`)
+### Application Handlers (`app/handlers/`)
 
-Commands are plain dataclasses that represent intent from the outside world (REST API or MQTT subscriber) toward a connected datalogger/inverter. Current commands include `GetDataloggerSettingByNameCommand`, `UpdateDataloggerSettingByNameCommand`, `ReadInverterRegistersCommand`, and others.
+Handlers in `app/handlers/` orchestrate requests from the outside world (REST API) toward a connected datalogger/inverter via `SessionRegistry`. Current handlers: `ReadRegisterHandler`, `WriteRegisterHandler`, `SendRawFrameHandler`. Command dataclasses in `domain/commands/commands.py` exist as data structures but handlers currently call session methods directly.
 
 ---
 
@@ -176,22 +139,13 @@ sequenceDiagram
     API-->>Client: HTTP 200 JSON
 ```
 
-The `SessionCommandExecutor` in `main/` bridges the REST API to the protocol session, sending a command frame and awaiting its response via a `Future`.
+Handlers call session methods directly via the `Session` interface; responses are awaited using asyncio.
 
 ---
 
 ## Composition Root
 
-**`main/app.py` (`Application`) is the only place where concrete implementations are assembled.** It:
-
-1. Creates the `asyncio.Queue[DomainEvent]`
-2. Builds `FrameFactory.encoder()` / `FrameFactory.server_decoder()`
-3. Constructs `ProtocolSessionFactory` and `ProtocolSessionRegistry`
-4. Constructs `TCPServer`
-5. Wires the full MQTT stack: `MqttClient` → `MqttPublisher` → `HassDiscoveryMapper` → `MqttBridge`
-6. (Intended) Constructs application handlers and passes them to adapters
-
-Configuration is loaded via `ApplicationConfig` (`main/config/config.py`), which uses `pydantic-settings` and supports environment variables (prefix `SHINE2MQTT_`, delimiter `__`) and a YAML config file.
+All concrete implementations are assembled in `main/app.py` (`Application`) — the only place allowed to import from all layers. Configuration is loaded via `ApplicationConfig` in `main/config/config.py`, supporting environment variables (prefix `SHINE2MQTT_`, delimiter `__`) and a YAML config file.
 
 ---
 
