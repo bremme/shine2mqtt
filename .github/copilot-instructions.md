@@ -10,20 +10,17 @@ This is project aims to be of high quality and maintainability. Follow establish
   * Simple is better than complex
   * Readability counts
   * Special cases aren't special enough to break the rules
-  * Although practicality beats purity
   * Errors should never pass silently
-  * Unless explicitly silenced
   * In the face of ambiguity, refuse the temptation to guess
-  * There should be one-- and preferably only one --obvious way to do it
   * Special cases aren't special enough to break the rules
   * If the implementation is hard to explain, it's a bad idea
 * SOLID principles
   * Single Responsibility Principle
   * Dependency Inversion Principle
 * Clean code
-* Application of design patterns where applicable
 * Design patterns where applicable
-* DRY, KISS and YAGNI principle
+* Don't repeat yourself (DRY)
+* Keep it simple, stupid (KISS)
 
 ###  Approach
 
@@ -32,12 +29,11 @@ This is project aims to be of high quality and maintainability. Follow establish
 * Talk about a problem in terms of functional and non-functional requirements
 * Discuss suitable application architecture patterns and software design patterns
 * Go step by step, don't jump to conclusions, don't come up with a complete solution when not explicitly asked
-* Always ask before implementing
 * Be as concise as possible with your answers, typically no more than a few sentences.
 * When giving code examples, make them as small as possible to explain the concept or relevant change.
 * Always start with the most simple implementation first
 * But mention alternatives if the current implementation or architecture does not follow best practices
-* Always number options in your answer
+* Always use numbers for option or questions so it is easier to answer
 
 ## Coding instructions
 
@@ -48,10 +44,14 @@ Use these instructions when writing code for the project
 * Use descriptive and unambiguous names
 * Don't add comments to explain what the code does
 * Don't add module/class/method/function docstrings to explain what the code does
-* Apply KISS and YAGNI principle
-  * Make things as simple as possible, only support use cases that are actually needed
+* Make things as simple as possible, only support use cases that are actually needed
 * Local reasoning is important
 * Always use type hints
+
+### Code style
+
+* Follow PEP8
+* Use ruff for code formatting
 
 ### Refactoring
 
@@ -62,7 +62,7 @@ When refactoring
 
 ## Project architecture
 
-Read the project architecture documentation (ARCHITECTURE.md) before suggesting any architectural changes.
+
 
 ### Unit testing instructions
 
