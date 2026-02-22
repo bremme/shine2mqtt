@@ -10,6 +10,7 @@ from shine2mqtt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.protocol.messages.ack.ack import GrowattAckMessage
 from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage
 from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
+from shine2mqtt.protocol.messages.ping.message import GrowattPingMessage
 from shine2mqtt.protocol.session.base import BaseProtocolSession
 from shine2mqtt.protocol.session.mapper import MessageEventMapper
 from shine2mqtt.protocol.session.message_factory import MessageFactory
@@ -72,6 +73,7 @@ class ProtocolSessionInitializer(BaseProtocolSession):
         )
 
         state = ServerProtocolSessionState(datalogger=datalogger, inverter=inverter)
+
         return ProtocolSession(
             transport=self.transport,
             state=state,
@@ -88,9 +90,11 @@ class ProtocolSessionInitializer(BaseProtocolSession):
                     response = GrowattAckMessage(header=message.header, ack=True)
                     await self._write_message(response)
                     return message
+                case GrowattPingMessage():
+                    await self._write_message(message)
                 case _:
                     logger.warning(
-                        f"Received unexpected message while waiting for announce: {message}"
+                        f"Received unexpected message while waiting for announce: {type(message).__name__}"
                     )
 
     async def _request_datalogger_config(
@@ -107,7 +111,9 @@ class ProtocolSessionInitializer(BaseProtocolSession):
             match message := await self._read_message():
                 case GrowattGetConfigResponseMessage() if message.register == register:
                     return message.value
+                case GrowattPingMessage():
+                    await self._write_message(message)
                 case _:
                     logger.warning(
-                        f"Received unexpected message while waiting for config response: {message}"
+                        f"Received unexpected message while waiting for config response: {type(message).__name__}"
                     )
