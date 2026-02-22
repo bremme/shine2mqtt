@@ -78,3 +78,93 @@ ignore = ["E501"]
 [tool.ruff.format]
 
 [tool.ty]
+
+
+[tool.importlinter]
+root_package = "shine2mqtt"
+
+[[tool.importlinter.contracts]]
+name = "domain does not import from other packages"
+type = "forbidden"
+source_modules = ["shine2mqtt.domain"]
+forbidden_modules = [
+    "shine2mqtt.protocol",
+    "shine2mqtt.infrastructure",
+    "shine2mqtt.adapters",
+    "shine2mqtt.app",
+    "shine2mqtt.main",
+    "shine2mqtt.util",
+]
+
+[[tool.importlinter.contracts]]
+name = "util does not import from other packages"
+type = "forbidden"
+source_modules = ["shine2mqtt.util"]
+forbidden_modules = [
+    "shine2mqtt.domain",
+    "shine2mqtt.protocol",
+    "shine2mqtt.infrastructure",
+    "shine2mqtt.adapters",
+    "shine2mqtt.app",
+    "shine2mqtt.main",
+]
+
+[[tool.importlinter.contracts]]
+name = "infrastructure does not import from protocol, adapters, app or main"
+type = "forbidden"
+source_modules = ["shine2mqtt.infrastructure"]
+forbidden_modules = [
+    "shine2mqtt.protocol",
+    "shine2mqtt.adapters",
+    "shine2mqtt.app",
+    "shine2mqtt.main",
+]
+# Known architecture debt: server/client layers are currently coupled to protocol.
+# These should be cleaned up by moving frame decoding and session creation to protocol/.
+ignore_imports = [
+    "shine2mqtt.infrastructure.client.client -> shine2mqtt.protocol.simulator.config",
+    "shine2mqtt.infrastructure.client.client -> shine2mqtt.protocol.simulator.factory",
+    "shine2mqtt.infrastructure.client.client -> shine2mqtt.protocol.simulator.session",
+    "shine2mqtt.infrastructure.client.transport -> shine2mqtt.protocol.frame.constants",
+    "shine2mqtt.infrastructure.client.transport -> shine2mqtt.protocol.frame.decoder",
+    "shine2mqtt.infrastructure.server.server -> shine2mqtt.protocol.session.factory",
+    "shine2mqtt.infrastructure.server.server -> shine2mqtt.protocol.session.registry",
+    "shine2mqtt.infrastructure.server.session -> shine2mqtt.protocol.frame.constants",
+    "shine2mqtt.infrastructure.server.session -> shine2mqtt.protocol.frame.decoder",
+]
+
+[[tool.importlinter.contracts]]
+name = "protocol does not import from adapters, app or main"
+type = "forbidden"
+source_modules = ["shine2mqtt.protocol"]
+forbidden_modules = [
+    "shine2mqtt.adapters",
+    "shine2mqtt.app",
+    "shine2mqtt.main",
+]
+
+[[tool.importlinter.contracts]]
+name = "adapters does not import from infrastructure, protocol or main"
+type = "forbidden"
+source_modules = ["shine2mqtt.adapters"]
+forbidden_modules = [
+    "shine2mqtt.infrastructure",
+    "shine2mqtt.protocol",
+    "shine2mqtt.main",
+]
+ignore_imports = [
+    "shine2mqtt.adapters.api.dependencies -> shine2mqtt.protocol.session.registry",
+    "shine2mqtt.adapters.api.inverter.models -> shine2mqtt.protocol.frame.header.header",
+]
+
+[[tool.importlinter.contracts]]
+name = "app does not import from infrastructure, protocol, adapters or main"
+type = "forbidden"
+source_modules = ["shine2mqtt.app"]
+forbidden_modules = [
+    "shine2mqtt.infrastructure",
+    "shine2mqtt.protocol",
+    "shine2mqtt.adapters",
+    "shine2mqtt.main",
+]
+
