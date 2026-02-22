@@ -1,9 +1,12 @@
 from abc import ABC
+from asyncio import Queue
 from dataclasses import dataclass
 from datetime import datetime
 
 from shine2mqtt.domain.models.datalogger import DataLogger
 from shine2mqtt.domain.models.inverter import Inverter, InverterState
+
+DomainEvents = Queue["DomainEvent"]
 
 
 @dataclass(frozen=True)

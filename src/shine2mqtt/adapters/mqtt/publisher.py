@@ -50,9 +50,9 @@ class MqttPublisher:
     def _map_event_to_message(self, event: DomainEvent) -> list[MqttMessage]:
         match event:
             case DataloggerAnnouncedEvent():
-                return self._discovery_mapper.get_discovery_messages(
-                    event
-                ) + self._event_mapper.map_datalogger_announced(event)
+                discovery_messages = self._discovery_mapper.get_discovery_messages(event)
+                sensor_update_messages = self._event_mapper.map_datalogger_announced(event)
+                return discovery_messages + sensor_update_messages
             case InverterStateUpdatedEvent():
                 return self._event_mapper.map_inverter_state(event)
             case _:

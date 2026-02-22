@@ -42,7 +42,7 @@ async def update_single_inverter_setting(serial: str, name: str, value: str):
     not_implemented_501()
 
 
-# Inverter register endpoints
+# Inverter (holding) register endpoints
 @router.get("/registers/{address}")
 async def read_single_inverter_register(
     serial: str,
@@ -85,6 +85,7 @@ async def write_multiple_inverter_registers(serial: str, registers: list[dict[st
     not_implemented_501()
 
 
+# Raw frame endpoints
 @router.post(
     "/raw-frames",
     responses={504: {"description": "Gateway timeout when the datalogger did not respond in time"}},

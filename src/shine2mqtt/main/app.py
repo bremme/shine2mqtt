@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 
 import uvicorn
 
@@ -14,52 +15,52 @@ from shine2mqtt.adapters.mqtt.subscriber import MqttSubscriber
 from shine2mqtt.app.handlers.read_register import ReadRegisterHandler
 from shine2mqtt.app.handlers.send_raw_frame import SendRawFrameHandler
 from shine2mqtt.app.handlers.write_register import WriteRegisterHandler
-from shine2mqtt.domain.events.events import DomainEvent
+from shine2mqtt.domain.events.events import DomainEvents
+from shine2mqtt.domain.interfaces.registry import SessionRegistry
 from shine2mqtt.infrastructure.server.server import TCPServer
 from shine2mqtt.main.config.config import ApplicationConfig
+from shine2mqtt.protocol.frame.capturer import CaptureHandler
 from shine2mqtt.protocol.frame.factory import FrameFactory
 from shine2mqtt.protocol.session.factory import ProtocolSessionFactory
 from shine2mqtt.protocol.session.registry import ProtocolSessionRegistry
 from shine2mqtt.protocol.settings.registry import SettingsRegistry
+from shine2mqtt.util.logger import logger
 
 
 class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
 
-        domain_events = asyncio.Queue[DomainEvent](maxsize=100)
-
-        encoder = FrameFactory.encoder()
-        decoder = FrameFactory.server_decoder()
+        domain_events = DomainEvents(maxsize=100)
         session_registry = ProtocolSessionRegistry()
+
+        # Protocol
+        encoder = FrameFactory.encoder()
+
+        if config.capture_data:
+            logger.info("Frame data capturing is enabled.")
+            capture_handler = CaptureHandler.create(Path("./captured_frames"), encoder)
+            decoder = FrameFactory.server_decoder(on_decode=capture_handler)
+        else:
+            decoder = FrameFactory.server_decoder()
+
         session_factory = ProtocolSessionFactory(
             encoder=encoder, decoder=decoder, domain_events=domain_events
         )
 
         # Infrastructure
-        tcp_server = TCPServer(
+        self._tcp_server = TCPServer(
             session_registry=session_registry,
             session_factory=session_factory,
             config=config.server,
         )
 
-        # Application handlers
-        settings_registry = SettingsRegistry()
-        read_handler = ReadRegisterHandler(session_registry, settings_registry)
-        write_handler = WriteRegisterHandler(session_registry, settings_registry)
-        send_raw_frame_handler = SendRawFrameHandler(session_registry)
-
         # Adapters
         self._mqtt_bridge = self._setup_mqtt_bridge(domain_events, config)
-        self._api_app = create_app(
-            session_registry, read_handler, write_handler, send_raw_frame_handler
-        )
-        self._api_server = self._setup_api_server(config)
-
-        self._tcp_server = tcp_server
+        self._api_server = self._setup_api_server(session_registry, config)
 
     def _setup_mqtt_bridge(
-        self, domain_events: asyncio.Queue[DomainEvent], config: ApplicationConfig
+        self, domain_events: DomainEvents, config: ApplicationConfig
     ) -> MqttBridge:
         discovery_builder = HassDiscoveryPayloadBuilder(
             config=config.mqtt.discovery,
@@ -88,9 +89,22 @@ class Application:
             mapper=mapper,
         )
 
-    def _setup_api_server(self, config: ApplicationConfig) -> uvicorn.Server | None:
+    def _setup_api_server(
+        self, session_registry: SessionRegistry, config: ApplicationConfig
+    ) -> uvicorn.Server | None:
         if not config.api.enabled:
             return None
+
+        # Application handlers
+        settings_registry = SettingsRegistry()
+        read_handler = ReadRegisterHandler(session_registry, settings_registry)
+        write_handler = WriteRegisterHandler(session_registry, settings_registry)
+        send_raw_frame_handler = SendRawFrameHandler(session_registry)
+
+        self._api_app = create_app(
+            session_registry, read_handler, write_handler, send_raw_frame_handler
+        )
+
         uvicorn_config = uvicorn.Config(
             app=self._api_app,
             host=config.api.host,
@@ -109,7 +123,5 @@ class Application:
 
         if self.config.api.enabled and self._api_server is not None:
             tasks.append(asyncio.create_task(self._api_server.serve()))
-
-        await asyncio.gather(*tasks)
 
         await asyncio.gather(*tasks)

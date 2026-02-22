@@ -6,11 +6,11 @@ from shine2mqtt.adapters.api.inverter.router import router as inverter_router
 from shine2mqtt.app.handlers.read_register import ReadRegisterHandler
 from shine2mqtt.app.handlers.send_raw_frame import SendRawFrameHandler
 from shine2mqtt.app.handlers.write_register import WriteRegisterHandler
-from shine2mqtt.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.domain.interfaces.registry import SessionRegistry
 
 
 def create_app(
-    session_registry: ProtocolSessionRegistry,
+    session_registry: SessionRegistry,
     read_handler: ReadRegisterHandler,
     write_handler: WriteRegisterHandler,
     send_raw_frame_handler: SendRawFrameHandler,

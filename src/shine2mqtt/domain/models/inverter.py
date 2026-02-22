@@ -4,10 +4,11 @@ from enum import Enum
 
 @dataclass(frozen=True)
 class Inverter:
+    # non-writable fields
     serial: str
     fw_version: str
     control_fw_version: str
-    # device_type: str
+    # writable fields are part of settings
     settings: InverterSettings
 
 
@@ -27,11 +28,6 @@ class InverterSettings:
     power_factor: float
     rated_power_ac: float
     rated_voltage_dc: float
-    # inverter_fw_version: str
-    # inverter_control_fw_version: str
-    # lcd_language: str
-    # timestamp: datetime
-
     voltage_ac_low_limit: float
     voltage_ac_high_limit: float
     frequency_ac_low_limit: float
