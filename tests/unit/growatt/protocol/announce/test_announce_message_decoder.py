@@ -2,12 +2,12 @@ from datetime import datetime
 
 import pytest
 
-from shine2mqtt.protocol.protocol.announce.announce import (
+from shine2mqtt.protocol.frame.header.header import MBAPHeader
+from shine2mqtt.protocol.messages.announce.announce import (
     GrowattAnnounceMessage,
     SafetyFunction,
 )
-from shine2mqtt.protocol.protocol.announce.decoder import AnnounceRequestDecoder
-from shine2mqtt.protocol.protocol.base.message import MBAPHeader
+from shine2mqtt.protocol.messages.announce.decoder import AnnounceRequestDecoder
 from tests.utils.loader import CapturedFrameLoader
 
 frames, headers, payloads = CapturedFrameLoader.load("announce_message")

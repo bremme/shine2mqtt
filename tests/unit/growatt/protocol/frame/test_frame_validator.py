@@ -2,11 +2,10 @@ import struct
 
 import pytest
 
-from shine2mqtt.protocol.protocol.base.message import MBAPHeader
-from shine2mqtt.protocol.protocol.constants import FunctionCode
-from shine2mqtt.protocol.protocol.crc.decoder import CRCDecoder
-from shine2mqtt.protocol.protocol.frame.crc import CRCCalculator
-from shine2mqtt.protocol.protocol.frame.validator import FrameValidator
+from shine2mqtt.protocol.frame.crc.calculator import CRCCalculator
+from shine2mqtt.protocol.frame.crc.decoder import CRCDecoder
+from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
+from shine2mqtt.protocol.frame.validator import FrameValidator
 from tests.utils.loader import CapturedFrameLoader
 
 frames, _, _ = CapturedFrameLoader.load("data_message")

@@ -2,9 +2,8 @@ from datetime import datetime
 
 import pytest
 
-from shine2mqtt.protocol.protocol.constants import InverterStatus
-from shine2mqtt.protocol.protocol.data.data import GrowattDataMessage
-from shine2mqtt.protocol.protocol.data.decoder import BufferDataRequestDecoder
+from shine2mqtt.protocol.messages.data.data import GrowattDataMessage, InverterStatus
+from shine2mqtt.protocol.messages.data.decoder import BufferDataRequestDecoder
 from tests.utils.loader import CapturedFrameLoader
 
 frames, headers, payloads = CapturedFrameLoader.load("buffered_data_message")

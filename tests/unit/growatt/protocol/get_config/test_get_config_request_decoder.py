@@ -1,8 +1,7 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.constants import FunctionCode
-from shine2mqtt.protocol.protocol.get_config.decoder import GetConfigRequestDecoder
-from shine2mqtt.protocol.protocol.header.header import MBAPHeader
+from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
+from shine2mqtt.protocol.messages.get_config.decoder import GetConfigRequestDecoder
 
 DATALOGGER_SERIAL = "XGDABCDEFG"
 

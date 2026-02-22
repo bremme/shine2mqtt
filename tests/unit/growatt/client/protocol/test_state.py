@@ -1,9 +1,8 @@
 import pytest
 
-from shine2mqtt.protocol.client.protocol.state import ClientProtocolSessionState
-from shine2mqtt.protocol.protocol.ack.ack import GrowattAckMessage
-from shine2mqtt.protocol.protocol.constants import FunctionCode
-from shine2mqtt.protocol.protocol.header.header import MBAPHeader
+from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
+from shine2mqtt.protocol.messages.ack.ack import GrowattAckMessage
+from shine2mqtt.protocol.simulator.state import ClientProtocolSessionState
 
 # TEMP
 default_function_codes = [

@@ -9,7 +9,7 @@ from shine2mqtt.main.cli.parser import CliArgParser
 class TestCliArgParser:
     def test_create_uses_sys_argv_and_package_name(self) -> None:
         with patch("sys.argv", ["shine2mqtt", "run"]):
-            with patch("shine2mqtt.app.cli.parser.NAME", "shine2mqtt"):
+            with patch("shine2mqtt.main.cli.parser.NAME", "shine2mqtt"):
                 parser = CliArgParser.create()
                 assert parser.prog == "shine2mqtt"
                 assert parser.argv == ["run"]

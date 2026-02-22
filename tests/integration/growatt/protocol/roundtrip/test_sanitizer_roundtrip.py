@@ -1,17 +1,17 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.announce.decoder import AnnounceRequestDecoder
-from shine2mqtt.protocol.protocol.crc.decoder import CRCDecoder
-from shine2mqtt.protocol.protocol.data.decoder import DataRequestDecoder
-from shine2mqtt.protocol.protocol.frame.capturer.sanitizer import (
+from shine2mqtt.protocol.frame.capturer.sanitizer import (
     DUMMY_DATALOGGER_SERIAL,
     DUMMY_INVERTER_SERIAL,
     RawPayloadSanitizer,
 )
-from shine2mqtt.protocol.protocol.frame.crc import CRCCalculator
-from shine2mqtt.protocol.protocol.frame.validator import FrameValidator
-from shine2mqtt.protocol.protocol.get_config.decoder import GetConfigResponseDecoder
-from shine2mqtt.protocol.protocol.ping.decoder import PingRequestDecoder
+from shine2mqtt.protocol.frame.crc.calculator import CRCCalculator
+from shine2mqtt.protocol.frame.crc.decoder import CRCDecoder
+from shine2mqtt.protocol.frame.validator import FrameValidator
+from shine2mqtt.protocol.messages.announce.decoder import AnnounceRequestDecoder
+from shine2mqtt.protocol.messages.data.decoder import DataRequestDecoder
+from shine2mqtt.protocol.messages.get_config.decoder import GetConfigResponseDecoder
+from shine2mqtt.protocol.messages.ping.decoder import PingRequestDecoder
 from tests.utils.loader import CapturedFrameLoader
 
 announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")

@@ -1,8 +1,8 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.base.decoder_registry import DecoderRegistry
-from shine2mqtt.protocol.protocol.constants import FunctionCode
-from shine2mqtt.protocol.protocol.frame.factory import FrameFactory
+from shine2mqtt.protocol.frame.factory import FrameFactory
+from shine2mqtt.protocol.frame.header.header import FunctionCode
+from shine2mqtt.protocol.messages.decoder.registry import DecoderRegistry
 
 
 class TestBidirectionalProtocol:

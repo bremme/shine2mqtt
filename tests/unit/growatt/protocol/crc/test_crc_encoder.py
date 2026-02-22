@@ -1,4 +1,4 @@
-from shine2mqtt.protocol.protocol.crc.encoder import CRCEncoder
+from shine2mqtt.protocol.frame.crc.encoder import CRCEncoder
 
 
 class TestCRCEncoder:

@@ -1,8 +1,7 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.base.message import MBAPHeader
-from shine2mqtt.protocol.protocol.constants import FunctionCode
-from shine2mqtt.protocol.protocol.header.encoder import HeaderEncoder
+from shine2mqtt.protocol.frame.header.encoder import HeaderEncoder
+from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
 
 
 class TestHeaderEncoder:

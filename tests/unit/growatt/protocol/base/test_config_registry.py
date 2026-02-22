@@ -1,6 +1,10 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.config import ConfigRegistry, RegisterInfo, RegisterNotFoundError
+from shine2mqtt.protocol.settings.registry import (
+    RegisterInfo,
+    RegisterNotFoundError,
+    SettingsRegistry,
+)
 
 
 @pytest.fixture
@@ -21,7 +25,7 @@ def test_registers():
 
 @pytest.fixture
 def registry(test_registers):
-    return ConfigRegistry(test_registers)
+    return SettingsRegistry(test_registers)
 
 
 def test_get_register_by_name(registry):
@@ -55,7 +59,7 @@ def test_has_register(registry):
 
 
 def test_default_uses_config_registers():
-    registry = ConfigRegistry()
+    registry = SettingsRegistry()
     assert registry.has_register(4) is True
     info = registry.get_register_info(4)
     assert info is not None

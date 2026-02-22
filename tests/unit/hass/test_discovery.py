@@ -1,7 +1,7 @@
 import pytest
 
 from shine2mqtt.adapters.hass.config import DeviceConfig, HassDiscoveryConfig
-from shine2mqtt.adapters.hass.discovery import MqttDiscoveryBuilder
+from shine2mqtt.adapters.hass.discovery import HassDiscoveryPayloadBuilder
 from shine2mqtt.adapters.hass.map import INVERTER_SENSOR_MAP
 
 
@@ -17,8 +17,8 @@ def config() -> HassDiscoveryConfig:
 
 
 @pytest.fixture
-def builder(config, sensor_map) -> MqttDiscoveryBuilder:
-    return MqttDiscoveryBuilder(
+def builder(config, sensor_map) -> HassDiscoveryPayloadBuilder:
+    return HassDiscoveryPayloadBuilder(
         config=config,
         datalogger_sensor_map=sensor_map,
         inverter_sensor_map=sensor_map,
@@ -53,7 +53,7 @@ def real_sensor_map():
 
 class TestMqttDiscoveryBuilder:
     def test_discovery_origin_contains_package_info(self):
-        assert MqttDiscoveryBuilder.DISCOVERY_ORIGIN == {
+        assert HassDiscoveryPayloadBuilder.DISCOVERY_ORIGIN == {
             "name": "shine2mqtt",
             "sw_version": "0.1.0",
             "support_url": "https://github.com/bremme/shine2mqtt",
@@ -61,7 +61,7 @@ class TestMqttDiscoveryBuilder:
 
 
 class TestMqttDiscoveryBuilderDiscoveryMessage:
-    def test_build_datalogger_discovery_message(self, builder: MqttDiscoveryBuilder):
+    def test_build_datalogger_discovery_message(self, builder: HassDiscoveryPayloadBuilder):
         result = builder.build_datalogger_discovery_message("1.0.0", "ABC123")
 
         assert result == {
@@ -74,7 +74,7 @@ class TestMqttDiscoveryBuilderDiscoveryMessage:
                 "sw_version": "1.0.0",
                 "serial_number": "ABC123",
             },
-            "origin": MqttDiscoveryBuilder.DISCOVERY_ORIGIN,
+            "origin": HassDiscoveryPayloadBuilder.DISCOVERY_ORIGIN,
             "components": {
                 "temperature": {
                     "platform": "sensor",
@@ -106,7 +106,7 @@ class TestMqttDiscoveryBuilderDiscoveryMessage:
             },
         }
 
-    def test_build_inverter_discovery_message(self, builder: MqttDiscoveryBuilder):
+    def test_build_inverter_discovery_message(self, builder: HassDiscoveryPayloadBuilder):
         result = builder.build_inverter_discovery_message("1.2.3", "INV789")
 
         assert result == {
@@ -120,7 +120,7 @@ class TestMqttDiscoveryBuilderDiscoveryMessage:
                 "serial_number": "INV789",
                 "via_device": "growatt_shinewifi_x",
             },
-            "origin": MqttDiscoveryBuilder.DISCOVERY_ORIGIN,
+            "origin": HassDiscoveryPayloadBuilder.DISCOVERY_ORIGIN,
             "components": {
                 "temperature": {
                     "platform": "sensor",
@@ -155,7 +155,7 @@ class TestMqttDiscoveryBuilderDiscoveryMessage:
     def test_build_inverter_discovery_message_with_real_sensor_map(
         self, config: HassDiscoveryConfig, real_sensor_map: dict[str, dict[str, str]]
     ):
-        builder = MqttDiscoveryBuilder(
+        builder = HassDiscoveryPayloadBuilder(
             config=config,
             datalogger_sensor_map=real_sensor_map,
             inverter_sensor_map=real_sensor_map,
@@ -185,11 +185,11 @@ class TestMqttDiscoveryBuilderDiscoveryMessage:
 
 
 class TestMqttDiscoveryBuilderTopics:
-    def test_build_inverter_discovery_topic(self, builder: MqttDiscoveryBuilder):
+    def test_build_inverter_discovery_topic(self, builder: HassDiscoveryPayloadBuilder):
         result = builder.build_inverter_discovery_topic()
         assert result == "homeassistant/device/growatt_mic_3000tl_x/config"
 
-    def test_build_datalogger_discovery_topic(self, builder: MqttDiscoveryBuilder):
+    def test_build_datalogger_discovery_topic(self, builder: HassDiscoveryPayloadBuilder):
         result = builder.build_datalogger_discovery_topic()
         assert result == "homeassistant/device/growatt_shinewifi_x/config"
 
@@ -199,7 +199,7 @@ class TestMqttDiscoveryBuilderTopics:
             inverter=DeviceConfig(brand="Test", model="Inverter"),
             datalogger=DeviceConfig(brand="Test", model="Logger"),
         )
-        builder = MqttDiscoveryBuilder(config, sensor_map, sensor_map)
+        builder = HassDiscoveryPayloadBuilder(config, sensor_map, sensor_map)
 
         assert builder.build_inverter_discovery_topic() == "ha/device/test_inverter/config"
         assert builder.build_datalogger_discovery_topic() == "ha/device/test_logger/config"

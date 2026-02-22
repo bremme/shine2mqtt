@@ -2,12 +2,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from shine2mqtt.protocol.client.protocol.session import (
+from shine2mqtt.protocol.frame.header.header import FunctionCode
+from shine2mqtt.protocol.simulator.session import (
     ClientProtocolSession,
     SendIntervals,
     SendMessageAction,
 )
-from shine2mqtt.protocol.protocol.constants import FunctionCode
 
 
 class TestClientProtocolSession:
@@ -88,14 +88,18 @@ class TestClientProtocolSession:
             FunctionCode.PING,
         ],
     )
-    def test_get_send_message_frame_returns_frame(self, session, function_code):
+    def test_get_send_message_frame_returns_frame(
+        self, session: ClientProtocolSession, function_code: FunctionCode
+    ):
         action = SendMessageAction(function_code=function_code)
 
         result = session.get_send_message_frame(action)
 
         assert result == b"test_frame"
         session.generator.generate_frame.assert_called_once_with(
-            transaction_id=1, function_code=function_code
+            transaction_id=1,
+            function_code=function_code,
+            datalogger_serial=session.session_state.datalogger_serial,
         )
         session.session_state.update_last_send.assert_called_once_with(function_code, 0.0)
 

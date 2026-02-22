@@ -1,7 +1,7 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.data.decoder import DataRequestDecoder
-from shine2mqtt.protocol.protocol.data.encoder import DataPayloadEncoder
+from shine2mqtt.protocol.messages.data.decoder import DataRequestDecoder
+from shine2mqtt.protocol.messages.data.encoder import DataPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
 _, headers, payloads = CapturedFrameLoader.load("data_message")

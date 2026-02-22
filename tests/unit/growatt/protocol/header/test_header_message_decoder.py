@@ -1,6 +1,6 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.header.decoder import HeaderDecoder
+from shine2mqtt.protocol.frame.header.decoder import HeaderDecoder
 from tests.utils.loader import CapturedFrameLoader
 
 frames, headers, payloads = CapturedFrameLoader.load("ping_message")

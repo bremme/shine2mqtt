@@ -1,11 +1,11 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.config import ConfigRegistry
-from shine2mqtt.protocol.protocol.get_config.decoder import GetConfigResponseDecoder
-from shine2mqtt.protocol.protocol.get_config.get_config import (
+from shine2mqtt.protocol.frame.header.header import MBAPHeader
+from shine2mqtt.protocol.messages.get_config.decoder import GetConfigResponseDecoder
+from shine2mqtt.protocol.messages.get_config.get_config import (
     GrowattGetConfigResponseMessage,
 )
-from shine2mqtt.protocol.protocol.header.header import MBAPHeader
+from shine2mqtt.protocol.settings.registry import SettingsRegistry
 from tests.utils.loader import CapturedFrameLoader
 
 frames, headers, payloads = CapturedFrameLoader.load("get_config_response")
@@ -31,7 +31,7 @@ CASES = [(headers[14], payloads[14], EXPECTED_MESSAGES[0])]
 class TestGetConfigResponseDecoder:
     @pytest.fixture
     def decoder(self):
-        return GetConfigResponseDecoder(ConfigRegistry())
+        return GetConfigResponseDecoder(SettingsRegistry())
 
     @pytest.mark.parametrize(
         "header,payload,expected_message", CASES, ids=[f"{i}" for i in range(len(CASES))]

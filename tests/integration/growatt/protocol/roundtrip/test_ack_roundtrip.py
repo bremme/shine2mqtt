@@ -1,7 +1,7 @@
 import pytest
 
-from shine2mqtt.protocol.protocol.ack.decoder import AckMessageResponseDecoder
-from shine2mqtt.protocol.protocol.ack.encoder import AckPayloadEncoder
+from shine2mqtt.protocol.messages.ack.decoder import AckMessageResponseDecoder
+from shine2mqtt.protocol.messages.ack.encoder import AckPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
 _, headers, payloads = CapturedFrameLoader.load("set_config_response")
