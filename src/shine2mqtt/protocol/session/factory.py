@@ -29,4 +29,4 @@ class ProtocolSessionFactory:
             transport=transport,
             domain_events=self.domain_events,
         )
-        return await initializer._initialize()
+        return await initializer.initialize()

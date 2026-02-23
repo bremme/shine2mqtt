@@ -4,6 +4,7 @@ DATALOGGER_IP_ADDRESS_REGISTER = 14
 DATALOGGER_MAC_ADDRESS_REGISTER = 16
 DATALOGGER_SERVER_IP_ADDRESS_REGISTER = 17
 DATALOGGER_SW_VERSION_REGISTER = 21
+DATALOGGER_SYSTEM_TIME_REGISTER = 31
 DATALOGGER_WIFI_SSID_REGISTER = 56
 DATALOGGER_WIFI_PASSWORD_REGISTER = 57
 
@@ -72,6 +73,11 @@ CONFIG_REGISTERS = {
     DATALOGGER_WIFI_PASSWORD_REGISTER: {
         "name": "wifi_password",
         "description": "WiFi password",
+        "fmt": "s",
+    },
+    DATALOGGER_SYSTEM_TIME_REGISTER: {
+        "name": "system_time",
+        "description": "System time",
         "fmt": "s",
     },
 }
