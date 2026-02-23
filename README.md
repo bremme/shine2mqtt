@@ -468,6 +468,7 @@ This project is licensed under the GNU General Public License V3.0 - see the [LI
 ## 🙏 Acknowledgments
 
 - Johan Vromans for the excellent protocol documentation
+- Johan Meijer for the grott project
 - The Home Assistant community
 - All contributors to related Growatt projects
 
