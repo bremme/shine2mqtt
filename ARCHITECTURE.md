@@ -11,7 +11,7 @@ C4Context
     Person(user, "User", "Monitors solar production via Home Assistant")
 
     System_Boundary(home, "Local network") {
-        
+
         System(s2m, "shine2mqtt", "Decodes Growatt protocol, publishes to MQTT, exposes REST API")
         SystemDb(broker, "MQTT Broker", "e.g. Mosquitto")
         System(ha, "Home Assistant", "Automation platform")

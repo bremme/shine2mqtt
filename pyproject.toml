@@ -119,7 +119,7 @@ forbidden_modules = [
     "shine2mqtt.app",
     "shine2mqtt.main",
 ]
-# Known architecture debt: server/client layers are currently coupled to protocol.
+# Known architecture debt: client layers are currently coupled to protocol.
 # These should be cleaned up by moving frame decoding and session creation to protocol/.
 ignore_imports = [
     "shine2mqtt.infrastructure.client.client -> shine2mqtt.protocol.simulator.config",
@@ -163,4 +163,3 @@ forbidden_modules = [
     "shine2mqtt.adapters",
     "shine2mqtt.main",
 ]
-

@@ -43,7 +43,7 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   publish-image:
-    needs: 
+    needs:
       - ci
       - verify-version
     runs-on: ubuntu-latest
@@ -107,7 +107,7 @@ jobs:
       #     echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
   publish-package:
-    needs: 
+    needs:
       - ci
       - verify-version
     runs-on: ubuntu-latest
@@ -171,18 +171,18 @@ jobs:
   #         name: Release ${{ steps.version.outputs.VERSION }}
   #         body: |
   #           ## What's Changed
-            
+
   #           ${{ steps.changelog.outputs.CHANGELOG }}
-            
+
   #           ## Docker Images
-            
+
   #           - `${{ env.IMAGE_NAME }}:${{ steps.version.outputs.VERSION }}`
   #           - `${{ env.IMAGE_NAME }}:latest`
-            
+
   #           **Platforms:** linux/amd64, linux/arm64, linux/arm/v7
-            
+
   #           ## PyPI
-            
+
   #           ```bash
   #           pip install shine2mqtt==${{ steps.version.outputs.VERSION }}
   #           ```
