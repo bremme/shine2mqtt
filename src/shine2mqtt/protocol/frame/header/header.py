@@ -45,9 +45,18 @@ class MBAPHeader:
     protocol_id: int
     length: int
     unit_id: int
-    # TODO: strictly speaking, function code is not part of the MBAP header
-    # [MBAP Header][Function Code][Data]
-    # Function Code and Data are part of the PDU (Protocol Data Unit)
+    # NOTE: strictly speaking, function code is not part of the MBAP header
+    #                                         ◄──────────── Modbus RTU ──────────────►
+    #                                         ┌──────────┬───────────────┬──────┬─────┐
+    #                                         │ Slave ID │ Function Code │ Data │ CRC │
+    # ┌────────────────┬─────────────┬────────┼──────────┼───────────────┼──────┼─────┘
+    # │ Transaction ID │ Protocol ID │ Length │ Unit ID  │ Function Code │ Data │
+    # └────────────────┼─────────────┼────────┼──────────┼───────────────┼──────┼─────┐
+    # │ Transaction ID │ Protocol ID │ Length │ Unit ID  │ Function Code │ Data │ CRC │
+    # └────────────────┴─────────────┴────────┴──────────┴───────────────┴──────┴─────┘
+    # ◄──────────────────── MBAP Header ──────►◄──────── PDU ───────────────────►
+    # ◄──────────────────────────── Modbus TCP ─────────────────────────────────►
+    # ◄──────────────────────────────── Growatt TCP ──────────────────────────────────►
     function_code: FunctionCode
 
     def asdict(self) -> dict:
