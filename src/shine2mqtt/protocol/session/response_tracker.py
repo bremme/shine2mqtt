@@ -7,9 +7,13 @@ from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigR
 from shine2mqtt.protocol.messages.message import BaseMessage
 from shine2mqtt.protocol.messages.raw.raw import GrowattRawMessage
 from shine2mqtt.protocol.messages.read_register.read_register import (
-    GrowattReadRegisterResponseMessage,
+    GrowattReadMultipleRegisterResponseMessage,
 )
 from shine2mqtt.protocol.messages.set_config.set_config import GrowattSetConfigResponseMessage
+from shine2mqtt.protocol.messages.write_register.write_register import (
+    GrowattWriteMultipleRegistersResponseMessage,
+    GrowattWriteSingleRegisterResponseMessage,
+)
 from shine2mqtt.util.logger import logger
 
 type TransactionKey = tuple[FunctionCode, int]
@@ -45,8 +49,12 @@ class PendingResponseTracker:
                 )
             case GrowattSetConfigResponseMessage():
                 response.set_result(message.ack)
-            case GrowattReadRegisterResponseMessage():
+            case GrowattReadMultipleRegisterResponseMessage():
                 response.set_result(message.data_u16)
+            case GrowattWriteSingleRegisterResponseMessage():
+                response.set_result(message.ack)
+            case GrowattWriteMultipleRegistersResponseMessage():
+                response.set_result(message.ack)
             case GrowattRawMessage():
                 response.set_result(message.payload)
             case _:

@@ -84,6 +84,22 @@ class ProtocolSession(BaseProtocolSession, Session):
         return await self._resolve_request(request)
 
     @override
+    async def write_single_register(self, register: int, value: int) -> bool:
+        request = self._factory.write_single_register_request(
+            self.datalogger.serial, register, value
+        )
+        return await self._resolve_request(request)
+
+    @override
+    async def write_multiple_registers(
+        self, register_start: int, register_end: int, values: bytes
+    ) -> bool:
+        request = self._factory.write_multiple_registers_request(
+            self.datalogger.serial, register_start, register_end, values
+        )
+        return await self._resolve_request(request)
+
+    @override
     async def send_raw_frame(self, function_code: int, payload: bytes) -> bytes:
         request = self._factory.raw_frame_request(self.datalogger.serial, function_code, payload)
         return await self._resolve_request(request)

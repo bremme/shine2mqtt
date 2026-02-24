@@ -6,6 +6,10 @@ from shine2mqtt.protocol.messages.read_register.read_register import (
     GrowattReadRegistersRequestMessage,
 )
 from shine2mqtt.protocol.messages.set_config.set_config import GrowattSetConfigRequestMessage
+from shine2mqtt.protocol.messages.write_register.write_register import (
+    GrowattWriteMultipleRegistersRequestMessage,
+    GrowattWriteSingleRegisterRequestMessage,
+)
 from shine2mqtt.protocol.session.state import TransactionIdTracker
 
 
@@ -24,7 +28,7 @@ class MessageFactory:
     def get_config_request(
         self, datalogger_serial: str, register: int
     ) -> GrowattGetConfigRequestMessage:
-        header = self._make_header(FunctionCode.GET_CONFIG)
+        header = self._header(FunctionCode.GET_CONFIG)
         return GrowattGetConfigRequestMessage(
             header=header,
             datalogger_serial=datalogger_serial,
@@ -35,7 +39,7 @@ class MessageFactory:
     def set_config_request(
         self, datalogger_serial: str, register: int, value: str
     ) -> GrowattSetConfigRequestMessage:
-        header = self._make_header(FunctionCode.SET_CONFIG)
+        header = self._header(FunctionCode.SET_CONFIG)
         return GrowattSetConfigRequestMessage(
             header=header,
             datalogger_serial=datalogger_serial,
@@ -46,12 +50,35 @@ class MessageFactory:
     def read_registers_request(
         self, datalogger_serial: str, register_start: int, register_end: int
     ) -> GrowattReadRegistersRequestMessage:
-        header = self._make_header(FunctionCode.READ_REGISTERS)
+        header = self._header(FunctionCode.READ_MULTIPLE_HOLDING_REGISTERS)
         return GrowattReadRegistersRequestMessage(
             header=header,
             datalogger_serial=datalogger_serial,
             register_start=register_start,
             register_end=register_end,
+        )
+
+    def write_single_register_request(
+        self, datalogger_serial: str, register: int, value: int
+    ) -> GrowattWriteSingleRegisterRequestMessage:
+        header = self._header(FunctionCode.WRITE_SINGLE_HOLDING_REGISTER)
+        return GrowattWriteSingleRegisterRequestMessage(
+            header=header,
+            datalogger_serial=datalogger_serial,
+            register=register,
+            value=value,
+        )
+
+    def write_multiple_registers_request(
+        self, datalogger_serial: str, register_start: int, register_end: int, values: bytes
+    ) -> GrowattWriteMultipleRegistersRequestMessage:
+        header = self._header(FunctionCode.WRITE_MULTIPLE_HOLDING_REGISTERS)
+        return GrowattWriteMultipleRegistersRequestMessage(
+            header=header,
+            datalogger_serial=datalogger_serial,
+            register_start=register_start,
+            register_end=register_end,
+            values=values,
         )
 
     def raw_frame_request(
@@ -71,7 +98,7 @@ class MessageFactory:
             payload=payload,
         )
 
-    def _make_header(self, function_code: FunctionCode) -> MBAPHeader:
+    def _header(self, function_code: FunctionCode) -> MBAPHeader:
         return MBAPHeader(
             transaction_id=self._tracker.get_next_transaction_id(function_code),
             protocol_id=self._protocol_id,

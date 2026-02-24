@@ -14,7 +14,7 @@ class GrowattReadRegistersRequestMessage(DataloggerMessage):
 # Datalogger messages ######################################################################
 # response
 @dataclass
-class GrowattReadRegisterResponseMessage(DataloggerMessage):
+class GrowattReadMultipleRegisterResponseMessage(DataloggerMessage):
     register_start: int
     register_end: int
     data: str

@@ -10,23 +10,22 @@ class FunctionCode(Enum):
 
     SET_CONFIG = 0x18  # 24
     GET_CONFIG = 0x19  # 25
-    # REBOOT = 0x20 ?
 
-    READ_REGISTERS = 0x05  # 5 (custom code, not standard Modbus)
+    READ_MULTIPLE_HOLDING_REGISTERS = 0x05  # 5 (custom code, not standard Modbus)
     WRITE_SINGLE_HOLDING_REGISTER = 0x06
     WRITE_MULTIPLE_HOLDING_REGISTERS = 0x10
 
-    # default Modbus function codes
+    # Modbus public function codes
     # https://en.wikipedia.org/wiki/Modbus#Public_function_codes
-    X02_02 = 0x02  # Read Discrete Inputs
-    X01_01 = 0x01  # Read Coils
-    X05_05 = 0x05  # Write Single Coil
-    X0F_15 = 0x0F  # Write Multiple Coils
+    X02_02 = 0x02  # (02)Read Discrete Inputs
+    X01_01 = 0x01  # (01) Read Coils
+    X05_05 = 0x05  # (05) Write Single Coil
+    X0F_15 = 0x0F  # (15) Write Multiple Coils
 
-    X03_03 = 0x03  # Read Multiple Holding Registers
-    X06_06 = 0x06  # Write Single Holding Register
-    X04_04 = 0x04  # Read Input Registers
-    X10_16 = 0x10  # Write Multiple Holding Registers
+    X03_03 = 0x03  # (03) Read Multiple Holding Registers
+    X06_06 = 0x06  # (06) Write Single Holding Register
+    X04_04 = 0x04  # (04) Read Input Registers
+    X10_16 = 0x10  # (10) Write Multiple Holding Registers
     X14_20 = 0x14  # (20) Read File Record
     X15_21 = 0x15  # (21) Write File Record
     X16_22 = 0x16  # (22) Mask Write Register
@@ -34,7 +33,7 @@ class FunctionCode(Enum):
     X18_24 = 0x18  # (24) Read FIFO Queue
 
     X19_25 = 0x19  # (25) Get Config
-    X20_32 = 0x20  # (32) Reboot
+    X20_32 = 0x20  # (32)
     X32_50 = 0x32  # (50)
     X50_80 = 0x50  # (80)
 

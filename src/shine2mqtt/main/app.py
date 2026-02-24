@@ -38,7 +38,7 @@ class Application:
         encoder = FrameFactory.encoder()
 
         if config.capture_data:
-            logger.info("Frame data capturing is enabled.")
+            logger.info("Frame data capturing is ENABLED.")
             capture_handler = CaptureHandler.create(Path("./captured_frames"), encoder)
             decoder = FrameFactory.server_decoder(on_decode=capture_handler)
         else:

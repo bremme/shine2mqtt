@@ -11,7 +11,7 @@ from shine2mqtt.protocol.messages.get_config.decoder import (
     GetConfigResponseDecoder,
 )
 from shine2mqtt.protocol.messages.ping.decoder import PingRequestDecoder
-from shine2mqtt.protocol.messages.read_register.decoder import ReadRegistersResponseDecoder
+from shine2mqtt.protocol.messages.read_register.decoder import ReadMultipleRegistersResponseDecoder
 from shine2mqtt.protocol.messages.set_config.decoder import (
     SetConfigRequestDecoder,
     SetConfigResponseDecoder,
@@ -60,7 +60,9 @@ class DecoderRegistry:
         # Datalogger responses to server requests
         registry.register_decoder(FunctionCode.GET_CONFIG, GetConfigResponseDecoder())
         registry.register_decoder(FunctionCode.SET_CONFIG, SetConfigResponseDecoder())
-        registry.register_decoder(FunctionCode.READ_REGISTERS, ReadRegistersResponseDecoder())
+        registry.register_decoder(
+            FunctionCode.READ_MULTIPLE_HOLDING_REGISTERS, ReadMultipleRegistersResponseDecoder()
+        )
 
         return registry
 

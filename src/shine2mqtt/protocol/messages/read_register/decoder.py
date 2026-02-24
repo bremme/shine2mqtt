@@ -1,15 +1,19 @@
 from shine2mqtt.protocol.frame.header.header import MBAPHeader
 from shine2mqtt.protocol.messages.decoder.decoder import MessageDecoder
 from shine2mqtt.protocol.messages.read_register.read_register import (
-    GrowattReadRegisterResponseMessage,
+    GrowattReadMultipleRegisterResponseMessage,
 )
 
 
-class ReadRegistersResponseDecoder(MessageDecoder[GrowattReadRegisterResponseMessage]):
+class ReadMultipleRegistersResponseDecoder(
+    MessageDecoder[GrowattReadMultipleRegisterResponseMessage]
+):
     def __init__(self, register_registry=None):
         self.register_registry = register_registry
 
-    def decode(self, header: MBAPHeader, payload: bytes) -> GrowattReadRegisterResponseMessage:
+    def decode(
+        self, header: MBAPHeader, payload: bytes
+    ) -> GrowattReadMultipleRegisterResponseMessage:
         datalogger_serial = self.decode_str(payload, 0, 10)
         # padding
         register_start = self.decode_u16(payload, 30)
@@ -25,7 +29,7 @@ class ReadRegistersResponseDecoder(MessageDecoder[GrowattReadRegisterResponseMes
             offset = 34 + (reg - register_start) * 2
             data_u16[reg] = self.decode_u16(payload, offset)
 
-        return GrowattReadRegisterResponseMessage(
+        return GrowattReadMultipleRegisterResponseMessage(
             header=header,
             datalogger_serial=datalogger_serial,
             register_start=register_start,

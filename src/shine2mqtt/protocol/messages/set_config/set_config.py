@@ -12,6 +12,8 @@ class GrowattSetConfigRequestMessage(DataloggerMessage):
     value: str
 
 
+# Datalogger messages ##################################################################
+# responses
 @dataclass
 class GrowattSetConfigResponseMessage(DataloggerMessage):
     register: int

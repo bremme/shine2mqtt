@@ -324,15 +324,15 @@ DATALOGGER_SENSOR_MAP: dict[str, dict[str, str]] = {
         "icon": NETWORK_ICON,
     },
     "sw_version": {
-        "entity_id": "datalogger_sw_version",
+        "entity_id": "sw_version",
         "entity_category": "diagnostic",
-        "name": "Datalogger Software Version",
+        "name": "Software Version",
         "icon": VERSION_ICON,
     },
-    "datalogger_hw_version": {
-        "entity_id": "datalogger_hw_version",
+    "hw_version": {
+        "entity_id": "hw_version",
         "entity_category": "diagnostic",
-        "name": "Datalogger Hardware Version",
+        "name": "Hardware Version",
         "icon": VERSION_ICON,
     },
     "netmask": {

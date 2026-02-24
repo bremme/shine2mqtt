@@ -1,11 +1,16 @@
 import asyncio
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 
 from shine2mqtt.adapters.api.constants import INVERTER_COMMAND_TIMEOUT_SECONDS
-from shine2mqtt.adapters.api.dependencies import get_read_handler, get_send_raw_frame_handler
+from shine2mqtt.adapters.api.dependencies import (
+    get_read_handler,
+    get_send_raw_frame_handler,
+    get_write_handler,
+)
 from shine2mqtt.adapters.api.http_exceptions import (
+    bad_gateway_502,
     gateway_timeout_504,
     internal_server_error_500,
     not_found_404,
@@ -19,10 +24,12 @@ from shine2mqtt.adapters.api.inverter.models import (
     InverterRegister,
     RawFrameRequest,
     RawFrameResponse,
+    WriteMultipleRegistersRequest,
 )
 from shine2mqtt.app.exceptions import DataloggerNotConnectedError
 from shine2mqtt.app.handlers.read_register import ReadRegisterHandler
 from shine2mqtt.app.handlers.send_raw_frame import SendRawFrameHandler
+from shine2mqtt.app.handlers.write_register import WriteRegisterHandler
 
 router = APIRouter(prefix="/dataloggers/{serial}/inverter", tags=["inverter"])
 
@@ -76,13 +83,50 @@ async def read_multiple_inverter_registers(
 
 
 @router.put("/registers/{address}")
-async def write_single_inverter_register(serial: str, address: int, value: int):
-    not_implemented_501()
+async def write_single_inverter_register(
+    serial: str,
+    address: int,
+    value: int,
+    write_handler: Annotated[WriteRegisterHandler, Depends(get_write_handler)],
+):
+    try:
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
+            ack = await write_handler.write_single_inverter_register(serial, address, value)
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
+    except TimeoutError:
+        gateway_timeout_504()
+    except Exception as e:
+        internal_server_error_500(e)
+
+    if not ack:
+        bad_gateway_502("Inverter did not acknowledge the write")
+
+    return Response(status_code=204)
 
 
 @router.put("/registers")
-async def write_multiple_inverter_registers(serial: str, registers: list[dict[str, int]]):
-    not_implemented_501()
+async def write_multiple_inverter_registers(
+    serial: str,
+    request: WriteMultipleRegistersRequest,
+    write_handler: Annotated[WriteRegisterHandler, Depends(get_write_handler)],
+):
+    try:
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
+            ack = await write_handler.write_multiple_inverter_registers(
+                serial, request.register_start, request.register_end, bytes.fromhex(request.values)
+            )
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
+    except TimeoutError:
+        gateway_timeout_504()
+    except Exception as e:
+        internal_server_error_500(e)
+
+    if not ack:
+        bad_gateway_502("Inverter did not acknowledge the write")
+
+    return Response(status_code=204)
 
 
 # Raw frame endpoints

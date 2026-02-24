@@ -8,6 +8,23 @@ class InverterRegister(BaseModel):
     value: int
 
 
+class WriteMultipleRegistersRequest(BaseModel):
+    register_start: int
+    register_end: int
+    values: str = Field(
+        ..., description="Hex string payload (spaces allowed)", examples=["00 01 00 02", "0a0b0c0d"]
+    )
+
+    @field_validator("values")
+    @classmethod
+    def validate_hex_values(cls, v: str) -> str:
+        try:
+            bytes.fromhex(v)
+        except ValueError as e:
+            raise ValueError("Invalid hex string") from e
+        return v
+
+
 class RawFrameResponse(BaseModel):
     payload: str
 

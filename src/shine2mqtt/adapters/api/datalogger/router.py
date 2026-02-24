@@ -65,8 +65,6 @@ async def get_single_datalogger(
 
 
 # Settings endpoints ###############################################################################
-
-
 @router.get("/dataloggers/{serial}/settings")
 async def get_all_datalogger_settings(serial: str):
     not_implemented_501()

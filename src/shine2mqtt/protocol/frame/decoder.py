@@ -110,7 +110,7 @@ class FrameDecoder:
                 if self.on_decode:
                     self.on_decode(header, raw_payload)
             except Exception as e:
-                logger.error(f"on_decode hook failed: {e}")
+                logger.exception(f"on_decode hook failed: {e}")
 
             return message
         except Exception as e:

@@ -31,5 +31,15 @@ class Session(ABC):
         pass
 
     @abstractmethod
+    async def write_single_register(self, register: int, value: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def write_multiple_registers(
+        self, register_start: int, register_end: int, values: bytes
+    ) -> bool:
+        pass
+
+    @abstractmethod
     async def send_raw_frame(self, function_code: int, payload: bytes) -> bytes:
         pass

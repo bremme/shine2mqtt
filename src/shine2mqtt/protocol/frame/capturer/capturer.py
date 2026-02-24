@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
+from shine2mqtt.util.logger import logger
 
 
 @dataclass
@@ -28,11 +29,16 @@ class FileFrameCapturer(FrameCapturer):
         filename = self._get_filename(frame)
         filepath = self.output_dir / filename
 
+        data = {"frames": [], "headers": [], "payloads": []}
+
         if filepath.exists():
             with open(filepath) as f:
-                data = json.load(f)
-        else:
-            data = {"frames": [], "headers": [], "payloads": []}
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    logger.warning(
+                        f"Failed to decode existing capture file {filepath}, starting with empty data"
+                    )
 
         data["frames"].append(frame.frame.hex())
         data["headers"].append(frame.header.asdict())
@@ -56,7 +62,7 @@ class FileFrameCapturer(FrameCapturer):
             case (
                 FunctionCode.SET_CONFIG
                 | FunctionCode.GET_CONFIG
-                | FunctionCode.READ_REGISTERS
+                | FunctionCode.READ_MULTIPLE_HOLDING_REGISTERS
                 | FunctionCode.WRITE_SINGLE_HOLDING_REGISTER
                 | FunctionCode.WRITE_MULTIPLE_HOLDING_REGISTERS
             ):
