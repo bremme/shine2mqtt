@@ -32,17 +32,18 @@ class AnnounceRequestDecoder(MessageDecoder[GrowattAnnounceMessage]):
     def decode(self, header: MBAPHeader, payload: bytes) -> GrowattAnnounceMessage:
         return GrowattAnnounceMessage(
             header=header,
-            # Custom Announce block ####################################################
+            # Message header block #####################################################
             # first 70 bytes
             datalogger_serial=self.decode_str(payload, 0, 10),
             # 10-30 is \x00
             inverter_serial=self.decode_str(payload, 30, 10),
             # 40-60 is \x00
-            #
-            # online_since=self._decode_datetime(payload, offset=60, fmt="B"),
+            # TODO
+            # timestamp=self._decode_datetime(payload, offset=60, fmt="B"),
+            # 67-70 is \x00
             # Holding registers (read/write) ###########################################
             # See 4.1 Holding Registers in Protocol document v1.20 (page 9)
-            # Offset of 71 in the announce payload, every register is 2 bytes
+            # Offset of 71 in the payload, every register is 2 bytes
             remote_on_off=self.decode_bool(payload, 71),
             safety_function=self._decode_safety_function(payload, 73),
             power_factor_memory=self.decode_bool(payload, 75),
@@ -54,9 +55,7 @@ class AnnounceRequestDecoder(MessageDecoder[GrowattAnnounceMessage]):
             inverter_fw_version=self._decode_inverter_fw_version(payload, 89),
             inverter_control_fw_version=self._decode_inverter_control_fw_version(payload, 95),
             lcd_language=self._decode_lcd_language(payload, 101),
-            #
             device_type=self.decode_str(payload, 139, 16).rstrip("\x00"),
-            #
             timestamp=self._decode_datetime(payload, offset=161, fmt="H"),
             voltage_ac_low_limit=self._decode_u16_scaled(payload, 175, 0.1),
             voltage_ac_high_limit=self._decode_u16_scaled(payload, 177, 0.1),

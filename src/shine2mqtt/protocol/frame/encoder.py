@@ -47,13 +47,13 @@ class FrameEncoder:
 
         raw_payload = encoder.encode(message)
 
+        # FIXME maybe not ideal to change header here
+        # would be better to have immutability
+        message.header.length = len(raw_payload) + CRC16_LENGTH
+
         return self.encode_frame(message.header, raw_payload)
 
     def encode_frame(self, header: MBAPHeader, payload: bytes) -> bytes:
-        # FIXME maybe not ideal to change message here
-        # would be better to have immutability
-        header.length = len(payload) + CRC16_LENGTH
-
         raw_header = self.header_encoder.encode(header)
 
         encrypted_payload = self.payload_cipher.encrypt(payload, self.encryption_key)

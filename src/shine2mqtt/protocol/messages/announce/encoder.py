@@ -13,15 +13,15 @@ class AnnouncePayloadEncoder(PayloadEncoder[GrowattAnnounceMessage]):
 
     def encode(self, message: GrowattAnnounceMessage) -> bytes:
         payload = bytearray(self.ANNOUNCE_MESSAGE_PAYLOAD_SIZE)
-
-        # Custom Announce block ########################################################
+        # Message header block #####################################################
         # first 70 bytes
-        # Datalogger serial (0-10)
         payload[0:10] = self.encode_str(message.datalogger_serial, 10)
         # 10-30 is \x00 (padding)
         payload[30:40] = self.encode_str(message.inverter_serial, 10)
         # 40-60 is \x00 (padding)
-        # 60-70 is unknown
+        # TODO
+        # payload[60:67] = self.encode_datetime(message.timestamp, fmt="B")
+        # 60-70 is \x00 (padding)
         # Holding registers (read/write) ###############################################
         # See 4.1 Holding Registers in Protocol document v1.20(page 9)
         # Offset of 71 in the announce payload, every register is 2 bytes
@@ -47,6 +47,7 @@ class AnnouncePayloadEncoder(PayloadEncoder[GrowattAnnounceMessage]):
         payload[139:155] = self.encode_str(message.device_type, 16)
 
         # System datetime (161-175)
+        # FIXME do we need two timestamps, which one is which?
         payload[161:163] = struct.pack(">H", message.timestamp.year)
         payload[163:165] = struct.pack(">H", message.timestamp.month)
         payload[165:167] = struct.pack(">H", message.timestamp.day)

@@ -22,8 +22,10 @@ class SafetyFunction:
 # requests
 @dataclass
 class GrowattAnnounceMessage(DataloggerMessage):
+    # message header fields
     inverter_serial: str
-
+    timestamp: datetime
+    # holding registers
     remote_on_off: bool
     safety_function: SafetyFunction
     power_factor_memory: bool
@@ -36,8 +38,6 @@ class GrowattAnnounceMessage(DataloggerMessage):
     inverter_control_fw_version: str
     lcd_language: str
     device_type: str
-    timestamp: datetime
-
     voltage_ac_low_limit: float
     voltage_ac_high_limit: float
     frequency_ac_low_limit: float

@@ -7,30 +7,17 @@ class DataRequestDecoder(MessageDecoder[GrowattDataMessage]):
     def decode(self, header: MBAPHeader, payload: bytes) -> GrowattDataMessage:
         return GrowattDataMessage(
             header=header,
-            # Custom  data block #######################################################
+            # Message header block #####################################################
             datalogger_serial=self.decode_str(payload, 0, 10),
-            #
-            # 10-30 is \x00
-            #
-            # Holding registers (read/write) ###########################################
-            # See 4.1 Holding Registers in Protocol document v1.20(page 9)
-            # 23 Serial NO
+            # 10-30 is \x00 (padding)
             inverter_serial=self.decode_str(payload, 30, 10),
-            # 40-60 is \x00
+            # 40-60 is \x00 (padding)
             timestamp=self._decode_datetime(payload, offset=60, fmt="B"),
-            # "year": struct.unpack_from(">B", data, 60)[0],              # 45  Sys Year  System time-year
-            # "month": struct.unpack_from(">B", data, 61)[0],             # 46
-            # "day": struct.unpack_from(">B", data, 62)[0],               # 47
-            # "hour": struct.unpack_from(">B", data, 63)[0],              # 48
-            # "min": struct.unpack_from(">B", data, 64)[0],               # 49
-            # "sec": struct.unpack_from(">B", data, 65)[0],               # 50
-            # "weekly": struct.unpack_from(">B", data, 66)[0],            # 51
-            #
-            # 67-70 is \x00
-            #
+            # 60-70 is \x00 (padding)
             # Input registers (read) ###################################################
             # See 4.2 Input Reg -> Protocol document v1.20 (page 33)
             # See 4.2 Input Reg -> Protocol document v1.20 (page 48 for TL-X and TL-XH)
+            # Offset of 71 in the payload, every register is 2 bytes
             # 0 Inverter Status
             inverter_status=InverterStatus(self.decode_u16(payload, 71)),
             # DC
