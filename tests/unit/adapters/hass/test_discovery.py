@@ -3,6 +3,7 @@ import pytest
 from shine2mqtt.adapters.hass.config import DeviceConfig, HassDiscoveryConfig
 from shine2mqtt.adapters.hass.discovery import HassDiscoveryPayloadBuilder
 from shine2mqtt.adapters.hass.map import INVERTER_SENSOR_MAP
+from shine2mqtt.domain.models.datalogger import DataLogger
 
 
 @pytest.fixture
@@ -62,7 +63,16 @@ class TestMqttDiscoveryBuilder:
 
 class TestMqttDiscoveryBuilderDiscoveryMessage:
     def test_build_datalogger_discovery_message(self, builder: HassDiscoveryPayloadBuilder):
-        result = builder.build_datalogger_discovery_message("1.0.0", "ABC123")
+        datalogger = DataLogger(
+            serial="ABC123",
+            sw_version="1.2.3",
+            hw_version="4.5.6",
+            protocol_id=0,
+            unit_id=1,
+            ip_address="192.168.1.100",
+            mac_address="00:11:22:33:44:55",
+        )
+        result = builder.build_datalogger_discovery_message(datalogger)
 
         assert result == {
             "availability_topic": "solar/state",
@@ -71,7 +81,10 @@ class TestMqttDiscoveryBuilderDiscoveryMessage:
                 "manufacturer": "Growatt",
                 "model": "ShineWiFi-X",
                 "name": "Growatt Shinewifi-X",
-                "sw_version": "1.0.0",
+                "sw_version": "1.2.3",
+                "hw_version": "4.5.6",
+                "connections": [["ip", "192.168.1.100"], ["mac", "00:11:22:33:44:55"]],
+                "configuration_url": "192.168.1.100",
                 "serial_number": "ABC123",
             },
             "origin": HassDiscoveryPayloadBuilder.DISCOVERY_ORIGIN,

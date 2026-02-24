@@ -16,6 +16,7 @@ from shine2mqtt.protocol.session.message_factory import MessageFactory
 from shine2mqtt.protocol.session.session import ProtocolSession
 from shine2mqtt.protocol.session.state import ServerProtocolSessionState, TransactionIdTracker
 from shine2mqtt.protocol.settings.constants import (
+    DATALOGGER_HW_VERSION_REGISTER,
     DATALOGGER_IP_ADDRESS_REGISTER,
     DATALOGGER_MAC_ADDRESS_REGISTER,
     DATALOGGER_SW_VERSION_REGISTER,
@@ -53,6 +54,9 @@ class ProtocolSessionInitializer(BaseProtocolSession):
         sw_version = await self._request_datalogger_config(
             factory, announce.datalogger_serial, register=DATALOGGER_SW_VERSION_REGISTER
         )
+        hw_version = await self._request_datalogger_config(
+            factory, announce.datalogger_serial, register=DATALOGGER_HW_VERSION_REGISTER
+        )
         ip_address = await self._request_datalogger_config(
             factory, announce.datalogger_serial, register=DATALOGGER_IP_ADDRESS_REGISTER
         )
@@ -66,6 +70,7 @@ class ProtocolSessionInitializer(BaseProtocolSession):
             ip_address=ip_address,
             mac_address=mac_address,
             sw_version=sw_version,
+            hw_version=hw_version,
             protocol_id=announce.header.protocol_id,
             unit_id=announce.header.unit_id,
         )

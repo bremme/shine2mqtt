@@ -37,10 +37,7 @@ class HassDiscoveryMapper:
         )
 
     def _build_datalogger_discovery(self, event: DataloggerAnnouncedEvent) -> MqttMessage:
-        payload = self._payload_builder.build_datalogger_discovery_message(
-            datalogger_sw_version=event.datalogger.sw_version,
-            datalogger_serial=event.datalogger.serial,
-        )
+        payload = self._payload_builder.build_datalogger_discovery_message(event.datalogger)
         return MqttMessage(
             topic=self._payload_builder.build_datalogger_discovery_topic(),
             payload=json.dumps(payload),

@@ -2,6 +2,7 @@ from typing import Any
 
 from shine2mqtt import HOME_PAGE, __version__
 from shine2mqtt.adapters.hass.config import HassDiscoveryConfig
+from shine2mqtt.domain.models.datalogger import DataLogger
 
 
 class HassDiscoveryPayloadBuilder:
@@ -23,20 +24,20 @@ class HassDiscoveryPayloadBuilder:
 
     def build_datalogger_discovery_message(
         self,
-        datalogger_sw_version: str,
-        datalogger_serial: str,
+        datalogger: DataLogger,
     ) -> dict[str, Any]:
         discovery_payload = {
             "availability_topic": self._config.availability_topic,
             "device": {
-                "identifiers": [self._config.datalogger.device_id, datalogger_serial],
+                "identifiers": [self._config.datalogger.device_id, datalogger.serial],
                 "manufacturer": self._config.datalogger.brand,
                 "model": self._config.datalogger.model,
                 "name": self._config.datalogger.name,
-                "sw_version": datalogger_sw_version,
-                "serial_number": datalogger_serial,
-                # "configuration_url": ip_address,
-                # "connections": [["ip": ip_address],["mac": mac_address]],
+                "sw_version": datalogger.sw_version,
+                "hw_version": datalogger.hw_version,
+                "serial_number": datalogger.serial,
+                "configuration_url": datalogger.ip_address,
+                "connections": [["ip", datalogger.ip_address], ["mac", datalogger.mac_address]],
             },
             "origin": self.DISCOVERY_ORIGIN,
             "components": {},

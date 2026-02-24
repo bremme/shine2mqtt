@@ -4,6 +4,7 @@ DATALOGGER_IP_ADDRESS_REGISTER = 14
 DATALOGGER_MAC_ADDRESS_REGISTER = 16
 DATALOGGER_SERVER_IP_ADDRESS_REGISTER = 17
 DATALOGGER_SW_VERSION_REGISTER = 21
+DATALOGGER_HW_VERSION_REGISTER = 22
 DATALOGGER_SYSTEM_TIME_REGISTER = 31
 DATALOGGER_WIFI_SSID_REGISTER = 56
 DATALOGGER_WIFI_PASSWORD_REGISTER = 57
@@ -55,7 +56,7 @@ CONFIG_REGISTERS = {
         "description": "Datalogger software Version",
         "fmt": "s",
     },
-    22: {
+    DATALOGGER_HW_VERSION_REGISTER: {
         "name": "datalogger_hw_version",
         "description": "Datalogger Hardware Version",
         "fmt": "s",

@@ -58,6 +58,7 @@ class MessageEventMapper:
         ip_address: str,
         mac_address: str,
         sw_version: str,
+        hw_version: str,
     ) -> DataLogger:
         return DataLogger(
             serial=datalogger_serial,
@@ -66,6 +67,7 @@ class MessageEventMapper:
             mac_address=mac_address,
             protocol_id=protocol_id,
             unit_id=unit_id,
+            hw_version=hw_version,
         )
 
     def map_state_to_announce_event(
