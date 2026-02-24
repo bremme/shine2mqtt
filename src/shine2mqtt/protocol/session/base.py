@@ -41,7 +41,7 @@ class BaseProtocolSession:
     async def _write_message(self, response: BaseMessage) -> None:
         transaction_id = response.header.transaction_id
         logger.info(
-            f"→ Send {response.header.function_code.name} ({response.header.function_code.value:#02x}) response, {transaction_id=}"
+            f"→ Send {response.header.function_code.name} ({response.header.function_code.value:#02x}) message, {transaction_id=}"
         )
         frame = self.encoder.encode(response)
         await self.transport.write(frame)
