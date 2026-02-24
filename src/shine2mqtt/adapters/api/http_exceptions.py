@@ -7,6 +7,10 @@ def not_implemented_501() -> NoReturn:
     raise HTTPException(status_code=501, detail="Not implemented") from None
 
 
+def bad_gateway_502(detail: str) -> NoReturn:
+    raise HTTPException(status_code=502, detail=detail) from None
+
+
 def gateway_timeout_504() -> NoReturn:
     raise HTTPException(status_code=504, detail="Server timeout") from None
 
