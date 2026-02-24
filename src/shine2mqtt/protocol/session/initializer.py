@@ -49,8 +49,6 @@ class ProtocolSessionInitializer(BaseProtocolSession):
             tracker=self.transaction_id_tracker,
         )
 
-        await self._sync_datalogger_system_time(factory, announce)
-
         sw_version = await self._request_datalogger_config(
             factory, announce.datalogger_serial, register=DATALOGGER_SW_VERSION_REGISTER
         )
@@ -63,6 +61,8 @@ class ProtocolSessionInitializer(BaseProtocolSession):
         mac_address = await self._request_datalogger_config(
             factory, announce.datalogger_serial, register=DATALOGGER_MAC_ADDRESS_REGISTER
         )
+
+        await self._sync_datalogger_system_time(factory, announce)
 
         inverter = self.mapper.map_announce_message_to_inverter(announce)
         datalogger = self.mapper.map_config_to_datalogger(
@@ -96,7 +96,7 @@ class ProtocolSessionInitializer(BaseProtocolSession):
                 case GrowattPingMessage():
                     await self._write_message(message)
                 case _:
-                    logger.warning(
+                    logger.debug(
                         f"Received unexpected message while waiting for announce: {type(message).__name__}"
                     )
 
@@ -113,7 +113,7 @@ class ProtocolSessionInitializer(BaseProtocolSession):
 
     async def _write_datalogger_config(
         self, factory: MessageFactory, datalogger_serial: str, register: int, value: str
-    ) -> str:
+    ) -> bool:
         message = factory.set_config_request(
             datalogger_serial=datalogger_serial,
             register=register,
@@ -125,11 +125,11 @@ class ProtocolSessionInitializer(BaseProtocolSession):
         while True:
             match message := await self._read_message():
                 case GrowattSetConfigResponseMessage() if message.register == register:
-                    return value
+                    return message.ack
                 case GrowattPingMessage():
                     await self._write_message(message)
                 case _:
-                    logger.warning(
+                    logger.debug(
                         f"Received unexpected message while waiting for set config response: {type(message).__name__}"
                     )
 

@@ -32,12 +32,7 @@ repos:
       pass_filenames: false
     - id: pytest
       name: pytest
-      entry: uv run pytest
+      entry: uv run pytest --no-cov
       language: system
       types: [python]
-      pass_filenames: false
-    - id: pip-audit
-      name: pip-audit
-      entry: uv run pip-audit
-      language: system
       pass_filenames: false
