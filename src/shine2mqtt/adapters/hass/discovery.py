@@ -36,7 +36,7 @@ class HassDiscoveryPayloadBuilder:
                 "sw_version": datalogger.sw_version,
                 "hw_version": datalogger.hw_version,
                 "serial_number": datalogger.serial,
-                "configuration_url": datalogger.ip_address,
+                "configuration_url": f"http://{datalogger.ip_address}",
                 "connections": [["ip", datalogger.ip_address], ["mac", datalogger.mac_address]],
             },
             "origin": self.DISCOVERY_ORIGIN,

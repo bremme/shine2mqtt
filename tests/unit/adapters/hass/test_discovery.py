@@ -84,7 +84,7 @@ class TestMqttDiscoveryBuilderDiscoveryMessage:
                 "sw_version": "1.2.3",
                 "hw_version": "4.5.6",
                 "connections": [["ip", "192.168.1.100"], ["mac", "00:11:22:33:44:55"]],
-                "configuration_url": "192.168.1.100",
+                "configuration_url": "http://192.168.1.100",
                 "serial_number": "ABC123",
             },
             "origin": HassDiscoveryPayloadBuilder.DISCOVERY_ORIGIN,
