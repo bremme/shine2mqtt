@@ -1,7 +1,7 @@
 from enum import Enum
 
 ACK = b"\x00"
-NACK = b"\x03"
+NACK = b"\x01"
 
 ENCRYPTION_KEY = b"Growatt"
 DECRYPTION_KEY = ENCRYPTION_KEY
