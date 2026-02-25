@@ -4,7 +4,7 @@ from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.ack.decoder import AckMessageResponseDecoder
 from tests.utils.loader import CapturedFrameLoader
 
-frames, headers, payloads = CapturedFrameLoader.load("set_config_response")
+frames, headers, payloads = CapturedFrameLoader.load("ack_message")
 
 EXPECTED_MESSAGES = [
     GrowattAckMessage(header=headers[0], ack=True),

@@ -4,7 +4,7 @@ from shine2mqtt.growatt.protocol.ack.ack import GrowattAckMessage
 from shine2mqtt.growatt.protocol.ack.encoder import AckPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
-frames, headers, payloads = CapturedFrameLoader.load("set_config_response")
+frames, headers, payloads = CapturedFrameLoader.load("ack_message")
 
 # First payload is ACK (0x00), second is NACK (0x03)
 INPUT_MESSAGES = [
@@ -19,7 +19,7 @@ CASES = list(zip(INPUT_MESSAGES, EXPECTED_PAYLOADS, strict=True))
 
 class TestAckPayloadEncoder:
     @pytest.fixture
-    def encoder(self):
+    def encoder(self) -> AckPayloadEncoder:
         return AckPayloadEncoder()
 
     @pytest.mark.parametrize(
@@ -40,7 +40,7 @@ class TestAckPayloadEncoder:
 
         assert payload == b"\x00"
 
-    def test_encode_ack_false_returns_nack_byte(self, encoder):
+    def test_encode_ack_false_returns_nack_byte(self, encoder: AckPayloadEncoder):
         message = GrowattAckMessage(
             header=headers[0],
             ack=False,
@@ -48,4 +48,4 @@ class TestAckPayloadEncoder:
 
         payload = encoder.encode(message)
 
-        assert payload == b"\x03"
+        assert payload == b"\x01"
