@@ -19,8 +19,7 @@ class AnnouncePayloadEncoder(PayloadEncoder[GrowattAnnounceMessage]):
         # 10-30 is \x00 (padding)
         payload[30:40] = self.encode_str(message.inverter_serial, 10)
         # 40-60 is \x00 (padding)
-        # TODO
-        # payload[60:67] = self.encode_datetime(message.timestamp, fmt="B")
+        payload[60:67] = self.encode_datetime(message.timestamp, fmt="B")
         # 60-70 is \x00 (padding)
         # Holding registers (read/write) ###############################################
         # See 4.1 Holding Registers in Protocol document v1.20(page 9)
@@ -47,14 +46,13 @@ class AnnouncePayloadEncoder(PayloadEncoder[GrowattAnnounceMessage]):
         payload[139:155] = self.encode_str(message.device_type, 16)
 
         # System datetime (161-175)
-        # FIXME do we need two timestamps, which one is which?
-        payload[161:163] = struct.pack(">H", message.timestamp.year)
-        payload[163:165] = struct.pack(">H", message.timestamp.month)
-        payload[165:167] = struct.pack(">H", message.timestamp.day)
-        payload[167:169] = struct.pack(">H", message.timestamp.hour)
-        payload[169:171] = struct.pack(">H", message.timestamp.minute)
-        payload[171:173] = struct.pack(">H", message.timestamp.second)
-        payload[173:175] = struct.pack(">H", message.timestamp.weekday())
+        payload[161:163] = struct.pack(">H", message.system_time.year)
+        payload[163:165] = struct.pack(">H", message.system_time.month)
+        payload[165:167] = struct.pack(">H", message.system_time.day)
+        payload[167:169] = struct.pack(">H", message.system_time.hour)
+        payload[169:171] = struct.pack(">H", message.system_time.minute)
+        payload[171:173] = struct.pack(">H", message.system_time.second)
+        payload[173:175] = struct.pack(">H", message.system_time.weekday())
 
         # Voltage and frequency limits
         payload[175:177] = self.encode_u16(int(message.voltage_ac_low_limit * 10))

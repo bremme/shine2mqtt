@@ -38,6 +38,7 @@ class GrowattAnnounceMessage(DataloggerMessage):
     inverter_control_fw_version: str
     lcd_language: str
     device_type: str
+    system_time: datetime
     voltage_ac_low_limit: float
     voltage_ac_high_limit: float
     frequency_ac_low_limit: float
