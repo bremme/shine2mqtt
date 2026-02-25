@@ -185,8 +185,8 @@ The table below lists all available environment variables with their default val
 | `SHINE2MQTT_MQTT__SERVER__CLIENT_ID`         | `shine2mqtt`    | MQTT client identifier                             |
 | `SHINE2MQTT_MQTT__DISCOVERY__ENABLED`        | `false`         | Enable Home Assistant MQTT discovery               |
 | `SHINE2MQTT_MQTT__DISCOVERY__PREFIX_TOPIC`   | `homeassistant` | MQTT discovery topic prefix                        |
-| `SHINE2MQTT_MQTT__DISCOVERY__INVERTER__MODEL`    |            | Inverter model for Home Assistant                  |
-| `SHINE2MQTT_MQTT__DISCOVERY__DATALOGGER__MODEL`  |            | Datalogger model for Home Assistant                |
+| `SHINE2MQTT_MQTT__DISCOVERY__INVERTER__MODEL`   |              | Inverter model for Home Assistant                  |
+| `SHINE2MQTT_MQTT__DISCOVERY__DATALOGGER__MODEL` |              | Datalogger model for Home Assistant                |
 | `SHINE2MQTT_SERVER__HOST`                    | `0.0.0.0`       | TCP server host                                    |
 | `SHINE2MQTT_SERVER__PORT`                    | `5279`          | TCP server port                                    |
 | `SHINE2MQTT_API__ENABLED`                    | `false`         | Enable RESTful API                                 |
@@ -303,9 +303,9 @@ Shine2MQTT publishes the following metrics via MQTT:
 
 | Metric                      | Topic                                           | Unit |
 | --------------------------- | ----------------------------------------------- | ---- |
-| Datalogger Serial Number    | `solar/datalogger/sensor/datalogger_serial`     | -    |
-| Datalogger Software Version | `solar/datalogger/sensor/datalogger_sw_version` | -    |
-| Datalogger Hardware Version | `solar/datalogger/sensor/datalogger_hw_version` | -    |
+| Datalogger Serial Number    | `solar/datalogger/sensor/serial`                | -    |
+| Datalogger Software Version | `solar/datalogger/sensor/sw_version`            | -    |
+| Datalogger Hardware Version | `solar/datalogger/sensor/hw_version`            | -    |
 | Data Update Interval        | `solar/datalogger/sensor/update_interval`       | min  |
 | Datalogger IP Address       | `solar/datalogger/sensor/ip_address`            | -    |
 | Datalogger MAC Address      | `solar/datalogger/sensor/mac_address`           | -    |
@@ -319,7 +319,7 @@ Shine2MQTT publishes the following metrics via MQTT:
 
 An optional REST API (built with [FastAPI](https://fastapi.tiangolo.com/)) allows you to read and write inverter and datalogger settings directly. Enable it via the `api` section in your config file and enable with `api.enabled: true`.
 
-Interactive Swagger docs are available at `http://<host>:8000` when the API is running.
+Interactive Swagger docs are available at `http://localhost:8000` when the API is running.
 
 ### Datalogger endpoints
 
