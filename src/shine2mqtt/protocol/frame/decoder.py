@@ -21,13 +21,10 @@ class FrameDecoderFactory:
     """Factory for creating frame encoder and decoder with all dependencies."""
 
     @staticmethod
-    def decoder(on_decode=None, decoder_registry: DecoderRegistry | None = None) -> FrameDecoder:
-        """Create a FrameDecoder with specified or default decoders registered.
-
-        Args:
-            on_decode: Optional callback(frame: bytes, message: BaseMessage) called after decoding
-            decoder_registry: Optional decoder registry. Defaults to server registry if not specified.
-        """
+    def decoder(
+        on_decode: Callable[[MBAPHeader, bytes], None] | None = None,
+        decoder_registry: DecoderRegistry | None = None,
+    ) -> FrameDecoder:
         crc_calculator = CRCCalculator()
         crc_decoder = CRCDecoder()
 
