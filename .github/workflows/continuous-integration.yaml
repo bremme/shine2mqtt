@@ -48,6 +48,9 @@ jobs:
       - name: Run type checker
         run: uv run ty check
 
+      - name: Run import linter
+        run: uv run lint-imports
+
       - name: Run dependency check
         if: inputs.run-dependency-check
         run: uv run pip-audit --skip-editable --verbose
