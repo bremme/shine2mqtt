@@ -30,7 +30,7 @@ Shine2MQTT acts as a local server for your Growatt Shine (Wifi-X) datalogger, ca
 - 🔒 **Local Control** - Keep your data private, no cloud dependency
 - 🐳 **Docker Support** - Easy deployment with Docker/Docker Compose
 - ⚡ **Real-time Data** - Instant solar production metrics
-- 🛠️ **RESTful API** - Built-in API for monitoring and control (Alpha)
+- 🛠️ **RESTful API** - Built-in API for monitoring and control
 - 📊 **Comprehensive Metrics** - Power, voltage, current, energy totals, and more
 
 ## 🔌 Compatibility
@@ -315,6 +315,33 @@ Shine2MQTT publishes the following metrics via MQTT:
 | Server Port                 | `solar/datalogger/sensor/server_port`           | -    |
 | WiFi Network Name (SSID)    | `solar/datalogger/sensor/wifi_ssid`             | -    |
 
+## 🌐 REST API
+
+An optional REST API (built with [FastAPI](https://fastapi.tiangolo.com/)) allows you to read and write inverter and datalogger settings directly. Enable it via the `api` section in your config file and enable with `api.enabled: true`.
+
+Interactive Swagger docs are available at `http://<host>:8000` when the API is running.
+
+### Datalogger endpoints
+
+| Method  | Endpoint                                     | Description                        |
+|---------|----------------------------------------------|------------------------------------|
+| `GET`   | `/dataloggers`                               | List all connected dataloggers     |
+| `GET`   | `/dataloggers/{serial}`                      | Get a single datalogger            |
+| `GET`   | `/dataloggers/{serial}/settings/{name}`      | Read a datalogger setting by name  |
+| `PUT`   | `/dataloggers/{serial}/settings/{name}`      | Update a datalogger setting by name|
+| `GET`   | `/dataloggers/{serial}/registers/{address}`  | Read a datalogger register         |
+| `PUT`   | `/dataloggers/{serial}/registers/{address}`  | Update a datalogger register       |
+
+### Inverter endpoints
+
+| Method  | Endpoint                                              | Description                                       |
+|---------|-------------------------------------------------------|---------------------------------------------------|
+| `GET`   | `/dataloggers/{serial}/inverter/registers/{address}`  | Read a single inverter register                   |
+| `GET`   | `/dataloggers/{serial}/inverter/registers`            | Read multiple inverter registers                  |
+| `PUT`   | `/dataloggers/{serial}/inverter/registers/{address}`  | Update a single inverter register                 |
+| `PUT`   | `/dataloggers/{serial}/inverter/registers`            | Update multiple inverter registers                |
+| `POST`  | `/dataloggers/{serial}/inverter/raw-frames`           | Send a raw Growatt protocol frame                 |
+
 ## 🛠️ Development
 
 ### Prerequisites
@@ -425,10 +452,10 @@ uv build
 docker build -t bremme/shine2mqtt:latest .
 ```
 
+
 ### Running Locally with simulated Client
 
 Run the main application in one terminal, and the simulated client in another terminal:
-
 
 ```bash
 # run shine2mqtt on different port (to prevent datalogger conflicts)
