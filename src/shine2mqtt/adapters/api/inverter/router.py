@@ -1,0 +1,190 @@
+import asyncio
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Response
+
+from shine2mqtt.adapters.api.constants import INVERTER_COMMAND_TIMEOUT_SECONDS
+from shine2mqtt.adapters.api.dependencies import (
+    get_read_handler,
+    get_send_raw_frame_handler,
+    get_write_handler,
+)
+from shine2mqtt.adapters.api.http_exceptions import (
+    bad_gateway_502,
+    gateway_timeout_504,
+    internal_server_error_500,
+    not_found_404,
+    not_implemented_501,
+)
+from shine2mqtt.adapters.api.inverter.mappers import (
+    inverter_registers_to_api_model,
+    raw_bytes_to_api_model,
+)
+from shine2mqtt.adapters.api.inverter.models import (
+    InverterRegister,
+    RawFrameRequest,
+    RawFrameResponse,
+    WriteMultipleRegistersRequest,
+)
+from shine2mqtt.app.exceptions import DataloggerNotConnectedError
+from shine2mqtt.app.handlers.read_register import ReadRegisterHandler
+from shine2mqtt.app.handlers.send_raw_frame import SendRawFrameHandler
+from shine2mqtt.app.handlers.write_register import WriteRegisterHandler
+
+router = APIRouter(prefix="/dataloggers/{serial}/inverter", tags=["inverter"])
+
+
+@router.get("/settings")
+async def get_all_inverter_settings(serial: str):
+    not_implemented_501()
+
+
+@router.get("/settings/{name}")
+async def get_single_inverter_setting(serial: str, name: str):
+    not_implemented_501()
+
+
+@router.put("/settings/{name}")
+async def update_single_inverter_setting(serial: str, name: str, value: str):
+    not_implemented_501()
+
+
+# Inverter (holding) register endpoints
+@router.get(
+    "/registers/{address}",
+    responses={
+        404: {"description": "Datalogger not connected or register not found"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
+async def read_single_inverter_register(
+    serial: str,
+    address: int,
+    read_handler: Annotated[ReadRegisterHandler, Depends(get_read_handler)],
+) -> InverterRegister:
+    registers = await read_multiple_inverter_registers(serial, address, address, read_handler)
+    if not registers:
+        not_found_404(f"Register {address} not found")
+    return registers[0]
+
+
+@router.get(
+    "/registers",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
+async def read_multiple_inverter_registers(
+    serial: str,
+    start: int,
+    end: int,
+    read_handler: Annotated[ReadRegisterHandler, Depends(get_read_handler)],
+) -> list[InverterRegister]:
+    try:
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
+            data = await read_handler.read_inverter_registers(serial, start, end)
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
+    except TimeoutError:
+        gateway_timeout_504()
+    except Exception as e:
+        internal_server_error_500(e)
+
+    return inverter_registers_to_api_model(data)
+
+
+@router.put(
+    "/registers/{address}",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        502: {"description": "Inverter did not acknowledge the write"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
+async def write_single_inverter_register(
+    serial: str,
+    address: int,
+    value: int,
+    write_handler: Annotated[WriteRegisterHandler, Depends(get_write_handler)],
+):
+    try:
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
+            ack = await write_handler.write_single_inverter_register(serial, address, value)
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
+    except TimeoutError:
+        gateway_timeout_504()
+    except Exception as e:
+        internal_server_error_500(e)
+
+    if not ack:
+        bad_gateway_502("Inverter did not acknowledge the write")
+
+    return Response(status_code=204)
+
+
+@router.put(
+    "/registers",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        502: {"description": "Inverter did not acknowledge the write"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
+async def write_multiple_inverter_registers(
+    serial: str,
+    request: WriteMultipleRegistersRequest,
+    write_handler: Annotated[WriteRegisterHandler, Depends(get_write_handler)],
+):
+    try:
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
+            ack = await write_handler.write_multiple_inverter_registers(
+                serial, request.register_start, request.register_end, bytes.fromhex(request.values)
+            )
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
+    except TimeoutError:
+        gateway_timeout_504()
+    except Exception as e:
+        internal_server_error_500(e)
+
+    if not ack:
+        bad_gateway_502("Inverter did not acknowledge the write")
+
+    return Response(status_code=204)
+
+
+# Raw frame endpoints
+@router.post(
+    "/raw-frames",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
+async def send_raw_frame(
+    serial: str,
+    request: RawFrameRequest,
+    handler: Annotated[SendRawFrameHandler, Depends(get_send_raw_frame_handler)],
+) -> RawFrameResponse:
+    try:
+        async with asyncio.timeout(INVERTER_COMMAND_TIMEOUT_SECONDS):
+            payload = await handler.send_raw_frame(
+                serial,
+                request.function_code,
+                bytes.fromhex(request.payload),
+            )
+    except DataloggerNotConnectedError:
+        not_found_404(f"Datalogger '{serial}' not connected")
+    except TimeoutError:
+        gateway_timeout_504()
+    except Exception as e:
+        internal_server_error_500(e)
+
+    return raw_bytes_to_api_model(payload)

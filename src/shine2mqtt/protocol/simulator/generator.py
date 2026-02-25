@@ -1,0 +1,113 @@
+from itertools import cycle
+
+from shine2mqtt.protocol.codec.byte import ByteEncoder
+from shine2mqtt.protocol.frame.capturer.loader import CapturedFrameLoader
+from shine2mqtt.protocol.frame.encoder import FrameEncoder
+from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
+from shine2mqtt.protocol.messages.constants import ACK, NACK
+
+announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")
+buffered_data_frames, buffered_data_headers, buffered_data_payloads = CapturedFrameLoader.load(
+    "buffered_data_message"
+)
+data_frames, data_headers, data_payloads = CapturedFrameLoader.load("data_message")
+get_config_frames, get_config_headers, get_config_payloads = CapturedFrameLoader.load(
+    "get_config_response"
+)
+ping_frames, ping_headers, ping_payloads = CapturedFrameLoader.load("ping_message")
+
+
+class FrameGenerator:
+    def __init__(self, encoder: FrameEncoder):
+        self.announce_headers = cycle(announce_headers)
+        self.announce_payloads = cycle(announce_payloads)
+
+        self.data_headers = cycle(data_headers)
+        self.data_payloads = cycle(data_payloads)
+
+        self.get_config_headers = dict(enumerate(get_config_headers))
+        self.get_config_payloads = dict(enumerate(get_config_payloads))
+
+        self.ping_headers = cycle(ping_headers)
+        self.ping_payloads = cycle(ping_payloads)
+
+        self.encoder = encoder
+
+    def generate_frame(
+        self, transaction_id: int, function_code: FunctionCode, datalogger_serial: str
+    ) -> bytes:
+        match function_code:
+            case FunctionCode.ANNOUNCE:
+                return self.generate_announce_frame(transaction_id, datalogger_serial)
+            case FunctionCode.DATA:
+                return self.generate_data_frame(transaction_id, datalogger_serial)
+            case FunctionCode.PING:
+                return self.generate_ping_frame(transaction_id, datalogger_serial)
+            case _:
+                raise NotImplementedError(f"No generator for {function_code}")
+
+    def generate_announce_frame(self, transaction_id: int, datalogger_serial: str) -> bytes:
+        raw_payload = self.set_datalogger_serial(next(self.announce_payloads), datalogger_serial)
+
+        header = next(self.announce_headers)
+        header.transaction_id = transaction_id
+
+        return self.encoder.encode_frame(header, raw_payload)
+
+    def generate_data_frame(self, transaction_id: int, datalogger_serial: str) -> bytes:
+        raw_payload = self.set_datalogger_serial(next(self.data_payloads), datalogger_serial)
+
+        header = next(self.data_headers)
+        header.transaction_id = transaction_id
+
+        return self.encoder.encode_frame(header, raw_payload)
+
+    def generate_ping_frame(self, transaction_id: int, datalogger_serial: str) -> bytes:
+        raw_payload = self.set_datalogger_serial(next(self.ping_payloads), datalogger_serial)
+
+        header = next(self.ping_headers)
+        header.transaction_id = transaction_id
+
+        return self.encoder.encode_frame(header, raw_payload)
+
+    def generate_get_config_response_frame(
+        self, transaction_id: int, register: int, datalogger_serial: str
+    ) -> bytes:
+        raw_payload = self.get_config_payloads.get(register)
+        header = self.get_config_headers.get(register)
+
+        if header is None or raw_payload is None:
+            raise ValueError(f"Unknown register {register}")
+
+        header.transaction_id = transaction_id
+
+        raw_payload = self.set_datalogger_serial(raw_payload, datalogger_serial)
+
+        return self.encoder.encode_frame(header, raw_payload)
+
+    def generate_set_config_response_frame(
+        self, transaction_id: int, register: int, datalogger_serial: str, ack: bool
+    ) -> bytes:
+        payload = bytearray(35)
+
+        header = MBAPHeader(
+            transaction_id=transaction_id,
+            protocol_id=0,
+            unit_id=0,
+            function_code=FunctionCode.SET_CONFIG,
+            length=len(payload),
+        )
+
+        payload[0:10] = ByteEncoder.encode_str(datalogger_serial, 10)
+        # 10-30 is \x00 (padding)
+        payload[30:32] = ByteEncoder.encode_u16(register)
+        payload[32:33] = ACK if ack else NACK
+
+        return self.encoder.encode_frame(header, bytes(payload))
+
+    def generate_ack_frame(self, header: MBAPHeader, ack: bool) -> bytes:
+        payload = ACK if ack else NACK
+        return self.encoder.encode_frame(header, payload)
+
+    def set_datalogger_serial(self, raw_payload: bytes, datalogger_serial: str):
+        return ByteEncoder.encode_str(datalogger_serial, 10) + raw_payload[10:]

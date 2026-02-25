@@ -2,17 +2,16 @@ from datetime import datetime
 
 import pytest
 
-from shine2mqtt.growatt.protocol.announce.announce import GrowattAnnounceMessage, SafetyFunction
-from shine2mqtt.growatt.protocol.base.message import BaseMessage
-from shine2mqtt.growatt.protocol.constants import InverterStatus
-from shine2mqtt.growatt.protocol.data.data import GrowattDataMessage
-from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
-from shine2mqtt.growatt.protocol.frame.factory import FrameFactory
-from shine2mqtt.growatt.protocol.get_config.get_config import (
+from shine2mqtt.protocol.frame.decoder import FrameDecoder
+from shine2mqtt.protocol.frame.factory import FrameFactory
+from shine2mqtt.protocol.messages.announce.announce import GrowattAnnounceMessage, SafetyFunction
+from shine2mqtt.protocol.messages.data.data import GrowattDataMessage, InverterStatus
+from shine2mqtt.protocol.messages.get_config.get_config import (
     GrowattGetConfigResponseMessage,
 )
-from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
-from shine2mqtt.growatt.protocol.set_config.set_config import GrowattSetConfigResponseMessage
+from shine2mqtt.protocol.messages.message import BaseMessage
+from shine2mqtt.protocol.messages.ping.message import GrowattPingMessage
+from shine2mqtt.protocol.messages.set_config.set_config import GrowattSetConfigResponseMessage
 from tests.utils.loader import CapturedFrameLoader
 
 announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")

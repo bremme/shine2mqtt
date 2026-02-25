@@ -1,7 +1,7 @@
 import pytest
 
-from shine2mqtt.growatt.protocol.data.decoder import BufferDataRequestDecoder
-from shine2mqtt.growatt.protocol.data.encoder import BufferedDataPayloadEncoder
+from shine2mqtt.protocol.messages.data.decoder import BufferDataRequestDecoder
+from shine2mqtt.protocol.messages.data.encoder import BufferedDataPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
 _, headers, payloads = CapturedFrameLoader.load("buffered_data_message")

@@ -2,7 +2,7 @@
 import json
 import sys
 
-from shine2mqtt.growatt.protocol.header.header import MBAPHeader
+from shine2mqtt.protocol.frame.header.header import MBAPHeader
 
 
 def load_capture_file(file_path: str) -> tuple[list[bytes], list[MBAPHeader], list[bytes]]:
@@ -55,7 +55,7 @@ def display_message_payload(payload: bytes, message_type: str) -> None:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python analyze_captures.py <json_file>")
+        print("Usage: uv run analyze_captures.py <json_file>")
         sys.exit(1)
 
     message_type = sys.argv[1].split("/")[-1].split("_message.json")[0]

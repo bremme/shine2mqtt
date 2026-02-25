@@ -30,7 +30,7 @@ Shine2MQTT acts as a local server for your Growatt Shine (Wifi-X) datalogger, ca
 - 🔒 **Local Control** - Keep your data private, no cloud dependency
 - 🐳 **Docker Support** - Easy deployment with Docker/Docker Compose
 - ⚡ **Real-time Data** - Instant solar production metrics
-- 🛠️ **RESTful API** - Built-in API for monitoring and control (Alpha)
+- 🛠️ **RESTful API** - Built-in API for monitoring and control
 - 📊 **Comprehensive Metrics** - Power, voltage, current, energy totals, and more
 
 ## 🔌 Compatibility
@@ -242,7 +242,7 @@ If MQTT discovery is enabled, your inverter will automatically appear in Home As
 - **Settings** → **Device & Services** → **MQTT** -> **Devices**
 - You should see a new entry for both the inverter as well as the datalogger:
   - **Inverter Name**: `Growatt MIC 3000TL-X` (or your specified model)
-  - **Datalogger Name**: `Shine WiFi-X` (or your specified model)  
+  - **Datalogger Name**: `Shine WiFi-X` (or your specified model)
 
 All sensors will be automatically created with appropriate device classes and units.
 
@@ -315,6 +315,33 @@ Shine2MQTT publishes the following metrics via MQTT:
 | Server Port                 | `solar/datalogger/sensor/server_port`           | -    |
 | WiFi Network Name (SSID)    | `solar/datalogger/sensor/wifi_ssid`             | -    |
 
+## 🌐 REST API
+
+An optional REST API (built with [FastAPI](https://fastapi.tiangolo.com/)) allows you to read and write inverter and datalogger settings directly. Enable it via the `api` section in your config file and enable with `api.enabled: true`.
+
+Interactive Swagger docs are available at `http://<host>:8000` when the API is running.
+
+### Datalogger endpoints
+
+| Method  | Endpoint                                     | Description                        |
+|---------|----------------------------------------------|------------------------------------|
+| `GET`   | `/dataloggers`                               | List all connected dataloggers     |
+| `GET`   | `/dataloggers/{serial}`                      | Get a single datalogger            |
+| `GET`   | `/dataloggers/{serial}/settings/{name}`      | Read a datalogger setting by name  |
+| `PUT`   | `/dataloggers/{serial}/settings/{name}`      | Update a datalogger setting by name|
+| `GET`   | `/dataloggers/{serial}/registers/{address}`  | Read a datalogger register         |
+| `PUT`   | `/dataloggers/{serial}/registers/{address}`  | Update a datalogger register       |
+
+### Inverter endpoints
+
+| Method  | Endpoint                                              | Description                                       |
+|---------|-------------------------------------------------------|---------------------------------------------------|
+| `GET`   | `/dataloggers/{serial}/inverter/registers/{address}`  | Read a single inverter register                   |
+| `GET`   | `/dataloggers/{serial}/inverter/registers`            | Read multiple inverter registers                  |
+| `PUT`   | `/dataloggers/{serial}/inverter/registers/{address}`  | Update a single inverter register                 |
+| `PUT`   | `/dataloggers/{serial}/inverter/registers`            | Update multiple inverter registers                |
+| `POST`  | `/dataloggers/{serial}/inverter/raw-frames`           | Send a raw Growatt protocol frame                 |
+
 ## 🛠️ Development
 
 ### Prerequisites
@@ -327,8 +354,7 @@ Shine2MQTT publishes the following metrics via MQTT:
 
 ```bash
 # Clone the repository
-git clone https://github.com/bremme/shine2mqtt.git
-cd shine2mqtt
+git clone https://github.com/bremme/shine2mqtt.git && cd shine2mqtt
 
 # Install dependencies (including dev dependencies)
 uv sync
@@ -342,16 +368,35 @@ pre-commit install
 ```shell
 shine2mqtt/
 ├── src/shine2mqtt/          # Main application code
-│   ├── growatt/             # Growatt protocol implementation
-│   │   ├── protocol/        # Protocol decoders/encoders
-│   │   ├── server/          # TCP server
-│   │   └── client/          # Simulated client (testing)
-│   ├── mqtt/                # MQTT bridge
-│   ├── hass/                # Home Assistant discovery
-│   └── api/                 # REST API
+│   ├── adapters/            # Outbound integrations
+│   │   ├── api/             # FastAPI REST interface
+│   │   ├── hass/            # Home Assistant MQTT discovery
+│   │   └── mqtt/            # MQTT publisher
+│   ├── app/                 # Application-layer command handlers
+│   │   └── handlers/        # Per-command handler implementations
+│   ├── domain/              # Core models and abstract interfaces
+│   │   ├── events/          # Event definitions
+│   │   ├── interfaces/      # Abstract interfaces (ports)
+│   │   └── models/          # Domain models
+│   ├── infrastructure/      # Raw asyncio TCP networking
+│   │   ├── client/          # TCP client
+│   │   └── server/          # TCP server
+│   ├── main/                # Composition root, CLI, config loading
+│   │   ├── cli/             # CLI entry points
+│   │   └── config/          # Config loading and validation
+│   ├── protocol/            # Growatt binary protocol implementation
+│   │   ├── codec/           # Frame encoding and decoding
+│   │   ├── frame/           # Frame definitions
+│   │   ├── messages/        # Protocol message types
+│   │   ├── session/         # Per-connection state machine
+│   │   ├── settings/        # Protocol-level settings
+│   │   └── simulator/       # Simulated datalogger client
+│   └── util/                # Shared utilities (clocks, conversions, logging)
 ├── tests/                   # Test suite
-│   ├── unit/                # Unit tests
-│   └── integration/         # Integration tests
+│   ├── data/                # Test data
+│   ├── integration/         # Integration tests
+│   ├── unit/                # Unit tests (mirrors src/ structure)
+│   └── utils/               # Test utilities and helpers
 └── docs/                    # Documentation
 ```
 
@@ -387,6 +432,12 @@ uv run ruff format src tests
 # Type checking
 uv run ty check src
 
+# Architecture constraints
+uv run import-linter lint
+
+# Vulnerability check
+uv run pip-audit
+
 # Run all pre-commit hooks
 pre-commit run --all-files
 ```
@@ -401,10 +452,10 @@ uv build
 docker build -t bremme/shine2mqtt:latest .
 ```
 
+
 ### Running Locally with simulated Client
 
 Run the main application in one terminal, and the simulated client in another terminal:
-
 
 ```bash
 # run shine2mqtt on different port (to prevent datalogger conflicts)
@@ -444,6 +495,7 @@ This project is licensed under the GNU General Public License V3.0 - see the [LI
 ## 🙏 Acknowledgments
 
 - Johan Vromans for the excellent protocol documentation
+- Johan Meijer for the grott project
 - The Home Assistant community
 - All contributors to related Growatt projects
 

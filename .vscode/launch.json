@@ -5,11 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "shine2mqtt (module)",
+            "name": "shine2mqtt",
             "type": "debugpy",
             "request": "launch",
             "module": "shine2mqtt",
             "args": ["run"]
+        },
+        {
+            "name": "shine2mqtt (capture)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "shine2mqtt",
+            "args": ["run", "--capture"]
+        },
+        {
+            "name": "shine2mqtt (dev)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "shine2mqtt",
+            "args": ["run", "--server-port", "4000"]
         }
     ]
 }
