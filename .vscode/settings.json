@@ -10,5 +10,9 @@
             "source.fixAll.ruff": "explicit",
             "source.organizeImports.ruff": "explicit"
         }
+    },
+    "sonarlint.connectedMode.project": {
+        "connectionId": "bremme",
+        "projectKey": "bremme_shine2mqtt"
     }
 }
