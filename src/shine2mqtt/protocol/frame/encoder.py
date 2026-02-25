@@ -47,8 +47,6 @@ class FrameEncoder:
 
         raw_payload = encoder.encode(message)
 
-        # FIXME maybe not ideal to change header here
-        # would be better to have immutability
         message.header.length = len(raw_payload) + CRC16_LENGTH
 
         return self.encode_frame(message.header, raw_payload)
