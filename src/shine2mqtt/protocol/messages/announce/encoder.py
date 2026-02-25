@@ -20,7 +20,6 @@ class AnnouncePayloadEncoder(PayloadEncoder[GrowattAnnounceMessage]):
         payload[30:40] = self.encode_str(message.inverter_serial, 10)
         # 40-60 is \x00 (padding)
         payload[60:67] = self.encode_datetime(message.timestamp, fmt="B")
-        # 60-70 is \x00 (padding)
         # Holding registers (read/write) ###############################################
         # See 4.1 Holding Registers in Protocol document v1.20(page 9)
         # Offset of 71 in the announce payload, every register is 2 bytes

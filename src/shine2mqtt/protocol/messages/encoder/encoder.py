@@ -18,12 +18,12 @@ class PayloadEncoder[T: BaseMessage](ABC, ByteEncoder):
         step = 2 if fmt == "H" else 1
         year_offset = 0 if fmt == "H" else 2000
 
-        payload = bytearray(6 * step)
+        payload = bytearray(7 * step)
         struct.pack_into(f">{fmt}", payload, 0 * step, timestamp.year - year_offset)
         struct.pack_into(f">{fmt}", payload, 1 * step, timestamp.month)
         struct.pack_into(f">{fmt}", payload, 2 * step, timestamp.day)
         struct.pack_into(f">{fmt}", payload, 3 * step, timestamp.hour)
         struct.pack_into(f">{fmt}", payload, 4 * step, timestamp.minute)
         struct.pack_into(f">{fmt}", payload, 5 * step, timestamp.second)
-
+        struct.pack_into(f">{fmt}", payload, 6 * step, timestamp.weekday())
         return bytes(payload)

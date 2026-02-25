@@ -1,5 +1,3 @@
-import struct
-
 from shine2mqtt.protocol.messages.data.data import (
     GrowattBufferedDataMessage,
     GrowattDataMessage,
@@ -22,20 +20,12 @@ class DataPayloadEncoder(PayloadEncoder[GrowattDataMessage]):
         # Inverter serial (30-40)
         payload[30:40] = self.encode_str(message.inverter_serial, 10)
         # 40-60 is \x00 (padding)
-
-        # TODO timestamp?
-
-        # System datetime (60-67) - format as bytes (B)
-        payload[60] = struct.pack(">B", message.timestamp.year % 100)[0]
-        payload[61] = struct.pack(">B", message.timestamp.month)[0]
-        payload[62] = struct.pack(">B", message.timestamp.day)[0]
-        payload[63] = struct.pack(">B", message.timestamp.hour)[0]
-        payload[64] = struct.pack(">B", message.timestamp.minute)[0]
-        payload[65] = struct.pack(">B", message.timestamp.second)[0]
-        payload[66] = struct.pack(">B", message.timestamp.weekday())[0]
-        # 67-71 is \x00 (padding)
-
-        # Inverter status (71-73)
+        payload[60:67] = self.encode_datetime(message.timestamp, fmt="B")
+        # Input registers (read) ###################################################
+        # See 4.2 Input Reg -> Protocol document v1.20 (page 33)
+        # See 4.2 Input Reg -> Protocol document v1.20 (page 48 for TL-X and TL-XH)
+        # Offset of 71 in the payload, every register is 2 bytes
+        # 0 Inverter Status
         payload[71:73] = self.encode_u16(message.inverter_status.value)
 
         # DC Power (73-77)
