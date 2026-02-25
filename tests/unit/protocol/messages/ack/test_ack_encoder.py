@@ -19,7 +19,7 @@ CASES = list(zip(INPUT_MESSAGES, EXPECTED_PAYLOADS, strict=True))
 
 class TestAckPayloadEncoder:
     @pytest.fixture
-    def encoder(self):
+    def encoder(self) -> AckPayloadEncoder:
         return AckPayloadEncoder()
 
     @pytest.mark.parametrize(
@@ -40,7 +40,7 @@ class TestAckPayloadEncoder:
 
         assert payload == b"\x00"
 
-    def test_encode_ack_false_returns_nack_byte(self, encoder):
+    def test_encode_ack_false_returns_nack_byte(self, encoder: AckPayloadEncoder):
         message = GrowattAckMessage(
             header=headers[0],
             ack=False,
