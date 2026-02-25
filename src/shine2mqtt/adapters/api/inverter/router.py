@@ -50,7 +50,14 @@ async def update_single_inverter_setting(serial: str, name: str, value: str):
 
 
 # Inverter (holding) register endpoints
-@router.get("/registers/{address}")
+@router.get(
+    "/registers/{address}",
+    responses={
+        404: {"description": "Datalogger not connected or register not found"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def read_single_inverter_register(
     serial: str,
     address: int,
@@ -62,7 +69,14 @@ async def read_single_inverter_register(
     return registers[0]
 
 
-@router.get("/registers")
+@router.get(
+    "/registers",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def read_multiple_inverter_registers(
     serial: str,
     start: int,
@@ -82,7 +96,15 @@ async def read_multiple_inverter_registers(
     return inverter_registers_to_api_model(data)
 
 
-@router.put("/registers/{address}")
+@router.put(
+    "/registers/{address}",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        502: {"description": "Inverter did not acknowledge the write"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def write_single_inverter_register(
     serial: str,
     address: int,
@@ -105,7 +127,15 @@ async def write_single_inverter_register(
     return Response(status_code=204)
 
 
-@router.put("/registers")
+@router.put(
+    "/registers",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        502: {"description": "Inverter did not acknowledge the write"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def write_multiple_inverter_registers(
     serial: str,
     request: WriteMultipleRegistersRequest,
@@ -132,7 +162,11 @@ async def write_multiple_inverter_registers(
 # Raw frame endpoints
 @router.post(
     "/raw-frames",
-    responses={504: {"description": "Gateway timeout when the datalogger did not respond in time"}},
+    responses={
+        404: {"description": "Datalogger not connected"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
 )
 async def send_raw_frame(
     serial: str,

@@ -48,7 +48,10 @@ async def get_all_dataloggers(
     ]
 
 
-@router.get(path="/dataloggers/{serial}")
+@router.get(
+    path="/dataloggers/{serial}",
+    responses={404: {"description": "Datalogger not found"}},
+)
 async def get_single_datalogger(
     serial: str,
     session_registry: Annotated[ProtocolSessionRegistry, Depends(get_session_registry)],
@@ -70,7 +73,14 @@ async def get_all_datalogger_settings(serial: str):
     not_implemented_501()
 
 
-@router.get("/dataloggers/{serial}/settings/{name}")
+@router.get(
+    "/dataloggers/{serial}/settings/{name}",
+    responses={
+        404: {"description": "Datalogger not connected or setting not found"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def get_single_datalogger_setting(
     serial: str,
     name: str,
@@ -90,7 +100,15 @@ async def get_single_datalogger_setting(
     return config_result_to_datalogger_setting(result)
 
 
-@router.put("/dataloggers/{serial}/settings/{name}")
+@router.put(
+    "/dataloggers/{serial}/settings/{name}",
+    responses={
+        400: {"description": "Failed to update setting"},
+        404: {"description": "Datalogger not connected or setting not found"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def update_single_datalogger_setting(
     serial: str,
     name: str,
@@ -121,7 +139,14 @@ async def get_all_registers(serial: str):
     not_implemented_501()
 
 
-@router.get("/dataloggers/{serial}/registers/{address}")
+@router.get(
+    "/dataloggers/{serial}/registers/{address}",
+    responses={
+        404: {"description": "Datalogger not connected"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def get_single_register(
     serial: str,
     address: int,
@@ -139,7 +164,15 @@ async def get_single_register(
     return config_result_to_datalogger_register_setting(result)
 
 
-@router.put("/dataloggers/{serial}/registers/{address}")
+@router.put(
+    "/dataloggers/{serial}/registers/{address}",
+    responses={
+        400: {"description": "Failed to update register"},
+        404: {"description": "Datalogger not connected"},
+        504: {"description": "Datalogger did not respond in time"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def update_single_register(
     serial: str,
     address: int,
