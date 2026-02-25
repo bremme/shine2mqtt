@@ -1,33 +1,30 @@
 import asyncio
-from asyncio import Queue, Server, StreamReader, StreamWriter
+from asyncio import Server, StreamReader, StreamWriter
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
-from shine2mqtt.growatt.protocol.processor.processor import ProtocolProcessor
 from shine2mqtt.growatt.server.config import GrowattServerConfig
+from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSessionFactory
 from shine2mqtt.growatt.server.session import GrowattTcpSession
 
 
 class GrowattServer:
     def __init__(
         self,
-        decoder: FrameDecoder,
-        incoming_messages: Queue,
-        outgoing_frames: Queue,
-        protocol_processor: ProtocolProcessor,
         config: GrowattServerConfig,
+        session_factory: ServerProtocolSessionFactory,
+        session_registry: ProtocolSessionRegistry,
     ) -> None:
-        self._decoder = decoder
         self.host = config.host
         self.port = config.port
 
         self.server: Server | None = None
         self.session: GrowattTcpSession | None = None
         self.session_task = None
-        self._incoming_messages = incoming_messages
-        self._outgoing_frames = outgoing_frames
-        self._protocol_processor = protocol_processor
+
+        self._session_factory = session_factory
+        self._session_registry = session_registry
 
     async def start(self):
         logger.info("Creating TCP server")
@@ -71,22 +68,17 @@ class GrowattServer:
 
         logger.info(f"Accepted new TCP connection from {addr}")
 
-        # Only allow a single session
-        if self.session is not None:
-            logger.warning("Existing active session detected, closing it")
-            writer.close()
-            await writer.wait_closed()
-            await self._close_session()
-            logger.info("Previous session closed, accepting new connection")
+        protocol_session = self._session_factory.create()
 
         self.session = GrowattTcpSession(
             reader,
             writer,
-            self._decoder,
-            self._incoming_messages,
-            self._outgoing_frames,
+            outgoing_frames=protocol_session.outgoing_frames,
+            protocol_session=protocol_session,
         )
-        self._protocol_processor.reset()
+
+        self._session_registry.add(protocol_session)
+
         self.session_task = asyncio.create_task(self.session.run())
 
         try:
@@ -96,5 +88,6 @@ class GrowattServer:
             logger.error(f"Error in TCP session from {addr}")
         finally:
             logger.info(f"TCP session closed from {addr}")
+            self._session_registry.remove(protocol_session)
             self.session = None
             self.session_task = None

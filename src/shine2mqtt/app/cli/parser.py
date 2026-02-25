@@ -20,7 +20,7 @@ class CliArgParser:
         self.parser = self._create_parsers()
 
     @staticmethod
-    def create() -> "CliArgParser":
+    def create() -> CliArgParser:
         return CliArgParser(sys.argv[1:], prog=NAME)
 
     def _create_parsers(self) -> ArgumentParser:
@@ -77,7 +77,14 @@ class CliArgParser:
             dest="log_color",
         )
 
-        parser.add_argument("-c", "--config-file", help="Path to configuration file", type=Path)
+        parser.add_argument(
+            "-c",
+            "--config-file",
+            help="Path to configuration file",
+            type=Path,
+            dest="config_file",
+            metavar="FILE",
+        )
 
     def _add_run_args(self, parser: ArgumentParser) -> None:
         self._add_capture_data_args(parser)

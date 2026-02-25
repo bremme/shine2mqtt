@@ -3,7 +3,9 @@ from asyncio import StreamReader, StreamWriter
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
+from shine2mqtt.growatt.protocol.frame.decoder import HEADER_LENGTH, FrameDecoder
+from shine2mqtt.growatt.server.protocol.queues import OutgoingFrames
+from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSession
 
 
 class GrowattTcpSession:
@@ -11,16 +13,13 @@ class GrowattTcpSession:
         self,
         reader: StreamReader,
         writer: StreamWriter,
-        decoder: FrameDecoder,
-        incoming_messages: asyncio.Queue,
-        outgoing_frames: asyncio.Queue,
+        outgoing_frames: OutgoingFrames,
+        protocol_session: ServerProtocolSession,
     ):
         self.reader = reader
         self.writer = writer
-        self.decoder = decoder
-
-        self._incoming_messages = incoming_messages
         self._outgoing_frames = outgoing_frames
+        self._protocol_session = protocol_session
 
     async def run(self):
         try:
@@ -36,14 +35,14 @@ class GrowattTcpSession:
         logger.info("Starting TCP Session reader loop, waiting for messages")
         try:
             while True:
-                raw_header = await self.reader.readexactly(8)
-                header = self.decoder.decode_header(raw_header)
+                raw_header = await self.reader.readexactly(HEADER_LENGTH)
 
-                raw_message_data = await self.reader.readexactly(header.length)
+                raw_payload_length = FrameDecoder.extract_payload_length(raw_header)
 
-                message = self.decoder.decode(header, raw_header + raw_message_data)
+                raw_payload = await self.reader.readexactly(raw_payload_length)
 
-                self._incoming_messages.put_nowait(message)
+                self._protocol_session.handle_incoming_frame(raw_header + raw_payload)
+
         except asyncio.IncompleteReadError:
             logger.error("Can't read from client, client disconnected")
             raise

@@ -1,0 +1,18 @@
+import time
+from typing import Protocol
+
+
+class ClockService(Protocol):
+    def now(self) -> float: ...
+
+
+class MonotonicClockService:
+    def now(self) -> float:
+        return time.monotonic()
+
+
+def has_interval_elapsed(now: float, last_time: float | None, interval: int) -> bool:
+    if last_time is None:
+        return True
+    elapsed = now - last_time
+    return elapsed >= interval

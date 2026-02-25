@@ -4,13 +4,13 @@ from typing import Any
 
 from loguru import logger
 
-from shine2mqtt.growatt.protocol.messages import (
-    BaseMessage,
-    GrowattAnnounceMessage,
+from shine2mqtt.growatt.protocol.announce.announce import GrowattAnnounceMessage
+from shine2mqtt.growatt.protocol.base.message import BaseMessage
+from shine2mqtt.growatt.protocol.data.data import (
     GrowattBufferedDataMessage,
     GrowattDataMessage,
 )
-from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigResponseMessage
+from shine2mqtt.growatt.protocol.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
 from shine2mqtt.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 from shine2mqtt.mqtt.config import MqttConfig

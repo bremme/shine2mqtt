@@ -10,20 +10,26 @@ class RegisterInfo:
     fmt: str
 
 
+class RegisterNotFoundError(KeyError):
+    pass
+
+
 class ConfigRegistry:
     def __init__(self, registers: dict[int, dict] = CONFIG_REGISTERS):
         self._registers = registers
 
-    def get_register_by_name(self, name: str) -> int | None:
+    def get_register_by_name(self, name: str) -> int:
         for register, info in self._registers.items():
             if info.get("name") == name:
                 return register
-        return None
+        raise RegisterNotFoundError(f"Register with name '{name}' not found")
 
-    def get_register_info(self, register: int) -> RegisterInfo | None:
-        info = self._registers.get(register)
+    def get_register_info(self, register: int) -> RegisterInfo:
+        info = self._registers.get(register, None)
         if info is None:
-            return None
+            raise RegisterNotFoundError(
+                f"No register info found or available for register '{register}'"
+            )
         return RegisterInfo(
             name=info["name"],
             description=info["description"],

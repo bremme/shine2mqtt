@@ -23,7 +23,7 @@ class ConfigFileLoader:
         ]
 
     @staticmethod
-    def create() -> "ConfigFileLoader":
+    def create() -> ConfigFileLoader:
         return ConfigFileLoader(dict(os.environ), DEFAULT_CONFIG_FILE)
 
     def load(self, path: Path | None = None) -> dict[str, Any]:

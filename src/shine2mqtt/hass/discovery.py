@@ -2,7 +2,6 @@ from typing import Any
 
 from shine2mqtt import HOME_PAGE, __version__
 from shine2mqtt.hass.config import HassDiscoveryConfig
-from shine2mqtt.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 
 
 class MqttDiscoveryBuilder:
@@ -12,8 +11,15 @@ class MqttDiscoveryBuilder:
         "support_url": HOME_PAGE,
     }
 
-    def __init__(self, config: HassDiscoveryConfig):
+    def __init__(
+        self,
+        config: HassDiscoveryConfig,
+        datalogger_sensor_map: dict[str, dict[str, str]],
+        inverter_sensor_map: dict[str, dict[str, str]],
+    ) -> None:
         self._config = config
+        self._datalogger_sensor_map = datalogger_sensor_map
+        self._inverter_sensor_map = inverter_sensor_map
 
     def build_datalogger_discovery_message(
         self,
@@ -37,7 +43,7 @@ class MqttDiscoveryBuilder:
         }
 
         discovery_payload["components"] = self._build_components(
-            DATALOGGER_SENSOR_MAP, "datalogger"
+            self._datalogger_sensor_map, "datalogger"
         )
 
         return discovery_payload
@@ -60,11 +66,15 @@ class MqttDiscoveryBuilder:
             "components": {},
         }
 
-        discovery_payload["components"] = self._build_components(INVERTER_SENSOR_MAP, "inverter")
+        discovery_payload["components"] = self._build_components(
+            self._inverter_sensor_map, "inverter"
+        )
 
         return discovery_payload
 
-    def _build_components(self, sensor_map: dict[str, dict], base_sub_topic: str) -> dict[str, Any]:
+    def _build_components(
+        self, sensor_map: dict[str, dict[str, str]], base_sub_topic: str
+    ) -> dict[str, Any]:
         components = {}
 
         for entity_id, sensor_config in sensor_map.items():

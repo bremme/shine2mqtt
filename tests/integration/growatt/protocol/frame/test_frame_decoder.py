@@ -2,19 +2,17 @@ from datetime import datetime
 
 import pytest
 
+from shine2mqtt.growatt.protocol.announce.announce import GrowattAnnounceMessage, SafetyFunction
+from shine2mqtt.growatt.protocol.base.message import BaseMessage
 from shine2mqtt.growatt.protocol.constants import InverterStatus
+from shine2mqtt.growatt.protocol.data.data import GrowattDataMessage
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.factory import FrameFactory
-from shine2mqtt.growatt.protocol.messages import (
-    BaseMessage,
-    GrowattAnnounceMessage,
-    MBAPHeader,
+from shine2mqtt.growatt.protocol.get_config.get_config import (
+    GrowattGetConfigResponseMessage,
 )
-from shine2mqtt.growatt.protocol.messages.ack import GrowattAckMessage
-from shine2mqtt.growatt.protocol.messages.announce import SafetyFunction
-from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigResponseMessage
-from shine2mqtt.growatt.protocol.messages.data import GrowattDataMessage
-from shine2mqtt.growatt.protocol.messages.ping import GrowattPingMessage
+from shine2mqtt.growatt.protocol.ping.message import GrowattPingMessage
+from shine2mqtt.growatt.protocol.set_config.set_config import GrowattSetConfigResponseMessage
 from tests.utils.loader import CapturedFrameLoader
 
 announce_frames, announce_headers, announce_payloads = CapturedFrameLoader.load("announce_message")
@@ -23,11 +21,13 @@ buffered_data_frames, buffered_data_headers, buffered_data_payloads = CapturedFr
 )
 data_frames, data_headers, data_payloads = CapturedFrameLoader.load("data_message")
 get_config_frames, get_config_headers, get_config_payloads = CapturedFrameLoader.load(
-    "get_config_message"
+    "get_config_response"
 )
 ping_frames, ping_headers, ping_payloads = CapturedFrameLoader.load("ping_message")
 
-ack_frames, ack_headers, ack_payloads = CapturedFrameLoader.load("ack_message")
+set_config_response_frames, set_config_response_headers, set_config_response_payloads = (
+    CapturedFrameLoader.load("set_config_response")
+)
 
 DECRYPTION_KEY = b"Growatt"
 DATALOGGER_SERIAL = "XGDABCDEFG"
@@ -135,14 +135,15 @@ EXPECTED_MESSAGES = [
         header=get_config_headers[14],
         datalogger_serial=DATALOGGER_SERIAL,
         register=14,
-        length=13,
         data=b"192.168.1.100",
         name="ip_address",
         description="Local IP",
         value="192.168.1.100",
     ),
-    GrowattAckMessage(
-        header=ack_headers[0],
+    GrowattSetConfigResponseMessage(
+        header=set_config_response_headers[0],
+        datalogger_serial=DATALOGGER_SERIAL,
+        register=4,
         ack=True,
     ),
     GrowattPingMessage(
@@ -153,12 +154,12 @@ EXPECTED_MESSAGES = [
 
 
 CASES = [
-    (announce_frames[0], announce_headers[0], EXPECTED_MESSAGES[0]),
-    (buffered_data_frames[0], buffered_data_headers[0], EXPECTED_MESSAGES[1]),
-    (data_frames[0], data_headers[0], EXPECTED_MESSAGES[2]),
-    (get_config_frames[14], get_config_headers[14], EXPECTED_MESSAGES[3]),
-    (ack_frames[0], ack_headers[0], EXPECTED_MESSAGES[4]),
-    (ping_frames[0], ping_headers[0], EXPECTED_MESSAGES[5]),
+    (announce_frames[0], EXPECTED_MESSAGES[0]),
+    (buffered_data_frames[0], EXPECTED_MESSAGES[1]),
+    (data_frames[0], EXPECTED_MESSAGES[2]),
+    (get_config_frames[14], EXPECTED_MESSAGES[3]),
+    (set_config_response_frames[0], EXPECTED_MESSAGES[4]),
+    (ping_frames[0], EXPECTED_MESSAGES[5]),
 ]
 
 
@@ -167,14 +168,13 @@ class TestFrameDecoder:
     def decoder(self):
         return FrameFactory.server_decoder()
 
-    @pytest.mark.parametrize("frame,header,expected_message", CASES, ids=list(range(len(CASES))))
+    @pytest.mark.parametrize("frame,expected_message", CASES, ids=list(range(len(CASES))))
     def test_decode_valid_frame_success(
         self,
         decoder: FrameDecoder,
         frame: bytes,
-        header: MBAPHeader,
         expected_message: BaseMessage,
     ):
-        message = decoder.decode(header, frame)
+        message = decoder.decode(frame)
 
         assert message == expected_message

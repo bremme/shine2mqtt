@@ -1,21 +1,23 @@
-from shine2mqtt.growatt.protocol.decoders.data import BufferDataRequestDecoder
-from shine2mqtt.growatt.protocol.encoders.data import BufferedDataPayloadEncoder
+import pytest
+
+from shine2mqtt.growatt.protocol.data.decoder import BufferDataRequestDecoder
+from shine2mqtt.growatt.protocol.data.encoder import BufferedDataPayloadEncoder
 from tests.utils.loader import CapturedFrameLoader
 
 _, headers, payloads = CapturedFrameLoader.load("buffered_data_message")
 
 
-class TestBufferedDataRoundtrip:
-    @staticmethod
-    def test_encode_decode_roundtrip_preserves_data() -> None:
-        decoder = BufferDataRequestDecoder()
-        encoder = BufferedDataPayloadEncoder()
+@pytest.mark.parametrize(
+    "header,payload", zip(headers, payloads, strict=True), ids=range(len(headers))
+)
+def test_encode_decode_buffered_data_message_roundtrip_preserves_data(header, payload) -> None:
+    decoder = BufferDataRequestDecoder()
+    encoder = BufferedDataPayloadEncoder()
 
-        for header, payload in zip(headers, payloads, strict=True):
-            decoded_message = decoder.decode(header, payload)
+    decoded_message = decoder.decode(header, payload)
 
-            encoded_payload = encoder.encode(decoded_message)
+    encoded_payload = encoder.encode(decoded_message)
 
-            redecoded_message = decoder.decode(header, encoded_payload)
+    redecoded_message = decoder.decode(header, encoded_payload)
 
-            assert decoded_message == redecoded_message
+    assert decoded_message == redecoded_message

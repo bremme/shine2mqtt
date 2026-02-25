@@ -4,20 +4,21 @@ from pathlib import Path
 import uvicorn
 from loguru import logger
 
-from shine2mqtt.api.api import RestApi
+from shine2mqtt.api.api import create_app
 from shine2mqtt.app.config.config import ApplicationConfig
+from shine2mqtt.growatt.protocol.config import ConfigRegistry
 from shine2mqtt.growatt.protocol.frame import (
     FrameFactory,
 )
 from shine2mqtt.growatt.protocol.frame.capturer import CaptureHandler
-from shine2mqtt.growatt.protocol.frame.capturer.capturer import FileFrameCapturer
-from shine2mqtt.growatt.protocol.frame.capturer.sanitizer import (
-    RawPayloadSanitizer,
-)
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
-from shine2mqtt.growatt.protocol.processor.processor import ProtocolProcessor
 from shine2mqtt.growatt.server import GrowattServer
+from shine2mqtt.growatt.server.protocol.queues import (
+    ProtocolEvents,
+)
+from shine2mqtt.growatt.server.protocol.session.registry import ProtocolSessionRegistry
+from shine2mqtt.growatt.server.protocol.session.session import ServerProtocolSessionFactory
 from shine2mqtt.hass.discovery import MqttDiscoveryBuilder
+from shine2mqtt.hass.map import DATALOGGER_SENSOR_MAP, INVERTER_SENSOR_MAP
 from shine2mqtt.mqtt.bridge import MqttBridge
 from shine2mqtt.mqtt.client import MqttClient
 from shine2mqtt.mqtt.processor import MqttDataloggerMessageProcessor
@@ -27,46 +28,46 @@ class Application:
     def __init__(self, config: ApplicationConfig):
         self.config = config
 
-        incoming_messages = asyncio.Queue(maxsize=100)
-        outgoing_frames = asyncio.Queue(maxsize=100)
-        protocol_commands = asyncio.Queue(maxsize=100)
-        protocol_events = asyncio.Queue(maxsize=100)
+        protocol_events = ProtocolEvents(maxsize=100)
 
         encoder = FrameFactory.encoder()
 
         if config.capture_data:
             logger.info("Frame data capturing is enabled.")
-            capturer = FileFrameCapturer(Path("./captured_frames"))
-            sanitizer = RawPayloadSanitizer.create()
-            capture_handler = CaptureHandler(encoder, capturer, sanitizer)
+            capture_handler = CaptureHandler.create(Path("./captured_frames"), encoder)
             decoder = FrameFactory.server_decoder(on_decode=capture_handler)
         else:
             decoder = FrameFactory.server_decoder()
 
-        self.protocol_processor = ProtocolProcessor(
+        config_registry = ConfigRegistry()
+
+        self.session_factory = ServerProtocolSessionFactory(
+            decoder=decoder,
             encoder=encoder,
-            incoming_messages=incoming_messages,
-            outgoing_frames=outgoing_frames,
-            protocol_commands=protocol_commands,
+            config_registry=config_registry,
             protocol_events=protocol_events,
         )
 
+        session_registry = ProtocolSessionRegistry()
+
         self.tcp_server = GrowattServer(
-            decoder=decoder,
-            incoming_messages=incoming_messages,
-            outgoing_frames=outgoing_frames,
-            protocol_processor=self.protocol_processor,
             config=config.server,
+            session_factory=self.session_factory,
+            session_registry=session_registry,
         )
 
         self.mqtt_bridge = self._setup_mqtt_bridge(protocol_events, config)
 
-        self.rest_server = self._setup_rest_server(config, protocol_commands)
+        self.rest_server = self._setup_rest_server(config, session_registry)
 
     def _setup_mqtt_bridge(
-        self, protocol_events: asyncio.Queue[BaseMessage], config: ApplicationConfig
+        self, protocol_events: ProtocolEvents, config: ApplicationConfig
     ) -> MqttBridge:
-        discovery_builder = MqttDiscoveryBuilder(config=config.mqtt.discovery)
+        discovery_builder = MqttDiscoveryBuilder(
+            config=config.mqtt.discovery,
+            datalogger_sensor_map=DATALOGGER_SENSOR_MAP,
+            inverter_sensor_map=INVERTER_SENSOR_MAP,
+        )
 
         mqtt_event_processor = MqttDataloggerMessageProcessor(
             discovery=discovery_builder, config=config.mqtt
@@ -83,12 +84,12 @@ class Application:
     def _setup_rest_server(
         self,
         config: ApplicationConfig,
-        protocol_commands: asyncio.Queue,
+        session_registry: ProtocolSessionRegistry,
     ):
         if not config.api.enabled:
             return None
 
-        api_app = RestApi(protocol_commands=protocol_commands).app
+        api_app = create_app(session_registry=session_registry)
 
         uvicorn_config = uvicorn.Config(
             app=api_app,
@@ -107,7 +108,6 @@ class Application:
 
             tasks = [
                 asyncio.create_task(self.tcp_server.serve()),
-                asyncio.create_task(self.protocol_processor.run()),
                 asyncio.create_task(self.mqtt_bridge.run()),
             ]
 

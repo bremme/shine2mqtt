@@ -1,15 +1,15 @@
+from shine2mqtt.growatt.protocol.base.decoder_registry import DecoderRegistry
+from shine2mqtt.growatt.protocol.base.encoder_registry import PayloadEncoderRegistry
 from shine2mqtt.growatt.protocol.constants import DECRYPTION_KEY, ENCRYPTION_KEY
-from shine2mqtt.growatt.protocol.decoders import DecoderRegistry, HeaderDecoder
-from shine2mqtt.growatt.protocol.encoders import (
-    CRCEncoder,
-    HeaderEncoder,
-    PayloadEncoderRegistry,
-)
+from shine2mqtt.growatt.protocol.crc.decoder import CRCDecoder
+from shine2mqtt.growatt.protocol.crc.encoder import CRCEncoder
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.growatt.protocol.frame.crc import CRCCalculator
 from shine2mqtt.growatt.protocol.frame.decoder import FrameDecoder
 from shine2mqtt.growatt.protocol.frame.encoder import FrameEncoder
 from shine2mqtt.growatt.protocol.frame.validator import FrameValidator
+from shine2mqtt.growatt.protocol.header.decoder import HeaderDecoder
+from shine2mqtt.growatt.protocol.header.encoder import HeaderEncoder
 
 
 class FrameFactory:
@@ -36,11 +36,12 @@ class FrameFactory:
             decoder_registry: Optional decoder registry. Defaults to server registry if not specified.
         """
         crc_calculator = CRCCalculator()
+        crc_decoder = CRCDecoder()
 
         return FrameDecoder(
             decryption_key=DECRYPTION_KEY,
             header_decoder=HeaderDecoder(),
-            frame_validator=FrameValidator(crc_calculator),
+            frame_validator=FrameValidator(crc_calculator, crc_decoder),
             payload_cipher=PayloadCipher(),
             decoder_registry=decoder_registry or DecoderRegistry.server(),
             on_decode=on_decode,

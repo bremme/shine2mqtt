@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - '*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v0.2.0)'
+        required: true
+        type: string
 
 env:
   REGISTRY: docker.io
@@ -24,7 +30,9 @@ jobs:
           python-version-file: .python-version
 
       - name: Verify version
-        run: un run python .github/scripts/verify_tag_matches_pyproject_version.py
+        env:
+          GITHUB_REF_NAME: ${{ inputs.tag || github.ref_name }}
+        run: uv run python .github/scripts/verify_tag_matches_pyproject_version.py
 
   ci:
     uses: ./.github/workflows/continuous-integration.yaml
@@ -50,7 +58,7 @@ jobs:
       - name: Extract version from tag
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${{ inputs.tag || github.ref_name }}
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
@@ -71,9 +79,9 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=semver,pattern={{version}},value=${{ steps.version.outputs.VERSION }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.VERSION }}
+            type=semver,pattern={{major}},value=${{ steps.version.outputs.VERSION }}
             type=raw,value=latest
 
       - name: Build and push Docker image

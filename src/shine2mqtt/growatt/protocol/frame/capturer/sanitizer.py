@@ -1,5 +1,7 @@
 from dataclasses import replace
 
+from shine2mqtt.growatt.protocol.base.decoder import ByteDecoder
+from shine2mqtt.growatt.protocol.base.encoder import ByteEncoder
 from shine2mqtt.growatt.protocol.constants import (
     DATALOGGER_IP_ADDRESS_REGISTER,
     DATALOGGER_MAC_ADDRESS_REGISTER,
@@ -9,18 +11,11 @@ from shine2mqtt.growatt.protocol.constants import (
     ENCRYPTION_KEY,
     FunctionCode,
 )
-from shine2mqtt.growatt.protocol.decoders.decoder import ByteDecoder
-from shine2mqtt.growatt.protocol.encoders.crc import CRCEncoder
-from shine2mqtt.growatt.protocol.encoders.encoder import ByteEncoder
-from shine2mqtt.growatt.protocol.encoders.header import HeaderEncoder
+from shine2mqtt.growatt.protocol.crc.encoder import CRCEncoder
 from shine2mqtt.growatt.protocol.frame.cipher import PayloadCipher
 from shine2mqtt.growatt.protocol.frame.crc import CRC16_LENGTH, CRCCalculator
-from shine2mqtt.growatt.protocol.messages.announce import GrowattAnnounceMessage
-from shine2mqtt.growatt.protocol.messages.base import BaseMessage
-from shine2mqtt.growatt.protocol.messages.config import GrowattGetConfigResponseMessage
-from shine2mqtt.growatt.protocol.messages.data import GrowattBufferedDataMessage, GrowattDataMessage
-from shine2mqtt.growatt.protocol.messages.header import MBAPHeader
-from shine2mqtt.growatt.protocol.messages.ping import GrowattPingMessage
+from shine2mqtt.growatt.protocol.header.encoder import HeaderEncoder
+from shine2mqtt.growatt.protocol.header.header import MBAPHeader
 
 DUMMY_DATALOGGER_SERIAL = "XGDABCDEFG"
 DUMMY_INVERTER_SERIAL = "MLG0A12345"
@@ -81,10 +76,8 @@ class RawPayloadSanitizer:
 
     def _sanitize_payload(self, function_code: FunctionCode, payload: bytes) -> bytes:
         match function_code:
-            case FunctionCode.ANNOUNCE:
-                return self._sanitize_announce_payload(payload)
-            case FunctionCode.DATA | FunctionCode.BUFFERED_DATA:
-                return self._sanitize_data_payload(payload)
+            case FunctionCode.ANNOUNCE | FunctionCode.BUFFERED_DATA | FunctionCode.DATA:
+                return self._sanitize_announce_or_data_payload(payload)
             case FunctionCode.GET_CONFIG:
                 return self._sanitize_get_config_response_payload(payload)
             case FunctionCode.PING:
@@ -94,13 +87,7 @@ class RawPayloadSanitizer:
 
         return payload
 
-    def _sanitize_announce_payload(self, payload: bytes) -> bytes:
-        sanitized_payload = bytearray(payload)
-        sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
-        sanitized_payload[30:40] = ByteEncoder.encode_str(DUMMY_INVERTER_SERIAL, 10)
-        return bytes(sanitized_payload)
-
-    def _sanitize_data_payload(self, payload: bytes) -> bytes:
+    def _sanitize_announce_or_data_payload(self, payload: bytes) -> bytes:
         sanitized_payload = bytearray(payload)
         sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
         sanitized_payload[30:40] = ByteEncoder.encode_str(DUMMY_INVERTER_SERIAL, 10)
@@ -129,55 +116,3 @@ class RawPayloadSanitizer:
         sanitized_payload = bytearray(payload)
         sanitized_payload[0:10] = ByteEncoder.encode_str(DUMMY_DATALOGGER_SERIAL, 10)
         return bytes(sanitized_payload)
-
-
-class MessageSanitizer:
-    def sanitize(self, message: BaseMessage) -> BaseMessage:
-        match message:
-            case GrowattAnnounceMessage():
-                return replace(
-                    message,
-                    datalogger_serial=DUMMY_DATALOGGER_SERIAL,
-                    inverter_serial=DUMMY_INVERTER_SERIAL,
-                )
-            case GrowattBufferedDataMessage() | GrowattDataMessage():
-                return replace(
-                    message,
-                    datalogger_serial=DUMMY_DATALOGGER_SERIAL,
-                    inverter_serial=DUMMY_INVERTER_SERIAL,
-                )
-            case GrowattPingMessage():
-                return replace(
-                    message,
-                    datalogger_serial=DUMMY_DATALOGGER_SERIAL,
-                )
-            case GrowattGetConfigResponseMessage():
-                return self._sanitize_get_config_response(message)
-
-        return message
-
-    def _sanitize_get_config_response(
-        self, message: GrowattGetConfigResponseMessage
-    ) -> GrowattGetConfigResponseMessage:
-        sanitized_registers = {
-            "ip_address": DUMMY_IP_ADDRESS,
-            "mac_address": DUMMY_MAC_ADDRESS,
-            "server_ip_address": DUMMY_SERVER_IP_ADDRESS,
-            "wifi_ssid": DUMMY_WIFI_SSID,
-            "wifi_password": DUMMY_WIFI_PASSWORD,
-        }
-        if message.name not in sanitized_registers:
-            return message
-
-        sanitized_value = sanitized_registers[message.name]
-
-        sanitized_data = sanitized_value.encode("ascii")
-        length_difference = len(sanitized_data) - len(message.data)
-
-        return replace(
-            message,
-            datalogger_serial=DUMMY_DATALOGGER_SERIAL,
-            length=message.length + length_difference,
-            data=sanitized_data,
-            value=sanitized_value,
-        )

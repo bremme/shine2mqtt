@@ -2,10 +2,11 @@ import struct
 
 import pytest
 
+from shine2mqtt.growatt.protocol.base.message import MBAPHeader
 from shine2mqtt.growatt.protocol.constants import FunctionCode
+from shine2mqtt.growatt.protocol.crc.decoder import CRCDecoder
 from shine2mqtt.growatt.protocol.frame.crc import CRCCalculator
 from shine2mqtt.growatt.protocol.frame.validator import FrameValidator
-from shine2mqtt.growatt.protocol.messages.base import MBAPHeader
 from tests.utils.loader import CapturedFrameLoader
 
 frames, _, _ = CapturedFrameLoader.load("data_message")
@@ -15,7 +16,8 @@ class TestFrameValidator:
     @pytest.fixture
     def validator(self):
         crc_calculator = CRCCalculator()
-        return FrameValidator(crc_calculator)
+        crc_decoder = CRCDecoder()
+        return FrameValidator(crc_calculator, crc_decoder)
 
     @pytest.fixture
     def valid_header(self):
