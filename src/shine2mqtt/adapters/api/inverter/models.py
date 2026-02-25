@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from shine2mqtt.protocol.frame.header.header import FunctionCode
 
@@ -15,6 +15,10 @@ class WriteMultipleRegistersRequest(BaseModel):
         ..., description="Hex string payload (spaces allowed)", examples=["00 01 00 02", "0a0b0c0d"]
     )
 
+    @property
+    def values_as_bytes(self) -> bytes:
+        return bytes.fromhex(self.values)
+
     @field_validator("values")
     @classmethod
     def validate_hex_values(cls, v: str) -> str:
@@ -23,6 +27,17 @@ class WriteMultipleRegistersRequest(BaseModel):
         except ValueError as e:
             raise ValueError("Invalid hex string") from e
         return v
+
+    @model_validator(mode="after")
+    def validate_values_length(self) -> WriteMultipleRegistersRequest:
+        expected_bytes = (self.register_end - self.register_start + 1) * 2
+        actual_bytes = len(bytes.fromhex(self.values))
+        if actual_bytes != expected_bytes:
+            raise ValueError(
+                f"Expected {expected_bytes} bytes for register range "
+                f"{self.register_start}–{self.register_end}, got {actual_bytes}"
+            )
+        return self
 
 
 class RawFrameResponse(BaseModel):

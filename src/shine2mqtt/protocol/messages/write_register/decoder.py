@@ -9,9 +9,7 @@ from shine2mqtt.protocol.messages.write_register.write_register import (
 )
 
 
-class GrowattWriteSingleRegisterResponseDecoder(
-    MessageDecoder[GrowattWriteSingleRegisterResponseMessage]
-):
+class WriteSingleRegisterResponseDecoder(MessageDecoder[GrowattWriteSingleRegisterResponseMessage]):
     @override
     def decode(
         self, header: MBAPHeader, payload: bytes
@@ -19,7 +17,7 @@ class GrowattWriteSingleRegisterResponseDecoder(
         datalogger_serial = self.decode_str(payload, 0, 10)
         # 10-30 is \x00 (padding)
         register = self.decode_u16(payload, 30)
-        ack = self.decode_u8(payload, 32) == ACK
+        ack = payload[32:33] == ACK
         value = self.decode_u16(payload, 33)
 
         return GrowattWriteSingleRegisterResponseMessage(
@@ -31,7 +29,7 @@ class GrowattWriteSingleRegisterResponseDecoder(
         )
 
 
-class GrowattWriteMultipleRegistersResponseDecoder(
+class WriteMultipleRegistersResponseDecoder(
     MessageDecoder[GrowattWriteMultipleRegistersResponseMessage]
 ):
     @override
@@ -42,7 +40,7 @@ class GrowattWriteMultipleRegistersResponseDecoder(
         # 10-30 is \x00 (padding)
         register_start = self.decode_u16(payload, 30)
         register_end = self.decode_u16(payload, 32)
-        ack = self.decode_u8(payload, 34) == ACK
+        ack = payload[34:35] == ACK
 
         return GrowattWriteMultipleRegistersResponseMessage(
             header=header,

@@ -16,6 +16,10 @@ from shine2mqtt.protocol.messages.set_config.decoder import (
     SetConfigRequestDecoder,
     SetConfigResponseDecoder,
 )
+from shine2mqtt.protocol.messages.write_register.decoder import (
+    WriteMultipleRegistersResponseDecoder,
+    WriteSingleRegisterResponseDecoder,
+)
 from shine2mqtt.util.logger import logger
 
 
@@ -62,6 +66,12 @@ class DecoderRegistry:
         registry.register_decoder(FunctionCode.SET_CONFIG, SetConfigResponseDecoder())
         registry.register_decoder(
             FunctionCode.READ_MULTIPLE_HOLDING_REGISTERS, ReadMultipleRegistersResponseDecoder()
+        )
+        registry.register_decoder(
+            FunctionCode.WRITE_SINGLE_HOLDING_REGISTER, WriteSingleRegisterResponseDecoder()
+        )
+        registry.register_decoder(
+            FunctionCode.WRITE_MULTIPLE_HOLDING_REGISTERS, WriteMultipleRegistersResponseDecoder()
         )
 
         return registry

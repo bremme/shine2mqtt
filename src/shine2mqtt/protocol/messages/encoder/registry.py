@@ -14,6 +14,10 @@ from shine2mqtt.protocol.messages.ping.encoder import PingPayloadEncoder
 from shine2mqtt.protocol.messages.raw.encoder import RawRequestPayloadEncoder
 from shine2mqtt.protocol.messages.read_register.encoder import ReadRegistersPayloadEncoder
 from shine2mqtt.protocol.messages.set_config.encoder import SetConfigRequestPayloadEncoder
+from shine2mqtt.protocol.messages.write_register.encoder import (
+    WriteMultipleRegistersPayloadEncoder,
+    WriteSingleRegisterPayloadEncoder,
+)
 from shine2mqtt.util.logger import logger
 
 
@@ -57,6 +61,8 @@ class PayloadEncoderRegistry:
         registry.register_encoder(SetConfigRequestPayloadEncoder())
         registry.register_encoder(RawRequestPayloadEncoder())
         registry.register_encoder(ReadRegistersPayloadEncoder())
+        registry.register_encoder(WriteSingleRegisterPayloadEncoder())
+        registry.register_encoder(WriteMultipleRegistersPayloadEncoder())
 
         # Datalogger to server pushed messages
         registry.register_encoder(AnnouncePayloadEncoder())

@@ -5,9 +5,7 @@ from shine2mqtt.protocol.messages.write_register.write_register import (
 )
 
 
-class GrowattWriteSingleRegisterPayloadEncoder(
-    PayloadEncoder[GrowattWriteSingleRegisterRequestMessage]
-):
+class WriteSingleRegisterPayloadEncoder(PayloadEncoder[GrowattWriteSingleRegisterRequestMessage]):
     def __init__(self):
         super().__init__(GrowattWriteSingleRegisterRequestMessage)
 
@@ -21,7 +19,7 @@ class GrowattWriteSingleRegisterPayloadEncoder(
         return bytes(payload)
 
 
-class GrowattWriteMultipleRegistersPayloadEncoder(
+class WriteMultipleRegistersPayloadEncoder(
     PayloadEncoder[GrowattWriteMultipleRegistersRequestMessage]
 ):
     def __init__(self):
@@ -29,7 +27,7 @@ class GrowattWriteMultipleRegistersPayloadEncoder(
 
     def encode(self, message: GrowattWriteMultipleRegistersRequestMessage) -> bytes:
         length_values = len(message.values)
-        size = 10 + 20 + 2 + length_values
+        size = 10 + 20 + 2 + 2 + length_values
         payload = bytearray(size)
         payload[0:10] = self.encode_str(message.datalogger_serial, 10)
         # 10-30 is \x00 (padding)
