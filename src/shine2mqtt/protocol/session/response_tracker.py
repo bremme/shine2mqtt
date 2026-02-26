@@ -5,7 +5,7 @@ from shine2mqtt.domain.models.config import ConfigResult
 from shine2mqtt.protocol.frame.header.header import FunctionCode
 from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigResponseMessage
 from shine2mqtt.protocol.messages.message import BaseMessage
-from shine2mqtt.protocol.messages.raw.raw import GrowattRawMessage
+from shine2mqtt.protocol.messages.raw.raw import GrowattRawRequestMessage
 from shine2mqtt.protocol.messages.read_register.read_register import (
     GrowattReadMultipleRegisterResponseMessage,
 )
@@ -55,7 +55,7 @@ class PendingResponseTracker:
                 response.set_result(message.ack)
             case GrowattWriteMultipleRegistersResponseMessage():
                 response.set_result(message.ack)
-            case GrowattRawMessage():
+            case GrowattRawRequestMessage():
                 response.set_result(message.payload)
             case _:
                 logger.warning(f"Received unhandled response message: {message}")

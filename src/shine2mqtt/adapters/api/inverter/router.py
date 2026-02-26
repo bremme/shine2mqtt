@@ -18,7 +18,7 @@ from shine2mqtt.adapters.api.http_exceptions import (
 )
 from shine2mqtt.adapters.api.inverter.mappers import (
     inverter_registers_to_api_model,
-    raw_bytes_to_api_model,
+    raw_bytes_to_raw_frame_response,
 )
 from shine2mqtt.adapters.api.inverter.models import (
     InverterRegister,
@@ -187,4 +187,4 @@ async def send_raw_frame(
     except Exception as e:
         internal_server_error_500(e)
 
-    return raw_bytes_to_api_model(payload)
+    return raw_bytes_to_raw_frame_response(payload)

@@ -6,7 +6,7 @@ from shine2mqtt.protocol.messages.message import DataloggerMessage
 # Server messages ######################################################################
 # request
 @dataclass
-class GrowattReadRegistersRequestMessage(DataloggerMessage):
+class GrowattReadMultipleRegistersRequestMessage(DataloggerMessage):
     register_start: int
     register_end: int
 

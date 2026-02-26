@@ -1,9 +1,9 @@
 from shine2mqtt.protocol.frame.header.header import FunctionCode, MBAPHeader
 from shine2mqtt.protocol.messages.ack.ack import GrowattAckMessage
 from shine2mqtt.protocol.messages.get_config.get_config import GrowattGetConfigRequestMessage
-from shine2mqtt.protocol.messages.raw.raw import GrowattRawMessage
+from shine2mqtt.protocol.messages.raw.raw import GrowattRawRequestMessage
 from shine2mqtt.protocol.messages.read_register.read_register import (
-    GrowattReadRegistersRequestMessage,
+    GrowattReadMultipleRegistersRequestMessage,
 )
 from shine2mqtt.protocol.messages.set_config.set_config import GrowattSetConfigRequestMessage
 from shine2mqtt.protocol.messages.write_register.write_register import (
@@ -49,9 +49,9 @@ class MessageFactory:
 
     def read_registers_request(
         self, datalogger_serial: str, register_start: int, register_end: int
-    ) -> GrowattReadRegistersRequestMessage:
+    ) -> GrowattReadMultipleRegistersRequestMessage:
         header = self._header(FunctionCode.READ_MULTIPLE_HOLDING_REGISTERS)
-        return GrowattReadRegistersRequestMessage(
+        return GrowattReadMultipleRegistersRequestMessage(
             header=header,
             datalogger_serial=datalogger_serial,
             register_start=register_start,
@@ -83,7 +83,7 @@ class MessageFactory:
 
     def raw_frame_request(
         self, datalogger_serial: str, function_code: int, payload: bytes
-    ) -> GrowattRawMessage:
+    ) -> GrowattRawRequestMessage:
         fc = FunctionCode(function_code)
         header = MBAPHeader(
             transaction_id=self._tracker.get_next_transaction_id(fc),
@@ -92,7 +92,7 @@ class MessageFactory:
             function_code=fc,
             length=0,
         )
-        return GrowattRawMessage(
+        return GrowattRawRequestMessage(
             header=header,
             datalogger_serial=datalogger_serial,
             payload=payload,

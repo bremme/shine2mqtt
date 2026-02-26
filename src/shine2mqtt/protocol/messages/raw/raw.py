@@ -4,5 +4,5 @@ from shine2mqtt.protocol.messages.message import DataloggerMessage
 
 
 @dataclass
-class GrowattRawMessage(DataloggerMessage):
+class GrowattRawRequestMessage(DataloggerMessage):
     payload: bytes
