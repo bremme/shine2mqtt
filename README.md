@@ -467,6 +467,10 @@ uv run shine2mqtt sim --server-port 4000
 
 ## 📚 Resources
 
+### Further reading
+
+See the [docs](docs) folder for more extensive documentation, for example have look at the [protocol](docs/protocol.md) documentation
+
 ### Related Projects
 
 This project took inspiration from various other open-source Growatt projects:
