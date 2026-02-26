@@ -8,6 +8,9 @@ tmp/
 # LibreOffice/OpenOffice lock files
 .~lock.*#
 
+# Draw.io backup files
+*.drawio.bkp
+
 # Python .gitignore ####################################################################
 
 # Byte-compiled / optimized / DLL files
